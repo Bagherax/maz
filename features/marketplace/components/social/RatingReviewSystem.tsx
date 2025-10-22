@@ -8,30 +8,85 @@ interface RatingReviewSystemProps {
   ad: Ad;
 }
 
-const StarRating: React.FC<{ rating: number; setRating?: (rating: number) => void }> = ({ rating, setRating }) => {
-  const [hoverRating, setHoverRating] = useState(0);
-  const isInteractive = !!setRating;
+const heartRatingCSS = `
+.rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: start;
+  gap: 4px;
+}
+.rating:not(:checked) > input {
+  display: none;
+}
+.rating:not(:checked) > label {
+  cursor: pointer;
+  font-size: 20px;
+}
+.rating:not(:checked) > label > svg {
+  fill: #666;
+  transition:
+    fill 0.3s ease,
+    transform 0.3s ease;
+}
+.rating > input:checked ~ label > svg {
+  transform: scale(1.1);
+}
+.rating:not(:checked) > label:hover ~ label > svg,
+.rating:not(:checked) > label:hover > svg {
+  transform: scale(1.05);
+}
+#heart1:checked ~ label > svg { fill: #ff0000; }
+#heart2:checked ~ label > svg { fill: #ff4d00; }
+#heart3:checked ~ label > svg { fill: #ff9900; }
+#heart4:checked ~ label > svg { fill: #ccff00; }
+#heart5:checked ~ label > svg { fill: #66ff00; }
+#heart6:checked ~ label > svg { fill: #00ff4d; }
+#heart7:checked ~ label > svg { fill: #00ff99; }
+#heart8:checked ~ label > svg { fill: #00ccff; }
+#heart9:checked ~ label > svg { fill: #0059ff; }
+#heart10:checked ~ label > svg { fill: #9900ff; }
 
-  return (
-    <div className="flex items-center space-x-1 rtl:space-x-reverse">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <button
-          key={star}
-          type={isInteractive ? 'button' : 'submit'}
-          disabled={!isInteractive}
-          onClick={isInteractive ? () => setRating(star) : undefined}
-          onMouseEnter={isInteractive ? () => setHoverRating(star) : undefined}
-          onMouseLeave={isInteractive ? () => setHoverRating(0) : undefined}
-          className={`text-2xl ${isInteractive ? 'cursor-pointer' : 'cursor-default'} ${
-            (hoverRating || rating) >= star ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'
-          }`}
-        >
-          ★
-        </button>
-      ))}
-    </div>
-  );
+#heart1:hover ~ label > svg, #heart1:hover > svg { fill: #e60000 !important; }
+#heart2:hover ~ label > svg, #heart2:hover > svg { fill: #e64400 !important; }
+#heart3:hover ~ label > svg, #heart3:hover > svg { fill: #e68a00 !important; }
+#heart4:hover ~ label > svg, #heart4:hover > svg { fill: #b8e600 !important; }
+#heart5:hover ~ label > svg, #heart5:hover > svg { fill: #5ce600 !important; }
+#heart6:hover ~ label > svg, #heart6:hover > svg { fill: #00e644 !important; }
+#heart7:hover ~ label > svg, #heart7:hover > svg { fill: #00e68a !important; }
+#heart8:hover ~ label > svg, #heart8:hover > svg { fill: #00b8e6 !important; }
+#heart9:hover ~ label > svg, #heart9:hover > svg { fill: #005ce6 !important; }
+#heart10:hover ~ label > svg, #heart10:hover > svg { fill: #8a00e6 !important; }
+`;
+
+const HeartRating: React.FC<{ rating: number; setRating: (rating: number) => void }> = ({ rating, setRating }) => {
+    const hearts = Array.from({ length: 10 }, (_, i) => 10 - i); // [10, 9, ..., 1]
+
+    return (
+        <>
+            <style>{heartRatingCSS}</style>
+            <div className="rating">
+                {hearts.map(value => (
+                    <React.Fragment key={value}>
+                        <input
+                            value={value}
+                            name="rate"
+                            id={`heart${value}`}
+                            type="radio"
+                            checked={rating === value}
+                            onChange={() => setRating(value)}
+                        />
+                        <label htmlFor={`heart${value}`} title={`${value}/10`}>
+                            <svg viewBox="0 0 24 24" height="1em" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+                            </svg>
+                        </label>
+                    </React.Fragment>
+                ))}
+            </div>
+        </>
+    );
 };
+
 
 const RatingReviewSystem: React.FC<RatingReviewSystemProps> = ({ ad }) => {
   const { t } = useLocalization();
@@ -43,23 +98,19 @@ const RatingReviewSystem: React.FC<RatingReviewSystemProps> = ({ ad }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (rating > 0 && text.trim()) {
-      addReview(ad.id, rating, text);
+      addReview(ad.id, rating, text); // rating is 1-10
       setSubmitted(true);
-      // In a real app, you might disable the form or show a "thank you" message permanently
     }
   };
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">{t('social.reviews_section')}</h2>
-      
-      {/* Review submission form */}
       {!submitted && (
         <form onSubmit={handleSubmit} className="p-4 border rounded-lg dark:border-gray-700 space-y-4">
           <h3 className="font-semibold">{t('social.rate_this_ad')}</h3>
           <div>
             <label className="block text-sm font-medium mb-1">{t('social.your_rating')}</label>
-            <StarRating rating={rating} setRating={setRating} />
+            <HeartRating rating={rating} setRating={setRating} />
           </div>
           <div>
             <label htmlFor="review-text" className="block text-sm font-medium mb-1">{t('social.your_review')}</label>
@@ -79,7 +130,6 @@ const RatingReviewSystem: React.FC<RatingReviewSystemProps> = ({ ad }) => {
         </form>
       )}
 
-      {/* Existing reviews */}
       <div className="space-y-4">
         {ad.reviews.length > 0 ? (
           ad.reviews.map(review => (
@@ -88,14 +138,19 @@ const RatingReviewSystem: React.FC<RatingReviewSystemProps> = ({ ad }) => {
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-gray-800 dark:text-gray-200">{review.author.name}</span>
-                  {review.rating && <StarRating rating={review.rating} />}
+                  {review.rating && (
+                     <div className="flex items-center font-bold text-amber-500">
+                        <span>{review.rating.toFixed(1)}</span>
+                        <Icon name="heart" className="w-4 h-4 ml-1 fill-current" />
+                     </div>
+                  )}
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{review.text}</p>
               </div>
             </div>
           ))
         ) : (
-          <p className="text-gray-500">{t('social.no_reviews')}</p>
+          !submitted && <p className="text-gray-500">{t('social.no_reviews')}</p>
         )}
       </div>
     </div>

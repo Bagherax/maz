@@ -2,6 +2,7 @@ import React from 'react';
 import { SortOption } from '../../../../types';
 import { useLocalization } from '../../../../hooks/useLocalization';
 import Dropdown from '../../../../components/Dropdown';
+import Icon from '../../../../components/Icon';
 
 interface SortDropdownProps {
   selected: SortOption;
@@ -33,12 +34,17 @@ const SortDropdown: React.FC<SortDropdownProps> = ({ selected, onSelect, isLocat
 
   return (
     <div className="flex items-center">
-      <label htmlFor="sort-dropdown" className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2 rtl:ml-2 whitespace-nowrap">{t('controls.sort_by')}:</label>
-      <div className="w-48">
+      <div className="relative">
          <Dropdown
             options={sortOptions}
             selected={selectedOption}
             onSelect={(option) => onSelect(option.value as SortOption)}
+            trigger={
+              <button title={t('controls.sort_by')} className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700/50">
+                <Icon name="adjustments-horizontal" className="w-5 h-5" />
+              </button>
+            }
+            menuClassName="right-0 w-56"
         />
       </div>
     </div>

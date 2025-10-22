@@ -39,6 +39,15 @@ export interface Feature {
 // --- User & Auth System ---
 export type LoginMethod = 'email' | 'phone' | 'google' | 'facebook' | 'twitter' | 'apple' | 'github';
 export type AuthElement = 'rememberMe' | 'forgotPassword' | 'socialDivider' | 'termsCheckbox' | 'countrySelector';
+export type AuthView = 'login' | 'register' | 'phone-verify' | 'oauth-redirect' | '2fa-verify' | 'forgot-password';
+
+export interface CloudSyncConfig {
+  isEnabled: boolean;
+  provider: 'google-drive' | 'dropbox' | 'none';
+  syncOnWifiOnly: boolean;
+  mediaCompression: 'none' | 'medium' | 'high';
+  lastSync?: string;
+}
 
 export interface UserTier {
   level: 'normal' | 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond' | 'su_diamond' | 'MAZ';
@@ -75,6 +84,7 @@ export interface User {
   reviewCount: number;
   joinDate?: string; // For mock data
   responseRate?: number; // For mock data
+  cloudSync: CloudSyncConfig;
   // Admin fields
   isAdmin?: boolean;
   status: 'active' | 'banned';
@@ -97,6 +107,7 @@ export interface AuthContextType {
   error: string | null;
   loginWithProvider: (provider: LoginMethod) => Promise<void>;
   loginWithPhone: (phone: string) => Promise<void>;
+  updateCloudSyncConfig: (userId: string, config: Partial<CloudSyncConfig>) => Promise<void>;
   // Admin functions
   banUser: (userId: string, reason: string) => Promise<void>;
   unbanUser: (userId: string) => Promise<void>;
@@ -184,7 +195,12 @@ export interface Ad {
   title: string;
   description: string;
   images: string[];
-  video?: string;
+  videos?: string[];
+  documents?: {
+    name: string;
+    url: string;
+    previewUrl: string;
+  }[];
   price: number;
   currency: string;
   category: string;
@@ -257,7 +273,7 @@ export interface MarketplaceState {
   adminConfig: AdminConfig;
 }
 
-export type View = { type: 'marketplace' } | { type: 'ad'; id: string } | { type: 'create' } | { type: 'profile'; id: string };
+export type View = { type: 'marketplace' } | { type: 'ad'; id: string } | { type: 'create' } | { type: 'profile'; id: string } | { type: 'cloud-sync' };
 
 export interface AppContextType {
     view: View;

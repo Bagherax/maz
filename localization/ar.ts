@@ -272,6 +272,8 @@ export const ar = {
   'ad.delivery_type': 'نوع التوصيل',
   'ad.delivery_time': 'وقت التسليم المقدر',
   'ad.delivery_cost': 'تكلفة التوصيل',
+  'ad.video_preview': 'معاينة الفيديو',
+  'ad.document_preview': 'معاينة المستند',
   
   // Ad Creation
   'ad.create.title': 'إنشاء إعلان جديد',
@@ -291,8 +293,19 @@ export const ar = {
   'ad.create.condition_new': 'جديد',
   'ad.create.condition_used': 'مستعمل',
   'ad.create.condition_refurbished': 'مجدد',
-  'ad.create.image_upload_label': 'تحميل الصور',
+  'ad.create.image_upload_label': 'تحميل الصور (WebP، جودة 85%)',
   'ad.create.image_upload_prompt': 'انقر لتحميل صورة إعلانك',
+  'ad.create.image_compressing': 'جارٍ ضغط الصورة...',
+  'ad.create.original_size': 'الحجم الأصلي',
+  'ad.create.compressed_size': 'الحجم المضغوط',
+  'ad.create.size_reduction': 'تخفيض',
+  'ad.create.video_upload_label': 'تحميل فيديو (اختياري)',
+  'ad.create.video_upload_prompt': '60 ثانية كحد أقصى، مضغوط إلى 720p',
+  'ad.create.video_trim_warning': 'الفيديو أطول من 60 ثانية وسيتم قصه.',
+  'ad.create.video_compressing': 'محاكاة ضغط الفيديو...',
+  'ad.create.document_upload_label': 'تحميل مستند (PDF، اختياري)',
+  'ad.create.document_upload_prompt': 'مثال: دليل، منهج',
+  'ad.create.pdf_conversion_info': 'سيتم تحويل PDF إلى تنسيق سريع المعاينة وقابل للبث.',
   'ad.create.review_title': 'مراجعة إعلانك',
   'ad.create.limit_reached_title': 'تم الوصول إلى حد الإعلانات',
   'ad.create.limit_reached_message': 'لقد نشرت {adCount} من {limit} إعلانًا مسموحًا به لفئة {tier} الخاصة بك.',
@@ -317,6 +330,8 @@ export const ar = {
 
   // Profile
   'profile.title': 'الملف الشخصي',
+  'profile.settings': 'الإعدادات',
+  'profile.cloud_sync_title': 'إعدادات المزامنة السحابية',
   'profile.member_since': 'عضو منذ',
   'profile.bio': 'السيرة الذاتية',
   'profile.reputation': 'السمعة',
@@ -325,6 +340,24 @@ export const ar = {
   'profile.active_ads': 'الإعلانات النشطة',
   'profile.my_ads': 'إعلاناتي',
   'profile.verified': 'موثق',
+  
+  // Cloud Sync
+  'cloud.connect_provider': 'ربط التخزين السحابي',
+  'cloud.provider.google-drive': 'ربط Google Drive',
+  'cloud.provider.dropbox': 'ربط Dropbox',
+  'cloud.connected_as': 'متصل كـ {email}',
+  'cloud.disconnect': 'قطع الاتصال',
+  'cloud.settings': 'إعدادات المزامنة',
+  'cloud.enable_sync': 'تفعيل المزامنة التلقائية',
+  'cloud.wifi_only': 'المزامنة عبر Wi-Fi فقط',
+  'cloud.media_compression': 'ضغط الوسائط',
+  'cloud.compression.none': 'بدون (الجودة الأصلية)',
+  'cloud.compression.medium': 'متوسط (موصى به)',
+  'cloud.compression.high': 'عالي (يوفر مساحة)',
+  'cloud.sync_status': 'حالة المزامنة',
+  'cloud.last_sync': 'آخر مزامنة: {time}',
+  'cloud.not_synced': 'لم تتم المزامنة من قبل.',
+  'cloud.save_settings': 'حفظ الإعدادات',
 
   // Delivery
   'delivery.title': 'التوصيل والخدمات اللوجستية',

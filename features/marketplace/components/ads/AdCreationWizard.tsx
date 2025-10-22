@@ -1,8 +1,168 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { Ad, Category, DeliveryOption } from '../../../../types';
+import React, { useState, ChangeEvent, FormEvent, useRef, useEffect, ReactNode } from 'react';
+import { Ad, Category } from '../../../../types';
 import { useMarketplace } from '../../../../context/MarketplaceContext';
 import { useLocalization } from '../../../../hooks/useLocalization';
 import Icon from '../../../../components/Icon';
+
+// --- HELPER COMPONENTS ---
+
+const formatBytes = (bytes: number, decimals = 2) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+const Modal: React.FC<{ title: string; onClose: () => void; children: ReactNode }> = ({ title, onClose, children }) => {
+    return (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={onClose}>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+                <header className="p-4 border-b dark:border-gray-700 shrink-0">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">{title}</h2>
+                        <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <Icon name="close" className="w-6 h-6" />
+                        </button>
+                    </div>
+                </header>
+                <main className="flex-grow p-6 overflow-y-auto">
+                    {children}
+                </main>
+            </div>
+        </div>
+    );
+};
+
+const ImageUploadModalContent: React.FC<{ onSave: (images: string[]) => void; onClose: () => void }> = ({ onSave, onClose }) => {
+    const [files, setFiles] = useState<File[]>([]);
+    const [previews, setPreviews] = useState<string[]>([]);
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setFiles(prev => [...prev, ...Array.from(e.target.files!)]);
+        }
+    };
+
+    useEffect(() => {
+        const fileReaders: FileReader[] = [];
+        let isCancel = false;
+        if (files.length) {
+            const newPreviews: string[] = [];
+            files.forEach(file => {
+                const fileReader = new FileReader();
+                fileReaders.push(fileReader);
+                fileReader.onload = (e) => {
+                    const { result } = e.target as FileReader;
+                    if (result) {
+                        newPreviews.push(result as string);
+                    }
+                    if (newPreviews.length === files.length && !isCancel) {
+                        setPreviews(newPreviews);
+                    }
+                }
+                fileReader.readAsDataURL(file);
+            });
+        }
+        return () => {
+            isCancel = true;
+            fileReaders.forEach(fileReader => {
+                if (fileReader.readyState === 1) {
+                    fileReader.abort();
+                }
+            });
+        }
+    }, [files]);
+    
+    const handleSave = () => {
+        // In a real app, compression would happen here
+        onSave(previews);
+        onClose();
+    }
+
+    return (
+        <div className="space-y-4">
+            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md">
+                <div className="space-y-1 text-center">
+                    <Icon name="photo" className="mx-auto h-12 w-12 text-gray-400" />
+                    <div className="flex text-sm text-gray-600 dark:text-gray-400">
+                        <label htmlFor="image-upload-modal" className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
+                            <span>Upload images</span>
+                            <input id="image-upload-modal" name="image-upload-modal" type="file" className="sr-only" onChange={handleFileChange} accept="image/*" multiple />
+                        </label>
+                    </div>
+                </div>
+            </div>
+             {previews.length > 0 && (
+                <div className="grid grid-cols-3 gap-4">
+                    {previews.map((src, index) => <img key={index} src={src} className="w-full h-24 object-cover rounded" alt="preview"/>)}
+                </div>
+            )}
+            <div className="flex justify-end pt-4">
+                 <button onClick={handleSave} className="px-6 py-2 bg-indigo-600 text-white rounded-md">Add Images</button>
+            </div>
+        </div>
+    );
+};
+
+const VideoUploadModalContent: React.FC<{ onSave: (videoUrl: string) => void; onClose: () => void }> = ({ onSave, onClose }) => {
+    const [url, setUrl] = useState('');
+
+    const handleSave = () => {
+        if (url.trim()) {
+            onSave(url);
+            onClose();
+        }
+    };
+    
+    return (
+        <div className="space-y-4">
+            <label htmlFor="video-url" className="block text-sm font-medium">Video URL (e.g., YouTube)</label>
+            <input 
+                id="video-url"
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=..."
+                className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm"
+            />
+             <div className="flex justify-end pt-4">
+                 <button onClick={handleSave} className="px-6 py-2 bg-indigo-600 text-white rounded-md">Add Video</button>
+            </div>
+        </div>
+    )
+};
+
+const DocumentUploadModalContent: React.FC<{ onSave: (doc: Ad['documents'][0]) => void; onClose: () => void }> = ({ onSave, onClose }) => {
+    const [name, setName] = useState('');
+    const [url, setUrl] = useState('');
+
+    const handleSave = () => {
+        if (name.trim() && url.trim()) {
+            onSave({ name, url, previewUrl: '' }); // Preview URL would be generated on the backend
+            onClose();
+        }
+    };
+    
+    return (
+        <div className="space-y-4">
+            <div>
+                <label htmlFor="doc-name" className="block text-sm font-medium">Document Name</label>
+                <input id="doc-name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Product Manual" className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm" />
+            </div>
+            <div>
+                <label htmlFor="doc-url" className="block text-sm font-medium">Document URL</label>
+                <input id="doc-url" type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm" />
+            </div>
+             <div className="flex justify-end pt-4">
+                 <button onClick={handleSave} className="px-6 py-2 bg-indigo-600 text-white rounded-md">Add Document</button>
+            </div>
+        </div>
+    )
+};
+
+// --- WIZARD COMPONENT ---
 
 interface AdCreationWizardProps {
   onAdCreated: (adId: string) => void;
@@ -22,13 +182,30 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
     condition: 'used',
     availability: { quantity: 1, inStock: true },
     images: [],
+    videos: [],
+    documents: [],
     delivery: { available: false, cost: 0, time: '', type: 'pickup', instructions: '' },
     location: { city: 'Metropolis', country: 'USA' },
   });
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  
+  const [isMediaMenuOpen, setIsMediaMenuOpen] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isDocModalOpen, setIsDocModalOpen] = useState(false);
 
   const { createAd, categories } = useMarketplace();
   const { t } = useLocalization();
+  const mediaButtonRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mediaButtonRef.current && !mediaButtonRef.current.contains(event.target as Node)) {
+        setIsMediaMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -42,19 +219,6 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
   const handleDeliveryInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = e.target;
       setFormData(prev => ({ ...prev, delivery: { ...prev.delivery!, [name]: name === 'cost' ? Number(value) : value } }));
-  };
-  
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files[0]) {
-          const file = e.target.files[0];
-          const reader = new FileReader();
-          reader.onloadend = () => {
-              setImagePreview(reader.result as string);
-              // In a real app, you would upload this file and get a URL
-              setFormData(prev => ({ ...prev, images: [reader.result as string] }));
-          };
-          reader.readAsDataURL(file);
-      }
   };
 
   const handleDeliveryTypeChange = (option: 'home' | 'pickup') => {
@@ -90,6 +254,14 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
       console.error("Failed to create ad:", error);
       alert("Failed to create ad. Please try again.");
     }
+  };
+  
+  const handleRemoveMedia = (type: 'images' | 'videos' | 'documents', index: number) => {
+      setFormData(prev => {
+          const newMedia = [...(prev[type] || [])];
+          newMedia.splice(index, 1);
+          return { ...prev, [type]: newMedia };
+      });
   };
 
   const renderStep = () => {
@@ -139,22 +311,36 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
         );
       case 2: // Media
         return (
-             <div>
-                <label className="block text-sm font-medium">{t('ad.create.image_upload_label')}</label>
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md">
-                    <div className="space-y-1 text-center">
-                        {imagePreview ? (
-                            <img src={imagePreview} alt="Ad preview" className="mx-auto h-48 w-auto rounded-md" />
-                        ) : (
-                            <Icon name="photo" className="mx-auto h-12 w-12 text-gray-400" />
+             <div className="space-y-6">
+                <style>{`
+                  .input-container { display: flex; background: white; border-radius: 1rem; background: linear-gradient(135deg, #5c87df 0%, #14161a 100%); box-shadow: 10px 10px 20px #0e1013, -10px -10px 40px #383e4b; padding: 0.3rem; gap: 0.3rem; }
+                  .input-container input { border-radius: 0.8rem 0 0 0.8rem; background: #23272F; box-shadow: inset 5px 5px 10px #0e1013, inset -5px -5px 10px #383e4b, 0px 0px 100px rgba(255, 212, 59, 0), 0px 0px 100px rgba(255, 102, 0, 0); width: 100%; flex-basis: 75%; padding: 1rem; border: none; border: 1px solid transparent; color: white; transition: all 0.2s ease-in-out; }
+                  .input-container input:focus { border: 1px solid #418fa5; outline: none; box-shadow: inset 0px 0px 10px rgba(87, 173, 184, 0.5), inset 0px 0px 10px rgba(34, 133, 109, 0.5), 0px 0px 100px rgba(62, 143, 156, 0.5), 0px 0px 100px rgba(85, 184, 179, 0.5); }
+                  .input-container button { flex-basis: 25%; padding: 1rem; background: linear-gradient(135deg, rgb(59, 255, 232) 0%, rgb(0, 204, 255) 100%); box-shadow: 0px 0px 1px rgba(59, 255, 232, 0.5), 0px 0px 1px rgba(0, 204, 255, 0.5); font-weight: 900; letter-spacing: 0.3rem; text-transform: uppercase; color: #23272F; border: none; width: 100%; border-radius: 0 1rem 1rem 0; transition: all 0.2s ease-in-out; cursor: pointer; }
+                  .input-container button:hover { background: linear-gradient(135deg, rgb(59, 255, 232) 50%, rgb(0, 204, 255) 100%); box-shadow: 0px 0px 100px rgba(59, 255, 232, 0.5), 0px 0px 100px rgba(0, 204, 255, 0.5); }
+                  @media (max-width: 500px) { .input-container { flex-direction: column; } .input-container input { border-radius: 0.8rem; } .input-container button { padding: 1rem; border-radius: 0.8rem; } }
+                `}</style>
+                <div className="input-container" ref={mediaButtonRef}>
+                    <input type="text" placeholder="Add Item" readOnly onClick={() => setIsMediaMenuOpen(true)} />
+                    <div className="relative">
+                        <button type="button" onClick={() => setIsMediaMenuOpen(prev => !prev)}>Add</button>
+                        {isMediaMenuOpen && (
+                            <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10">
+                                <button onClick={() => { setIsImageModalOpen(true); setIsMediaMenuOpen(false); }} className="w-full text-left flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700"><Icon name="photo" className="w-5 h-5 mr-2" /> Photos</button>
+                                <button onClick={() => { setIsVideoModalOpen(true); setIsMediaMenuOpen(false); }} className="w-full text-left flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700"><Icon name="video" className="w-5 h-5 mr-2" /> Video</button>
+                                <button onClick={() => { setIsDocModalOpen(true); setIsMediaMenuOpen(false); }} className="w-full text-left flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700"><Icon name="document-text" className="w-5 h-5 mr-2" /> Document</button>
+                            </div>
                         )}
-                        <div className="flex text-sm text-gray-600 dark:text-gray-400">
-                            <label htmlFor="file-upload" className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
-                                <span>{t('ad.create.image_upload_prompt')}</span>
-                                <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleImageChange} accept="image/*" />
-                            </label>
-                        </div>
                     </div>
+                </div>
+
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                    {formData.images?.map((src, i) => (
+                        <div key={i} className="relative group">
+                            <img src={src} className="w-full h-24 object-cover rounded" alt="upload preview" />
+                            <button type="button" onClick={() => handleRemoveMedia('images', i)} className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100"><Icon name="close" className="w-4 h-4" /></button>
+                        </div>
+                    ))}
                 </div>
             </div>
         );
@@ -193,7 +379,7 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
         return (
              <div className="space-y-4">
                 <h3 className="text-xl font-bold">{t('ad.create.review_title')}</h3>
-                {imagePreview && <img src={imagePreview} alt="Preview" className="w-1/2 mx-auto rounded-lg"/>}
+                {formData.images && formData.images.length > 0 && <img src={formData.images[0]} alt="Preview" className="w-1/2 mx-auto rounded-lg"/>}
                 <p><strong>{t('ad.create.title_label')}:</strong> {formData.title}</p>
                 <p><strong>{t('ad.create.price_label')}:</strong> {formData.price} {formData.currency}</p>
                 <p><strong>{t('ad.create.category_label')}:</strong> {formData.category}</p>
@@ -207,6 +393,7 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
   const steps = [t('ad.create.step1'), t('ad.create.step2'), t('ad.create.step3'), t('ad.create.step4')];
 
   return (
+    <>
     <form onSubmit={handleSubmit}>
       {/* Stepper UI */}
       <div className="mb-8">
@@ -239,6 +426,31 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
         )}
       </div>
     </form>
+     {isImageModalOpen && (
+        <Modal title="Upload Photos" onClose={() => setIsImageModalOpen(false)}>
+            <ImageUploadModalContent 
+                onSave={(images) => setFormData(prev => ({...prev, images: [...(prev.images || []), ...images]}))}
+                onClose={() => setIsImageModalOpen(false)} 
+            />
+        </Modal>
+    )}
+    {isVideoModalOpen && (
+        <Modal title="Upload Video" onClose={() => setIsVideoModalOpen(false)}>
+            <VideoUploadModalContent 
+                onSave={(url) => setFormData(prev => ({ ...prev, videos: [...(prev.videos || []), url] }))}
+                onClose={() => setIsVideoModalOpen(false)}
+            />
+        </Modal>
+    )}
+    {isDocModalOpen && (
+        <Modal title="Upload Document" onClose={() => setIsDocModalOpen(false)}>
+            <DocumentUploadModalContent
+                 onSave={(doc) => setFormData(prev => ({ ...prev, documents: [...(prev.documents || []), doc] }))}
+                 onClose={() => setIsDocModalOpen(false)}
+            />
+        </Modal>
+    )}
+    </>
   );
 };
 

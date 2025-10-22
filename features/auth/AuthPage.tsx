@@ -5,23 +5,197 @@ import RegistrationWizard from './components/registration/RegistrationWizard';
 import { useLocalization } from '../../hooks/useLocalization';
 import { useAuthConfig } from '../../hooks/useAuthConfig';
 import AdminPanel from './components/AdminPanel';
-import { LoginMethod } from '../../types';
+import { LoginMethod, AuthView } from '../../types';
 import PhoneVerificationFlow from './components/PhoneVerificationFlow';
 import OAuthHandler from './components/OAuthHandler';
 import { useAuth } from '../../hooks/useAuth';
 import TwoFactorAuthFlow from './components/TwoFactorAuthFlow';
+import ForgotPasswordFlow from './components/ForgotPasswordFlow';
 
-type AuthView = 'login' | 'register' | 'phone-verify' | 'oauth-redirect' | '2fa-verify';
+
+const authCardStyles = `
+  .auth-container {
+    max-width: 380px;
+    width: 100%;
+    background: rgba(248, 249, 253, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 40px;
+    padding: 25px 35px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 30px 30px -20px;
+    margin: 20px;
+  }
+
+  .dark .auth-container {
+    background: rgba(30, 41, 59, 0.7); /* dark:bg-slate-800 with opacity */
+  }
+
+  .auth-heading {
+    text-align: center;
+    font-weight: 900;
+    font-size: 30px;
+    color: rgb(16, 137, 211);
+  }
+
+  .auth-form {
+    margin-top: 20px;
+  }
+
+  .auth-form .input {
+    width: 100%;
+    background: white;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 20px;
+    margin-top: 15px;
+    box-shadow: #cff0ff 0px 10px 10px -5px;
+    border-inline: 2px solid transparent;
+  }
+  
+  .dark .auth-form .input {
+     background: #334155; /* slate-700 */
+     color: #e2e8f0; /* slate-200 */
+     box-shadow: #0f172a 0px 10px 10px -5px;
+  }
+
+
+  .auth-form .input::-moz-placeholder {
+    color: rgb(170, 170, 170);
+  }
+
+  .auth-form .input::placeholder {
+    color: rgb(170, 170, 170);
+  }
+
+  .auth-form .input:focus {
+    outline: none;
+    border-inline: 2px solid #12B1D1;
+  }
+
+  .auth-form .forgot-password {
+    display: block;
+    margin-top: 10px;
+    margin-left: 10px;
+  }
+
+  .auth-form .forgot-password a, .auth-form .forgot-password button {
+    font-size: 11px;
+    color: #0099ff;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+   .auth-form .forgot-password button:hover {
+    text-decoration: underline;
+   }
+
+  .auth-form .login-button {
+    display: block;
+    width: 100%;
+    font-weight: bold;
+    background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+    color: white;
+    padding-block: 15px;
+    margin: 20px auto;
+    border-radius: 20px;
+    box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 20px 10px -15px;
+    border: none;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+  }
+
+  .auth-form .login-button:hover {
+    transform: scale(1.03);
+    box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 23px 10px -20px;
+  }
+
+  .auth-form .login-button:active {
+    transform: scale(0.95);
+    box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 15px 10px -10px;
+  }
+  .auth-form .login-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .social-account-container {
+    margin-top: 25px;
+  }
+
+  .social-account-container .title {
+    display: block;
+    text-align: center;
+    font-size: 10px;
+    color: rgb(170, 170, 170);
+  }
+  
+  .dark .social-account-container .title {
+    color: #94a3b8; /* slate-400 */
+  }
+
+  .social-account-container .social-accounts {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 5px;
+  }
+
+  .social-account-container .social-accounts .social-button {
+    background: linear-gradient(45deg, rgb(0, 0, 0) 0%, rgb(112, 112, 112) 100%);
+    border: 5px solid white;
+    padding: 5px;
+    border-radius: 50%;
+    width: 40px;
+    aspect-ratio: 1;
+    display: grid;
+    place-content: center;
+    box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 12px 10px -8px;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+  }
+  
+  .dark .social-account-container .social-accounts .social-button {
+    border: 5px solid #1e293b; /* slate-800 */
+  }
+
+  .social-account-container .social-accounts .social-button .svg {
+    fill: white;
+    margin: auto;
+    height: 1em;
+  }
+
+  .social-account-container .social-accounts .social-button:hover {
+    transform: scale(1.2);
+  }
+
+  .social-account-container .social-accounts .social-button:active {
+    transform: scale(0.9);
+  }
+
+  .agreement {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+  }
+
+  .agreement a {
+    text-decoration: none;
+    color: #0099ff;
+    font-size: 9px;
+  }
+`;
 
 const AuthPage: React.FC = () => {
   const [view, setView] = useState<AuthView>('login');
   const [oauthProvider, setOauthProvider] = useState<LoginMethod | null>(null);
-  const { t } = useLocalization();
   const { authConfig } = useAuthConfig();
   const { isAwaiting2FA } = useAuth();
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
 
-  const { colorScheme, customCSS } = authConfig;
+  const { customCSS } = authConfig;
 
   useEffect(() => {
     if (isAwaiting2FA) {
@@ -39,98 +213,50 @@ const AuthPage: React.FC = () => {
   };
   
   const handleBackToLogin = () => {
-    // A full logout is needed to clear any pending 2FA state
-    // In a real app, this would be a request to the backend to cancel the 2FA attempt
     window.location.reload(); 
   }
 
   const renderContent = () => {
     switch(view) {
       case 'login':
-        return <LoginForm onSocialLogin={handleSocialLogin} />;
+        return <LoginForm onSwitchView={setView} onSocialLogin={handleSocialLogin} />;
       case 'register':
-        return <RegistrationWizard onSocialLogin={handleSocialLogin} />;
+        return <RegistrationWizard onSwitchView={setView} onSocialLogin={handleSocialLogin} />;
       case 'phone-verify':
         return <PhoneVerificationFlow onBack={() => setView('login')} />;
       case 'oauth-redirect':
         return oauthProvider ? <OAuthHandler provider={oauthProvider} onBack={() => setView('login')} /> : null;
       case '2fa-verify':
         return <TwoFactorAuthFlow onBack={handleBackToLogin} />;
+      case 'forgot-password':
+        return <ForgotPasswordFlow onBack={() => setView('login')} />;
       default:
-        return <LoginForm onSocialLogin={handleSocialLogin} />;
+        return <LoginForm onSwitchView={setView} onSocialLogin={handleSocialLogin} />;
     }
   }
-
-  const getTitle = () => {
-    switch(view) {
-      case 'register': return t('auth.register_title');
-      case 'phone-verify': return t('auth.phone_verification_title');
-      case 'oauth-redirect': return t('auth.oauth_redirect_title');
-      case '2fa-verify': return t('auth.2fa_title');
-      default: return t('auth.login_title');
-    }
-  }
-
-  const dynamicStyles = `
-    :root {
-      --auth-color-primary: ${colorScheme.primary};
-      --auth-color-background: ${colorScheme.background};
-      --auth-color-text: ${colorScheme.text};
-      --auth-color-button: ${colorScheme.button};
-      --auth-color-button-text: ${colorScheme.buttonText};
-      --auth-color-border: ${colorScheme.border};
-    }
-    ${customCSS}
-  `;
 
   return (
     <>
-      <style>{dynamicStyles}</style>
+      <style>{authCardStyles}</style>
+      <style>{customCSS}</style>
       <div 
-        className="min-h-screen flex items-center justify-center px-4 transition-colors duration-300"
-        style={{ backgroundColor: 'var(--auth-color-background)', color: 'var(--auth-color-text)' }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-md"
       >
-        <div className="max-w-md w-full">
-          <div className="text-center mb-8">
-            <div 
-              className="mx-auto text-5xl font-bold tracking-wider" 
-              style={{ color: 'var(--auth-color-primary)' }}
-            >
-              MAZ
-            </div>
-            <h2 className="mt-6 text-3xl font-extrabold" style={{ color: 'var(--auth-color-text)' }}>
-              {getTitle()}
-            </h2>
-            { (view === 'login' || view === 'register') && (
-              <p className="mt-2 text-sm" style={{ color: 'var(--auth-color-text)' }}>
-                {t('auth.welcome_message')}
-              </p>
-            )}
+        {/* The new registration form has its own background, so we don't use the container for it */}
+        {view === 'register' ? (
+          renderContent()
+        ) : (
+          <div className="auth-container">
+              {renderContent()}
           </div>
-          
-          {renderContent()}
-
-          { (view === 'login' || view === 'register') && (
-            <p className="mt-4 text-center text-sm" style={{ color: 'var(--auth-color-text)' }}>
-              {view === 'login' ? t('auth.go_to_register') : t('auth.go_to_login')}{' '}
-              <button 
-                onClick={() => setView(view === 'login' ? 'register' : 'login')} 
-                className="font-medium hover:underline"
-                style={{ color: 'var(--auth-color-primary)' }}
-              >
-                {view === 'login' ? t('auth.go_to_register_link') : t('auth.go_to_login_link')}
-              </button>
-            </p>
-          )}
-        </div>
+        )}
         
         <div className="absolute top-4 right-4">
             <button
               onClick={() => setIsAdminPanelOpen(true)}
-              className="p-2 rounded-full hover:bg-gray-500/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--auth-color-primary)]"
-              aria-label={t('aria.open_admin_panel')}
+              className="p-2 rounded-full text-white/80 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
             >
-                <Icon name="cog" className="w-6 h-6" style={{ color: 'var(--auth-color-text)' }}/>
+                <Icon name="cog" className="w-6 h-6" />
             </button>
         </div>
 

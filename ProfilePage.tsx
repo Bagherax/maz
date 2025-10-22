@@ -7,7 +7,6 @@ import ReputationStat from './components/ReputationStat';
 import UserModerationPanel from '../admin/UserModerationPanel';
 import UserTierBadge from '../marketplace/components/users/UserTierBadge';
 import AdCard from '../marketplace/components/ads/AdCard';
-import { useView } from '../../App';
 
 interface ProfilePageProps {
   userId: string;
@@ -17,7 +16,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
   const { user: currentUser, getUserById, refreshCurrentUser } = useAuth();
   const { getAdsBySellerId } = useMarketplace();
   const { t, language } = useLocalization();
-  const { setView } = useView();
 
   // Determine if we are viewing our own profile or someone else's
   const viewedUser = getUserById(userId);
@@ -28,7 +26,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
   }
 
   const isBanned = viewedUser.status === 'banned';
-  const isOwnProfile = currentUser?.id === viewedUser.id;
 
   const handleModerationUpdate = () => {
     // In a real app with a backend, this would refetch data.
@@ -53,7 +50,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-40 pb-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center justify-center space-x-2">
             <span>{viewedUser.name}</span>
@@ -88,27 +85,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
              <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
               <h3 className="text-lg font-semibold mb-2">{t('profile.reputation')}</h3>
               <div className="space-y-3">
-                <ReputationStat 
-                    value={viewedUser.rating.toFixed(1)} 
-                    label={t('profile.overall_rating')} 
-                    icon={<Icon name="heart" className="w-4 h-4 inline-block text-amber-500 fill-current" />}
-                />
+                <ReputationStat value={`${viewedUser.rating.toFixed(1)} ★`} label={t('profile.overall_rating')} />
                 <ReputationStat value={viewedUser.reviewCount.toString()} label={t('profile.reviews')} />
                 <ReputationStat value={ads.length.toString()} label={t('profile.active_ads')} />
               </div>
             </div>
-            {isOwnProfile && (
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
-                <h3 className="text-lg font-semibold mb-4">{t('profile.settings')}</h3>
-                <button 
-                  onClick={() => setView({ type: 'cloud-sync'})}
-                  className="w-full flex items-center justify-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition-colors"
-                >
-                  <Icon name="cloud-arrow-up" className="w-5 h-5" />
-                  <span>{t('profile.cloud_sync_title')}</span>
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Right Column: User's Ads */}
@@ -116,12 +97,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
             <h2 className="text-2xl font-bold mb-4">{t('profile.my_ads')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {ads.length > 0 ? ads.map(ad => (
-                 <AdCard 
-                    key={ad.id} 
-                    ad={ad} 
-                    displayMode="standard" 
-                    onExpandClick={() => setView({ type: 'ad', id: ad.id })}
-                />
+                 <AdCard key={ad.id} ad={ad} displayMode="standard" />
               )) : (
                 <p className="text-gray-500 col-span-2">This user has no active ads.</p>
               )}

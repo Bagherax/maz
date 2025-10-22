@@ -272,6 +272,8 @@ export const en = {
   'ad.delivery_type': 'Delivery Type',
   'ad.delivery_time': 'Est. Delivery Time',
   'ad.delivery_cost': 'Delivery Cost',
+  'ad.video_preview': 'Video Preview',
+  'ad.document_preview': 'Document Preview',
   
   // Ad Creation
   'ad.create.title': 'Create a New Ad',
@@ -291,8 +293,19 @@ export const en = {
   'ad.create.condition_new': 'New',
   'ad.create.condition_used': 'Used',
   'ad.create.condition_refurbished': 'Refurbished',
-  'ad.create.image_upload_label': 'Upload Images',
+  'ad.create.image_upload_label': 'Upload Images (WebP, 85% quality)',
   'ad.create.image_upload_prompt': 'Click to upload your ad image',
+  'ad.create.image_compressing': 'Compressing image...',
+  'ad.create.original_size': 'Original',
+  'ad.create.compressed_size': 'Compressed',
+  'ad.create.size_reduction': 'Reduction',
+  'ad.create.video_upload_label': 'Upload Video (Optional)',
+  'ad.create.video_upload_prompt': 'Max 60s, compressed to 720p',
+  'ad.create.video_trim_warning': 'Video is longer than 60s and will be trimmed.',
+  'ad.create.video_compressing': 'Simulating video compression...',
+  'ad.create.document_upload_label': 'Upload Document (PDF, Optional)',
+  'ad.create.document_upload_prompt': 'e.g., manual, syllabus',
+  'ad.create.pdf_conversion_info': 'PDF will be converted to a streamable, fast-preview format.',
   'ad.create.review_title': 'Review Your Ad',
   'ad.create.limit_reached_title': 'Ad Limit Reached',
   'ad.create.limit_reached_message': 'You have posted {adCount} of {limit} ads allowed for your {tier} tier.',
@@ -317,6 +330,8 @@ export const en = {
 
   // Profile
   'profile.title': 'Profile',
+  'profile.settings': 'Settings',
+  'profile.cloud_sync_title': 'Cloud Sync Settings',
   'profile.member_since': 'Member Since',
   'profile.bio': 'Bio',
   'profile.reputation': 'Reputation',
@@ -325,6 +340,24 @@ export const en = {
   'profile.active_ads': 'Active Ads',
   'profile.my_ads': 'My Ads',
   'profile.verified': 'Verified',
+
+  // Cloud Sync
+  'cloud.connect_provider': 'Connect Cloud Storage',
+  'cloud.provider.google-drive': 'Connect Google Drive',
+  'cloud.provider.dropbox': 'Connect Dropbox',
+  'cloud.connected_as': 'Connected as {email}',
+  'cloud.disconnect': 'Disconnect',
+  'cloud.settings': 'Sync Settings',
+  'cloud.enable_sync': 'Enable Auto-Sync',
+  'cloud.wifi_only': 'Sync on Wi-Fi only',
+  'cloud.media_compression': 'Media Compression',
+  'cloud.compression.none': 'None (Original Quality)',
+  'cloud.compression.medium': 'Medium (Recommended)',
+  'cloud.compression.high': 'High (Saves Space)',
+  'cloud.sync_status': 'Sync Status',
+  'cloud.last_sync': 'Last synced: {time}',
+  'cloud.not_synced': 'Never synced.',
+  'cloud.save_settings': 'Save Settings',
 
   // Delivery
   'delivery.title': 'Delivery & Logistics',

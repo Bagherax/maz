@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { AuthContextType, User, LoginMethod, UserTier } from '../types';
+// FIX: Added CloudSyncConfig to the import list to be used for default user creation.
+import { AuthContextType, User, LoginMethod, UserTier, CloudSyncConfig } from '../types';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -79,6 +81,14 @@ const clearLoginAttempts = (email: string) => {
 // --- Mock IP Generator ---
 const generateMockIp = () => `${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
 
+// FIX: Added a default cloud sync configuration for new users.
+const defaultCloudSync: CloudSyncConfig = {
+  isEnabled: false,
+  provider: 'none',
+  syncOnWifiOnly: true,
+  mediaCompression: 'medium',
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -104,7 +114,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error("Failed to initialize auth state", e);
       localStorage.removeItem(JWT_TOKEN_KEY);
     } finally {
-      setLoading(false);
+      // Simulate a slightly longer load time to see the animation
+      setTimeout(() => setLoading(false), 1500);
     }
     
     // Check for token expiration periodically
@@ -159,7 +170,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 rating: 5, 
                 reviewCount: 999,
                 twoFactorEnabled: false,
-                ipAddress: '127.0.0.1'
+                ipAddress: '127.0.0.1',
+                // FIX: Added missing cloudSync property to conform to the User type.
+                cloudSync: defaultCloudSync,
              };
              usersDb.push(demoAdmin);
              saveUsersToStorage(usersDb);
@@ -246,6 +259,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             reviewCount: 0,
             twoFactorEnabled: false,
             ipAddress: generateMockIp(),
+            // FIX: Added missing cloudSync property to conform to the User type.
+            cloudSync: defaultCloudSync,
         };
         usersDb.push(newUser);
         saveUsersToStorage(usersDb);
@@ -300,6 +315,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 createdAt: new Date(), bio: "Joined via social media.", isVerified: true, rating: 0, reviewCount: 0,
                 twoFactorEnabled: false,
                 ipAddress: generateMockIp(),
+                // FIX: Added missing cloudSync property to conform to the User type.
+                cloudSync: defaultCloudSync,
             };
             usersDb.push(newUser);
             saveUsersToStorage(usersDb);
@@ -333,7 +350,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         tier: 'normal',
         createdAt: new Date(), bio: "Joined with phone.", isVerified: true, rating: 0, reviewCount: 0,
         isAdmin: false, status: 'active', twoFactorEnabled: false,
-        password: 'mock_phone_password'
+        password: 'mock_phone_password',
+        // FIX: Added missing cloudSync property to conform to the User type.
+        cloudSync: defaultCloudSync,
     };
     finalizeLogin(newUser);
   }, []);
@@ -381,6 +400,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [user, refreshCurrentUser]);
 
+  const updateCloudSyncConfig = useCallback(async (userId: string, config: Partial<CloudSyncConfig>): Promise<void> => {
+    let usersDb = getUsersFromStorage();
+    const userIndex = usersDb.findIndex(u => u.id === userId);
+    if (userIndex > -1) {
+        usersDb[userIndex].cloudSync = {
+            ...usersDb[userIndex].cloudSync,
+            ...config,
+            lastSync: new Date().toISOString()
+        };
+        saveUsersToStorage(usersDb);
+        if(user?.id === userId) refreshCurrentUser();
+    }
+  }, [user, refreshCurrentUser]);
+
   const value = {
     user,
     isAuthenticated: !!user,
@@ -393,6 +426,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     error,
     loginWithProvider,
     loginWithPhone,
+    updateCloudSyncConfig,
     banUser,
     unbanUser,
     updateUserTier,
@@ -402,7 +436,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {loading ? (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };

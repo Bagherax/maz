@@ -12,9 +12,11 @@ interface DropdownProps {
   selected: Option;
   onSelect: (option: Option) => void;
   label?: string;
+  trigger?: React.ReactNode;
+  menuClassName?: string;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ options, selected, onSelect, label }) => {
+const Dropdown: React.FC<DropdownProps> = ({ options, selected, onSelect, label, trigger, menuClassName }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -39,32 +41,39 @@ const Dropdown: React.FC<DropdownProps> = ({ options, selected, onSelect, label 
   return (
     <div className="relative w-full" ref={dropdownRef}>
       {label && <label className="block text-sm font-medium mb-1" style={{ color: 'var(--auth-color-text)' }}>{label}</label>}
-      <button
-        type="button"
-        className="relative w-full cursor-default rounded-md py-2 pl-3 pr-10 text-left shadow-sm sm:text-sm transition-colors duration-200 border"
-        style={{
-          backgroundColor: 'var(--auth-color-background)',
-          borderColor: 'var(--auth-color-border)',
-          color: 'var(--auth-color-text)'
-        }}
-        onClick={() => setIsOpen(!isOpen)}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-      >
-        <span className="flex items-center">
-          {selected.icon && <span className="mr-2">{selected.icon}</span>}
-          <span className="block truncate">{selected.label}</span>
-        </span>
-        <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
-          <svg className={`h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fillRule="evenodd" d="M10 3a.75.75 0 01.53.22l3.5 3.5a.75.75 0 01-1.06 1.06L10 4.81 7.03 7.78a.75.75 0 01-1.06-1.06l3.5-3.5A.75.75 0 0110 3zm-3.72 9.28a.75.75 0 011.06 0L10 15.19l2.97-2.91a.75.75 0 111.06 1.06l-3.5 3.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 010-1.06z" clipRule="evenodd" />
-          </svg>
-        </span>
-      </button>
+      
+      {trigger ? (
+        <div className="cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+          {trigger}
+        </div>
+      ) : (
+        <button
+          type="button"
+          className="relative w-full cursor-default rounded-md py-2 pl-3 pr-10 text-left shadow-sm sm:text-sm transition-colors duration-200 border"
+          style={{
+            backgroundColor: 'var(--auth-color-background)',
+            borderColor: 'var(--auth-color-border)',
+            color: 'var(--auth-color-text)'
+          }}
+          onClick={() => setIsOpen(!isOpen)}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+        >
+          <span className="flex items-center">
+            {selected.icon && <span className="mr-2">{selected.icon}</span>}
+            <span className="block truncate">{selected.label}</span>
+          </span>
+          <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
+            <svg className={`h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fillRule="evenodd" d="M10 3a.75.75 0 01.53.22l3.5 3.5a.75.75 0 01-1.06 1.06L10 4.81 7.03 7.78a.75.75 0 01-1.06-1.06l3.5-3.5A.75.75 0 0110 3zm-3.72 9.28a.75.75 0 011.06 0L10 15.19l2.97-2.91a.75.75 0 111.06 1.06l-3.5 3.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 010-1.06z" clipRule="evenodd" />
+            </svg>
+          </span>
+        </button>
+      )}
 
       {isOpen && (
         <ul
-          className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+          className={`absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm ${menuClassName}`}
           style={{
             backgroundColor: 'var(--auth-color-background)',
             borderColor: 'var(--auth-color-border)',

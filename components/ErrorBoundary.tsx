@@ -1,4 +1,4 @@
-import React, { Component, ReactNode } from 'react';
+import React, { Component, ReactNode, ErrorInfo } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -10,22 +10,20 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  state: State = {
-    hasError: false,
-  };
+  // FIX: Refactored to use class property for state initialization. This is a more modern syntax and can resolve typing issues with `this.state` and `this.props` in some configurations, as the previous constructor-based approach was still causing errors.
+  public state: State = { hasError: false };
 
   static getDerivedStateFromError(_: Error): State {
     // Update state so the next render will show the fallback UI.
     return { hasError: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // In a real app, you would log this to an error reporting service like Sentry or LogRocket
     console.error("Uncaught error:", error, errorInfo);
   }
 
   render() {
-    // FIX: In a class component, state and props must be accessed from `this`.
     if (this.state.hasError) {
       return this.props.fallback || (
         <div className="text-center p-8 m-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-lg border border-red-200 dark:border-red-800">

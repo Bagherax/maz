@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useMarketplace } from '../../context/MarketplaceContext';
 import { Ad, SortOption, DisplayMode } from '../../types';
 import MarketplaceControls, { Filters } from './components/browsing/MarketplaceControls';
@@ -9,7 +9,6 @@ import MarketplaceToolbar from './components/browsing/MarketplaceToolbar';
 import AdGrid from './components/ads/AdGrid';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import { useLocalStorage } from '../../hooks/usePersistentState';
-import { useView } from '../../App';
 
 const ADS_PER_PAGE = 12;
 
@@ -17,19 +16,22 @@ interface MarketplacePageProps {
     filters: Filters;
     onFilterChange: (newFilters: Partial<Filters>) => void;
     onResetFilters: () => void;
+    isFilterSidebarOpen: boolean;
+    setIsFilterSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const MarketplacePage: React.FC<MarketplacePageProps> = ({
     filters,
     onFilterChange,
     onResetFilters,
+    isFilterSidebarOpen,
+    setIsFilterSidebarOpen,
 }) => {
     const { ads, users } = useMarketplace();
     const { displayMode, setDisplayMode } = useDisplayMode();
     const [sortBy, setSortBy] = useLocalStorage<SortOption>('marketplaceSortBy', 'date-new-old');
     const [currentPage, setCurrentPage] = useState(1);
     const { location: userLocation, error: locationError } = useGeolocation();
-    const { view, setView } = useView();
     
     const filteredAds = useMemo(() => {
         return ads.filter(ad => {
@@ -49,22 +51,6 @@ const MarketplacePage: React.FC<MarketplacePageProps> = ({
     
     const sortedAds = useSorting(filteredAds, sortBy, userLocation);
 
-    // Effect to handle navigation to a specific ad (e.g., from a profile page)
-    useEffect(() => {
-        if (view.type === 'ad' && view.id) {
-            const adIndex = sortedAds.findIndex(ad => ad.id === view.id);
-            if (adIndex !== -1) {
-                const targetPage = Math.floor(adIndex / ADS_PER_PAGE) + 1;
-                setCurrentPage(prevPage => {
-                    if (prevPage !== targetPage) {
-                        return targetPage;
-                    }
-                    return prevPage;
-                });
-            }
-        }
-    }, [view, sortedAds]);
-
     const totalPages = Math.ceil(sortedAds.length / ADS_PER_PAGE);
     const paginatedAds = sortedAds.slice((currentPage - 1) * ADS_PER_PAGE, currentPage * ADS_PER_PAGE);
 
@@ -77,16 +63,6 @@ const MarketplacePage: React.FC<MarketplacePageProps> = ({
         onResetFilters();
         setCurrentPage(1);
     }
-    
-    const expandedAdId = view.type === 'ad' ? view.id : null;
-
-    const handleAdExpand = (adId: string | null) => {
-        if (expandedAdId === adId) { // If clicking the same ad, close it
-            setView({ type: 'marketplace' });
-        } else if (adId) { // If clicking a new ad, open it
-            setView({ type: 'ad', id: adId });
-        }
-    };
 
     const isLocationAvailable = !!userLocation && !locationError;
 
@@ -102,6 +78,20 @@ const MarketplacePage: React.FC<MarketplacePageProps> = ({
                     />
                 </aside>
 
+                 {/* Mobile Filter Drawer */}
+                <div className={`lg:hidden fixed inset-0 z-50 transition-opacity duration-300 ${isFilterSidebarOpen ? 'bg-black/60' : 'bg-transparent pointer-events-none'}`} onClick={() => setIsFilterSidebarOpen(false)}>
+                    <div 
+                        className={`transform transition-transform duration-300 ease-in-out w-full max-w-xs h-full bg-gray-50 dark:bg-gray-900 p-4 overflow-y-auto shadow-2xl ${isFilterSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <MarketplaceControls
+                            filters={filters}
+                            onFilterChange={handleFilterChangeWithReset}
+                            onReset={handleResetWithReset}
+                        />
+                    </div>
+                </div>
+
                 <div className="lg:col-span-3 mt-8 lg:mt-0">
                     <MarketplaceToolbar
                         sortBy={sortBy}
@@ -114,12 +104,7 @@ const MarketplacePage: React.FC<MarketplacePageProps> = ({
 
                     {paginatedAds.length > 0 ? (
                         <>
-                            <AdGrid
-                                ads={paginatedAds}
-                                displayMode={displayMode}
-                                expandedAdId={expandedAdId}
-                                onAdExpand={handleAdExpand}
-                            />
+                            <AdGrid ads={paginatedAds} displayMode={displayMode} />
                             <div className="mt-8">
                                 <Pagination
                                     currentPage={currentPage}

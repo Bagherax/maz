@@ -1,46 +1,53 @@
-
 import { Ad, User, Report, Review, Comment } from '../types';
 
 export const MOCK_SELLERS: Omit<User, 'password'>[] = [
   {
     id: 'seller-1', name: 'TechieTom', email: 'tom@example.com', avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=TechieTom',
     tier: 'gold', createdAt: '2022-01-15T10:00:00Z', bio: 'Your go-to for the latest gadgets and electronics.',
-    isVerified: true, rating: 4.9, reviewCount: 152, status: 'active', ipAddress: '73.125.68.21'
+    isVerified: true, rating: 4.9, reviewCount: 152, status: 'active', ipAddress: '73.125.68.21',
+    cloudSync: { isEnabled: true, provider: 'google-drive', syncOnWifiOnly: true, mediaCompression: 'medium', lastSync: '2024-05-22T11:00:00Z' }
   },
   {
     id: 'seller-2', name: 'FashionistaFiona', email: 'fiona@example.com', avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=Fiona',
     tier: 'platinum', createdAt: '2021-03-20T14:30:00Z', bio: 'Curated vintage and modern fashion pieces.',
-    isVerified: true, rating: 4.8, reviewCount: 340, status: 'active', ipAddress: '108.45.91.170'
+    isVerified: true, rating: 4.8, reviewCount: 340, status: 'active', ipAddress: '108.45.91.170',
+    cloudSync: { isEnabled: true, provider: 'dropbox', syncOnWifiOnly: false, mediaCompression: 'high' }
   },
   {
     id: 'seller-3', name: 'HomebodyHenry', email: 'henry@example.com', avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=Henry',
     tier: 'silver', createdAt: '2023-05-10T09:00:00Z', bio: 'Making your house a home, one piece of furniture at a time.',
-    isVerified: true, rating: 4.7, reviewCount: 88, status: 'active', ipAddress: '24.12.119.5'
+    isVerified: true, rating: 4.7, reviewCount: 88, status: 'active', ipAddress: '24.12.119.5',
+    cloudSync: { isEnabled: false, provider: 'none', syncOnWifiOnly: true, mediaCompression: 'medium' }
   },
   {
     id: 'seller-4', name: 'GearheadGary', email: 'gary@example.com', avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=Gary',
     tier: 'diamond', createdAt: '2020-11-01T18:00:00Z', bio: 'Collector of classic cars and rare motorcycles.',
-    isVerified: true, rating: 5.0, reviewCount: 75, status: 'active', ipAddress: '98.207.23.14'
+    isVerified: true, rating: 5.0, reviewCount: 75, status: 'active', ipAddress: '98.207.23.14',
+    cloudSync: { isEnabled: true, provider: 'google-drive', syncOnWifiOnly: true, mediaCompression: 'none' }
   },
   {
     id: 'seller-5', name: 'RealtorRita', email: 'rita@example.com', avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=Rita',
     tier: 'su_diamond', createdAt: '2019-08-12T11:00:00Z', bio: 'Finding your dream home or commercial space.',
-    isVerified: true, rating: 4.9, reviewCount: 210, status: 'active', ipAddress: '172.58.99.82'
+    isVerified: true, rating: 4.9, reviewCount: 210, status: 'active', ipAddress: '172.58.99.82',
+    cloudSync: { isEnabled: false, provider: 'none', syncOnWifiOnly: true, mediaCompression: 'medium' }
   },
   {
     id: 'seller-6', name: 'ServiceSam', email: 'sam@example.com', avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=Sam',
     tier: 'bronze', createdAt: '2023-09-01T12:00:00Z', bio: 'Freelance web developer and IT support specialist.',
-    isVerified: false, rating: 4.6, reviewCount: 32, status: 'active', ipAddress: '68.5.122.34'
+    isVerified: false, rating: 4.6, reviewCount: 32, status: 'active', ipAddress: '68.5.122.34',
+    cloudSync: { isEnabled: false, provider: 'none', syncOnWifiOnly: true, mediaCompression: 'medium' }
   },
   {
     id: 'seller-7', name: 'NewbieNick', email: 'nick@example.com', avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=Nick',
     tier: 'normal', createdAt: '2024-02-15T16:00:00Z', bio: 'Just getting started, selling some old stuff!',
-    isVerified: false, rating: 4.5, reviewCount: 4, status: 'active', ipAddress: '208.73.180.10'
+    isVerified: false, rating: 4.5, reviewCount: 4, status: 'active', ipAddress: '208.73.180.10',
+    cloudSync: { isEnabled: false, provider: 'none', syncOnWifiOnly: true, mediaCompression: 'medium' }
   },
   {
     id: 'seller-8', name: 'AdminAnna', email: 'admin@example.com', avatar: 'https://api.dicebear.com/8.x/adventurer/svg?seed=Anna',
     tier: 'MAZ', createdAt: '2018-01-01T00:00:00Z', bio: 'MAZDADY Marketplace Administrator.',
-    isVerified: true, rating: 5.0, reviewCount: 999, status: 'active', isAdmin: true, ipAddress: '127.0.0.1'
+    isVerified: true, rating: 5.0, reviewCount: 999, status: 'active', isAdmin: true, ipAddress: '127.0.0.1',
+    cloudSync: { isEnabled: false, provider: 'none', syncOnWifiOnly: true, mediaCompression: 'medium' }
   }
 ];
 
@@ -62,7 +69,7 @@ export const MOCK_ADS: Ad[] = [
   // 6 Electronics
   createAd(1, 0, {
     title: 'Pristine iPhone 14 Pro', description: 'Barely used iPhone 14 Pro, 256GB, Deep Purple. Comes with original box and cable. No scratches or dents.', price: 850, currency: 'USD',
-    images: ['https://images.unsplash.com/photo-1678695193933-4a696a63503a?q=80&w=500', 'https://images.unsplash.com/photo-1663183578338-12585394285b?q=80&w=500'], category: 'Electronics', condition: 'used',
+    images: ['https://images.unsplash.com/photo-1678695193933-4a696a63503a?q=80&w=500', 'https://images.unsplash.com/photo-1663183578338-12585394285b?q=80&w=500', 'https://images.unsplash.com/photo-1664353424454-34327389a952?q=80&w=500'], category: 'Electronics', condition: 'used',
     location: { city: 'San Francisco', country: 'USA', coordinates: { lat: 37.7749, lng: -122.4194 } },
     specifications: { brand: 'Apple', model: 'iPhone 14 Pro', color: 'Deep Purple', size: '256GB', warranty: false },
     stats: { views: 1205, likes: 88, shares: 12, createdAt: '2024-05-20T10:00:00Z', updatedAt: '2024-05-22T11:00:00Z' },
@@ -71,7 +78,7 @@ export const MOCK_ADS: Ad[] = [
   }),
   createAd(2, 0, {
     title: 'Dell XPS 15 Laptop', description: 'Powerful developer laptop. Intel i7, 32GB RAM, 1TB SSD, 4K OLED screen. Excellent condition.', price: 1600, currency: 'USD',
-    images: ['https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?q=80&w=500', 'https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=500'], category: 'Electronics', condition: 'used',
+    images: ['https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?q=80&w=500', 'https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=500', 'https://images.unsplash.com/photo-1542393545-10f5cde2c810?q=80&w=500'], category: 'Electronics', condition: 'used',
     location: { city: 'Austin', country: 'USA', coordinates: { lat: 30.2672, lng: -97.7431 } },
     specifications: { brand: 'Dell', model: 'XPS 15 9520', color: 'Silver', warranty: true },
     stats: { views: 850, likes: 65, shares: 8, createdAt: '2024-05-18T14:00:00Z', updatedAt: '2024-05-21T10:00:00Z' },
@@ -284,7 +291,12 @@ export const MOCK_ADS: Ad[] = [
     specifications: { brand: 'N/A', model: 'Tutoring', warranty: false, color: 'N/A' },
     stats: { views: 450, likes: 30, shares: 3, createdAt: '2024-04-18T17:00:00Z', updatedAt: '2024-05-18T17:00:00Z' },
     delivery: { available: false, cost: 0, time: 'N/A', type: 'delivery' },
-    availability: { quantity: 99, inStock: true }
+    availability: { quantity: 99, inStock: true },
+    documents: [{
+      name: 'Course_Syllabus.pdf',
+      url: '#', // In a real app, this would be a URL to the PDF file
+      previewUrl: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=500' // A placeholder image simulating the first page
+    }]
   }),
 ];
 

@@ -30,8 +30,14 @@ export const useSorting = (ads: Ad[], sortBy: SortOption, userLocation: { lat: n
   return useMemo(() => {
     const sortedAds = [...ads];
     
+    // If 'nearby-first' is selected but location is unavailable, fall back to sorting by newest.
+    // The UI should ideally prevent this, but this makes the logic robust.
+    const effectiveSortBy = (sortBy === 'nearby-first' && !userLocation)
+      ? 'date-new-old'
+      : sortBy;
+
     sortedAds.sort((a, b) => {
-      switch (sortBy) {
+      switch (effectiveSortBy) {
         case 'price-low-high':
           return a.price - b.price;
         case 'price-high-low':
@@ -61,9 +67,16 @@ export const useSorting = (ads: Ad[], sortBy: SortOption, userLocation: { lat: n
             // secondary sort by newest
             return new Date(b.stats.createdAt).getTime() - new Date(a.stats.createdAt).getTime();
         case 'nearby-first':
-            if (!userLocation || !a.location.coordinates || !b.location.coordinates) return 0;
-            const distA = haversineDistance(userLocation, a.location.coordinates);
-            const distB = haversineDistance(userLocation, b.location.coordinates);
+            // Due to effectiveSortBy, userLocation is guaranteed to be non-null here.
+            const aHasCoords = a.location.coordinates;
+            const bHasCoords = b.location.coordinates;
+
+            if (aHasCoords && !bHasCoords) return -1; // Ads with location data come first.
+            if (!aHasCoords && bHasCoords) return 1;
+            if (!aHasCoords && !bHasCoords) return 0; // If neither has coords, keep relative order.
+            
+            const distA = haversineDistance(userLocation!, a.location.coordinates!);
+            const distB = haversineDistance(userLocation!, b.location.coordinates!);
             return distA - distB;
         default:
           return 0;

@@ -4,7 +4,6 @@ import { useAuth } from '../hooks/useAuth';
 import { MOCK_ADS, MOCK_SELLERS } from '../data/mockAds';
 import { useLocalStorage } from '../hooks/usePersistentState';
 import { usePersistentSet } from '../hooks/usePersistentSetState';
-import { useIndexedDB } from '../hooks/useIndexedDB';
 
 export const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
 
@@ -52,41 +51,51 @@ const generateMockState = (): Omit<MarketplaceState, 'adminConfig'> => {
     };
 };
 
+const updateUserTierIfNeeded = (user: User, tiers: UserTier[]): User => {
+    const currentTierIndex = tiers.findIndex(t => t.level === user.tier);
+    if (currentTierIndex === -1) return user;
+
+    const currentTier = tiers[currentTierIndex];
+    // For now, progression is based only on rating as per the user request context.
+    // In a real app, you would also check user.transactions, user.activity, etc.
+    const userStats = { rating: user.rating }; 
+
+    // Check for promotion
+    const nextTier = tiers[currentTierIndex + 1];
+    if (nextTier && userStats.rating >= nextTier.requirements.minRating) {
+        console.log(`User ${user.name} promoted to ${nextTier.level} for reaching rating ${userStats.rating.toFixed(2)}`);
+        return { ...user, tier: nextTier.level };
+    }
+
+    // Check for demotion (don't demote from the lowest tier)
+    if (currentTierIndex > 0) {
+        if (userStats.rating < currentTier.requirements.minRating) {
+             // Find the correct tier to demote to by going downwards
+            for (let i = currentTierIndex - 1; i >= 0; i--) {
+                if (userStats.rating >= tiers[i].requirements.minRating) {
+                    console.log(`User ${user.name} demoted to ${tiers[i].level} for rating dropping to ${userStats.rating.toFixed(2)}`);
+                    return { ...user, tier: tiers[i].level };
+                }
+            }
+            // If they don't meet any requirements, demote to the lowest tier
+            console.log(`User ${user.name} demoted to ${tiers[0].level} for rating dropping to ${userStats.rating.toFixed(2)}`);
+            return { ...user, tier: tiers[0].level };
+        }
+    }
+
+    return user; // No change
+}
+
+
 export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { user: currentUser } = useAuth();
-    const db = useIndexedDB('mazdadyDB');
-
-    // Main state is now managed with useState, backed by our simulated IndexedDB
-    const [state, setState] = useState<Omit<MarketplaceState, 'adminConfig'>>({
-      ads: [], users: [], categories: [], userTiers: [], reports: []
-    });
-    const [isLoading, setIsLoading] = useState(true);
-
-    // Load initial state from IndexedDB or generate mock data on first load
-    useEffect(() => {
-      const loadState = async () => {
-        const storedState = await db.getItem<Omit<MarketplaceState, 'adminConfig'>>('marketplaceState');
-        if (storedState && storedState.ads.length > 0) {
-          setState(storedState);
-        } else {
-          const mockState = generateMockState();
-          setState(mockState);
-          await db.setItem('marketplaceState', mockState);
-        }
-        setIsLoading(false);
-      };
-      loadState();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-    // Wrapper for setState that also persists to IndexedDB asynchronously
-    const setAndPersistState = useCallback((updater: React.SetStateAction<Omit<MarketplaceState, 'adminConfig'>>) => {
-      setState(prevState => {
-        const newState = typeof updater === 'function' ? updater(prevState) : updater;
-        db.setItem('marketplaceState', newState);
-        return newState;
-      });
-    }, [db]);
-
+    
+    // Use localStorage for persistence. This fixes the data reset on refresh bug.
+    const [state, setAndPersistState] = useLocalStorage<Omit<MarketplaceState, 'adminConfig'>>(
+        'marketplaceState_v2', // Use a new key to avoid conflicts with old structure
+        generateMockState
+    );
+    
     // Preferences and smaller sets can still use localStorage for simplicity and speed
     const [adminConfig, setAdminConfig] = useLocalStorage<AdminConfig>('adminConfig', DEFAULT_ADMIN_CONFIG);
     const [likedAds, setLikedAds] = usePersistentSet<string>('likedAds');
@@ -111,10 +120,14 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
         if (!currentUser) throw new Error("User not authenticated");
         
         const newAd: Ad = {
-            id: `ad-${Date.now()}`, seller: currentUser, createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            id: `ad-${Date.now()}`, 
+            seller: currentUser, 
+            rating: 0, 
+            reviews: [], 
+            comments: [], 
+            reports: [], 
+            status: 'active',
             stats: { likes: 0, shares: 0, views: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-            likes: 0, shares: 0, views: 0, rating: 0, reviews: [], comments: [], reports: [], status: 'active',
             ...adData,
             specifications: adData.specifications || {}, delivery: adData.delivery || {},
             availability: adData.availability || { quantity: adData.quantity || 1, inStock: true },
@@ -130,7 +143,7 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
             ads: prevState.ads.map(ad => {
                 if (ad.id === adId) {
                     const newLikes = isCurrentlyLiked ? ad.stats.likes - 1 : ad.stats.likes + 1;
-                    return { ...ad, stats: { ...ad.stats, likes: newLikes }, likes: newLikes };
+                    return { ...ad, stats: { ...ad.stats, likes: newLikes } };
                 }
                 return ad;
             }),
@@ -154,16 +167,55 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
     
     const addReview = (adId: string, rating: number, text: string) => {
         if (!currentUser) return;
-        const newReview: Review = { id: `review-${Date.now()}`, author: currentUser, text, rating, likes: 0, replies: [], createdAt: new Date(), isEdited: false };
-        setAndPersistState(prevState => ({ ...prevState, ads: prevState.ads.map(ad => {
+        // Normalize 1-10 rating from input to 1-5 for storage and calculations
+        const normalizedRating = rating / 2.0;
+        const newReview: Review = { id: `review-${Date.now()}`, author: currentUser, text, rating: normalizedRating, likes: 0, replies: [], createdAt: new Date(), isEdited: false };
+        
+        setAndPersistState(prevState => {
+            let sellerIdToUpdate: string | null = null;
+    
+            // 1. Update the ad with the new review and recalculate its own average rating.
+            const updatedAds = prevState.ads.map(ad => {
                 if (ad.id === adId) {
+                    sellerIdToUpdate = ad.seller.id;
                     const updatedReviews = [newReview, ...ad.reviews];
                     const newTotalRating = updatedReviews.reduce((sum, r) => sum + (r.rating || 0), 0);
-                    const newAverageRating = newTotalRating / updatedReviews.length;
+                    const newAverageRating = updatedReviews.length > 0 ? newTotalRating / updatedReviews.length : 0;
                     return { ...ad, reviews: updatedReviews, rating: newAverageRating };
                 }
                 return ad;
-            }) }));
+            });
+    
+            if (!sellerIdToUpdate) {
+                return { ...prevState, ads: updatedAds };
+            }
+    
+            // 2. Recalculate the seller's overall rating across all their ads.
+            const allSellerAds = updatedAds.filter(ad => ad.seller.id === sellerIdToUpdate);
+            const allSellerReviews = allSellerAds.flatMap(ad => ad.reviews);
+            const totalRatingSum = allSellerReviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+            const newSellerRating = allSellerReviews.length > 0 ? totalRatingSum / allSellerReviews.length : 0;
+    
+            // 3. Update the seller in the users array, including tier progression.
+            const updatedUsers = prevState.users.map(user => {
+                if (user.id === sellerIdToUpdate) {
+                    const userWithNewRating = {
+                        ...user,
+                        rating: newSellerRating,
+                        reviewCount: allSellerReviews.length,
+                    };
+                    // Check for tier promotion/demotion
+                    return updateUserTierIfNeeded(userWithNewRating, prevState.userTiers);
+                }
+                return user;
+            });
+            
+            return {
+                ...prevState,
+                ads: updatedAds,
+                users: updatedUsers,
+            };
+        });
     };
 
     const addReplyToComment = (adId: string, parentCommentId: string, text: string) => {
@@ -191,10 +243,6 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
         updateAdminConfig,
     };
     
-    if (isLoading) {
-        return <div className="dark:bg-gray-900 bg-gray-50 min-h-screen flex items-center justify-center text-gray-700 dark:text-gray-300">Loading Marketplace...</div>;
-    }
-
     return (
         <MarketplaceContext.Provider value={value}>
             {children}

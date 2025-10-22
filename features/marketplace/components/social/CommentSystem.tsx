@@ -92,9 +92,6 @@ const CommentSystem: React.FC<CommentSystemProps> = ({ ad }) => {
   const { t } = useLocalization();
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">{t('social.comments_section')}</h2>
-      
-      {/* Add new comment form */}
       <CommentForm adId={ad.id} onCommentPosted={() => {}} />
 
       {/* Existing comments */}

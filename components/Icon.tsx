@@ -1,12 +1,37 @@
 import React from 'react';
 
 interface IconProps {
-  name: 'react' | 'palette' | 'globe' | 'wrench' | 'pwa' | 'sun' | 'moon' | 'user-plus' | 'logout' | 'share-network' | 'magnifying-glass-circle' | 'rocket-launch' | 'arrow-path' | 'shield-check' | 'database' | 'photo' | 'cloud-arrow-up' | 'server-stack' | 'arrows-pointing-in' | 'storefront' | 'magnifying-glass' | 'user-circle' | 'wallet' | 'squares-plus' | 'arrows-right-left' | 'queue-list' | 'arrow-down-on-square' | 'chat-bubble-left-right' | 'bolt' | 'arrow-down-tray' | 'arrow-path-rounded-square' | 'adjustments-horizontal' | 'bell' | 'chat-bubble-bottom-center-text' | 'beaker' | 'puzzle-piece' | 'cursor-arrow-rays' | 'chart-bar-square' | 'finger-print' | 'building-storefront' | 'globe-alt' | 'arrow-down-circle' | 'chart-pie' | 'google' | 'facebook' | 'twitter' | 'apple' | 'github' | 'phone' | 'eye' | 'eye-slash' | 'cog' | 'plus' | 'arrow-left' | 'heart' | 'bookmark' | 'share' | 'check-badge' | 'truck' | 'map-pin' | 'clock' | 'trash' | 'shield-exclamation' | 'view-grid' | 'view-grid-compact' | 'view-grid-standard' | 'view-grid-detailed' | 'close';
+  name: 'react' | 'palette' | 'globe' | 'wrench' | 'pwa' | 'sun' | 'moon' | 'user-plus' | 'logout' | 'share-network' | 'magnifying-glass-circle' | 'rocket-launch' | 'arrow-path' | 'shield-check' | 'database' | 'photo' | 'cloud-arrow-up' | 'server-stack' | 'arrows-pointing-in' | 'storefront' | 'magnifying-glass' | 'user-circle' | 'wallet' | 'squares-plus' | 'arrows-right-left' | 'queue-list' | 'arrow-down-on-square' | 'chat-bubble-left-right' | 'bolt' | 'arrow-down-tray' | 'arrow-path-rounded-square' | 'adjustments-horizontal' | 'bell' | 'chat-bubble-bottom-center-text' | 'beaker' | 'puzzle-piece' | 'cursor-arrow-rays' | 'chart-bar-square' | 'finger-print' | 'building-storefront' | 'globe-alt' | 'arrow-down-circle' | 'chart-pie' | 'google' | 'facebook' | 'twitter' | 'apple' | 'github' | 'phone' | 'eye' | 'eye-slash' | 'cog' | 'plus' | 'arrow-left' | 'heart' | 'bookmark' | 'share' | 'check-badge' | 'truck' | 'map-pin' | 'clock' | 'trash' | 'shield-exclamation' | 'view-grid' | 'view-grid-compact' | 'view-grid-standard' | 'view-grid-detailed' | 'close' | 'document-text' | 'google-drive' | 'dropbox' | 'instagram' | 'video';
   className?: string;
 }
 
 const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
   const icons: { [key in IconProps['name']]: React.ReactElement } = {
+    'video': (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9A2.25 2.25 0 0013.5 5.25h-9A2.25 2.25 0 002.25 7.5v9A2.25 2.25 0 004.5 18.75z" />
+        </svg>
+    ),
+    'instagram': (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664-4.771 4.919-4.919C8.416 2.175 8.796 2.163 12 2.163zm0 1.441c-3.118 0-3.483.012-4.697.068-2.91.132-4.148 1.373-4.28 4.28-.056 1.213-.067 1.578-.067 4.697s.011 3.483.067 4.697c.132 2.907 1.37 4.148 4.28 4.28 1.213.056 1.578.067 4.697.067s3.483-.011 4.697-.067c2.907-.132 4.148-1.373 4.28-4.28.056-1.213.067-1.578.067-4.697s-.011-3.483-.067-4.697c-.132-2.907-1.37-4.148-4.28-4.28C15.483 3.614 15.118 3.604 12 3.604zm0 4.865a3.532 3.532 0 100 7.064 3.532 3.532 0 000-7.064zm0 5.622a2.09 2.09 0 110-4.18 2.09 2.09 0 010 4.18zm4.838-6.402a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z"></path>
+        </svg>
+    ),
+    'document-text': (
+       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9Z" />
+      </svg>
+    ),
+    'google-drive': ( // Placeholder
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+      </svg>
+    ),
+    'dropbox': ( // Placeholder
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+      </svg>
+    ),
     // ... existing icons
     'view-grid': (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
@@ -255,11 +280,8 @@ const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
       </svg>
     ),
     google: (
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className={className}>
-        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path>
-        <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path>
-        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.223 0-9.657-3.356-11.303-7.918l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path>
-        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 36.426 44 30.638 44 24c0-1.341-.138-2.65-.389-3.917z"></path>
+      <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 488 512" className={className}>
+        <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
       </svg>
     ),
     facebook: (
@@ -268,13 +290,13 @@ const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
       </svg>
     ),
     twitter: (
-       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+       <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" className={className}>
+        <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"></path>
       </svg>
     ),
     apple: (
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-        <path d="M17.64,5.43a4.77,4.77,0,0,0-4.29,2.32,4.86,4.86,0,0,0-4.29-2.32A5,5,0,0,0,4,10.32a7.48,7.48,0,0,0,2.44,5.38,10.1,10.1,0,0,0,5.56,2.68V14.69c-2.33-.5-4.14-2.22-4.14-4.37a3.86,3.86,0,0,1,3.88-3.86,3.6,3.6,0,0,1,3.52,2.69h.16a3.6,3.6,0,0,1,3.52-2.69,3.86,3.86,0,0,1,3.88,3.86c0,2.15-1.81,3.87-4.14,4.37v3.7a10.1,10.1,0,0,0,5.56-2.68,7.48,7.48,0,0,0,2.44-5.38A5,5,0,0,0,17.64,5.43Z"></path>
+      <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512" className={className}>
+        <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"></path>
       </svg>
     ),
     github: (

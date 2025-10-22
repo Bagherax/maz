@@ -1,193 +1,262 @@
 import React, { useState, FormEvent } from 'react';
 import { useAuth } from '../../../../hooks/useAuth';
 import { useLocalization } from '../../../../hooks/useLocalization';
-import { useAuthConfig } from '../../../../hooks/useAuthConfig';
-import PasswordInput from '../PasswordInput';
-import PasswordStrengthMeter from '../PasswordStrengthMeter';
-import SocialLogins from '../SocialLogins';
-import { LoginMethod, FormErrors } from '../../../../types';
-import AvatarUploader from './AvatarUploader';
-import Icon from '../../../../components/Icon';
+import { AuthView } from '../../../../types';
 
 interface RegistrationWizardProps {
-  onSocialLogin: (provider: LoginMethod) => void;
+  onSwitchView: (view: AuthView) => void;
+  onSocialLogin: (provider: any) => void; // Keep for potential future use
 }
 
-type WizardData = {
-  name: string;
-  email: string;
-  password: string;
-  avatar?: string;
-  bio?: string;
-  termsAccepted: boolean;
-};
-
-const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSocialLogin }) => {
-  const [step, setStep] = useState(1);
-  const [data, setData] = useState<Partial<WizardData>>({
-    name: '',
-    email: '',
-    password: '',
-    termsAccepted: false,
-  });
-  const [errors, setErrors] = useState<FormErrors>({});
-  
+const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView }) => {
   const { register, loading, error: apiError } = useAuth();
   const { t } = useLocalization();
-  const { authConfig } = useAuthConfig();
-  const { visibleElements } = authConfig;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    const isCheckbox = (e.target as HTMLInputElement).type === 'checkbox';
-    const checked = (e.target as HTMLInputElement).checked;
-
-    setData(prev => ({ ...prev, [name]: isCheckbox ? checked : value }));
-  };
-
-  const validateStep1 = () => {
-    const newErrors: FormErrors = {};
-    if (!data.name || data.name.length < 3) newErrors.name = t('auth.error_username_short');
-    if (!data.email || !/\S+@\S+\.\S+/.test(data.email)) newErrors.email = t('auth.error_invalid_email');
-    if (!data.password) newErrors.password = t('auth.error_field_required');
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validateStep3 = () => {
-     if (visibleElements.includes('termsCheckbox') && !data.termsAccepted) {
-        setErrors({ termsAccepted: t('auth.error_terms_required') });
-        return false;
-    }
-    setErrors({});
-    return true;
-  }
-
-  const nextStep = () => {
-    if (step === 1 && validateStep1()) {
-      setStep(s => s + 1);
-    } else if (step > 1) {
-       setStep(s => s + 1);
-    }
-  };
-
-  const prevStep = () => setStep(s => s - 1);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!validateStep3()) return;
+    setError(null);
+
+    if (password !== confirmPassword) {
+      setError(t('auth.error_password_mismatch'));
+      return;
+    }
 
     try {
       await register({
-        name: data.name!,
-        email: data.email!,
-        password: data.password!,
-        bio: data.bio,
-        avatar: data.avatar,
+        name: `${firstName} ${lastName}`,
+        email,
+        password,
       });
+      // On success, AuthContext handles the redirect
     } catch (err) {
-      console.error("Registration failed:", err);
+      // The error from useAuth hook (apiError) will be displayed
     }
   };
 
-  const Step1_BasicInfo = () => (
-    <div className="space-y-4">
-        <div>
-          <input name="name" type="text" placeholder={t('auth.username')} value={data.name} onChange={handleChange} className={`input-field ${errors.name ? 'border-red-500' : ''}`} style={{ borderColor: errors.name ? 'rgb(239 68 68)' : 'var(--auth-color-border)' }} />
-          {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
-        </div>
-        <div>
-          <input name="email" type="email" placeholder={t('auth.email')} value={data.email} onChange={handleChange} className={`input-field ${errors.email ? 'border-red-500' : ''}`} style={{ borderColor: errors.email ? 'rgb(239 68 68)' : 'var(--auth-color-border)' }}/>
-          {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
-        </div>
-        <div>
-          <PasswordInput id="password" name="password" value={data.password} onChange={handleChange} placeholder={t('auth.password')} />
-          {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
-        </div>
-        <PasswordStrengthMeter password={data.password} />
-        <SocialLogins onSocialLogin={onSocialLogin} />
-    </div>
-  );
-
-  const Step2_ProfileSetup = () => (
-      <div className="space-y-6">
-          <AvatarUploader onAvatarChange={(base64) => setData(prev => ({ ...prev, avatar: base64 }))} />
-          <div>
-            <label htmlFor="bio" className="block text-sm font-medium mb-1">Your Bio (Optional)</label>
-            <textarea name="bio" id="bio" rows={3} value={data.bio} onChange={handleChange} placeholder="Tell the community a little about yourself..." className="input-field"></textarea>
-          </div>
-      </div>
-  );
-  
-  const Step3_Verification = () => (
-      <div className="text-center space-y-6">
-          <Icon name="shield-check" className="w-16 h-16 mx-auto text-green-500" />
-          <h3 className="text-xl font-semibold">Almost there!</h3>
-          <p className="text-sm">To complete your registration, please agree to our terms of service.</p>
-           {visibleElements.includes('termsCheckbox') && (
-            <div>
-              <div className="flex items-center justify-center text-sm">
-                  <input id="terms" name="termsAccepted" type="checkbox" checked={data.termsAccepted} onChange={handleChange} className="h-4 w-4 rounded" style={{accentColor: 'var(--auth-color-primary)'}} />
-                  <label htmlFor="terms" className="ml-2 rtl:mr-2 block">
-                      {t('auth.terms_agree')}{' '}
-                      <a href="#" className="font-medium hover:underline" style={{ color: 'var(--auth-color-primary)' }}>
-                          {t('auth.terms_and_conditions')}
-                      </a>
-                  </label>
-              </div>
-              {errors.termsAccepted && <p className="text-xs text-red-500 mt-1">{errors.termsAccepted}</p>}
-            </div>
-          )}
-      </div>
-  );
-
-  const renderStepContent = () => {
-      switch (step) {
-          case 1: return <Step1_BasicInfo />;
-          case 2: return <Step2_ProfileSetup />;
-          case 3: return <Step3_Verification />;
-          default: return null;
-      }
-  }
-  
-  const steps = ['Account Info', 'Profile Setup', 'Verification'];
-
   return (
-    <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
-        {/* Stepper UI */}
-        <div className="mb-8">
-            <ol className="flex items-center w-full">
-            {steps.map((stepName, index) => (
-                <li key={stepName} className={`flex w-full items-center ${index + 1 < steps.length ? "after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" : ''} ${index + 1 <= step ? 'text-indigo-600 dark:text-indigo-400 after:border-indigo-600' : 'after:border-gray-200 dark:after:border-gray-700'}`}>
-                <span className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 ${index + 1 <= step ? 'bg-indigo-100 dark:bg-indigo-800' : 'bg-gray-100 dark:bg-gray-700'}`}>
-                    {index + 1}
-                </span>
-                </li>
-            ))}
-            </ol>
-        </div>
-        
-        <div className="min-h-[300px]">
-            {renderStepContent()}
-        </div>
-        
-        {apiError && <p className="text-sm text-red-500 text-center">{t(apiError)}</p>}
+    <>
+      <style>{`
+        .custom-reg-form {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          max-width: 350px;
+          padding: 20px;
+          border-radius: 20px;
+          position: relative;
+          background-color: #1a1a1a;
+          color: #fff;
+          border: 1px solid #333;
+        }
 
-        <div className="flex justify-between items-center pt-4">
-            <button type="button" onClick={prevStep} disabled={step === 1 || loading} className="px-6 py-2 border rounded-md disabled:opacity-50" style={{ borderColor: 'var(--auth-color-border)' }}>
-                Back
-            </button>
-            {step < 3 ? (
-                <button type="button" onClick={nextStep} disabled={loading} className="px-6 py-2 rounded-md" style={{ backgroundColor: 'var(--auth-color-button)', color: 'var(--auth-color-button-text)' }}>
-                    Next
-                </button>
-            ) : (
-                <button type="submit" disabled={loading} className="px-6 py-2 rounded-md" style={{ backgroundColor: 'var(--auth-color-button)', color: 'var(--auth-color-button-text)' }}>
-                    {loading ? '...' : t('auth.register_button')}
-                </button>
-            )}
+        .custom-reg-form .title {
+          font-size: 28px;
+          font-weight: 600;
+          letter-spacing: -1px;
+          position: relative;
+          display: flex;
+          align-items: center;
+          padding-left: 30px;
+          color: #00bfff;
+        }
+
+        .custom-reg-form .title::before {
+          width: 18px;
+          height: 18px;
+        }
+
+        .custom-reg-form .title::after {
+          width: 18px;
+          height: 18px;
+          animation: pulse 1s linear infinite;
+        }
+
+        .custom-reg-form .title::before,
+        .custom-reg-form .title::after {
+          position: absolute;
+          content: "";
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          left: 0px;
+          background-color: #00bfff;
+        }
+
+        .custom-reg-form .message, 
+        .custom-reg-form .signin {
+          font-size: 14.5px;
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .custom-reg-form .signin {
+          text-align: center;
+        }
+
+        .custom-reg-form .signin a {
+          color: #00bfff;
+          cursor: pointer;
+        }
+        .custom-reg-form .signin a:hover {
+          text-decoration: underline;
+        }
+
+        .custom-reg-form .flex {
+          display: flex;
+          width: 100%;
+          gap: 6px;
+        }
+
+        .custom-reg-form label {
+          position: relative;
+        }
+
+        .custom-reg-form label .input {
+          background-color: #333;
+          color: #fff;
+          width: 100%;
+          padding: 20px 05px 05px 10px;
+          outline: 0;
+          border: 1px solid rgba(105, 105, 105, 0.397);
+          border-radius: 10px;
+        }
+
+        .custom-reg-form label .input + span {
+          color: rgba(255, 255, 255, 0.5);
+          position: absolute;
+          left: 10px;
+          top: 0px;
+          font-size: 0.9em;
+          cursor: text;
+          transition: 0.3s ease;
+        }
+
+        .custom-reg-form label .input:placeholder-shown + span {
+          top: 12.5px;
+          font-size: 0.9em;
+        }
+
+        .custom-reg-form label .input:focus + span,
+        .custom-reg-form label .input:valid + span {
+          color: #00bfff;
+          top: 0px;
+          font-size: 0.7em;
+          font-weight: 600;
+        }
+
+        .custom-reg-form .input {
+          font-size: medium;
+        }
+
+        .custom-reg-form .submit {
+          border: none;
+          outline: none;
+          padding: 10px;
+          border-radius: 10px;
+          color: #fff;
+          font-size: 16px;
+          transform: .3s ease;
+          background-color: #00bfff;
+          cursor: pointer;
+        }
+
+        .custom-reg-form .submit:hover {
+          background-color: #00bfff96;
+        }
+         .custom-reg-form .submit:disabled {
+          background-color: #00bfff50;
+          cursor: not-allowed;
+         }
+
+        @keyframes pulse {
+          from {
+            transform: scale(0.9);
+            opacity: 1;
+          }
+
+          to {
+            transform: scale(1.8);
+            opacity: 0;
+          }
+        }
+      `}</style>
+      <form className="custom-reg-form" onSubmit={handleSubmit}>
+        <p className="title">Register</p>
+        <p className="message">Signup now and get full access to our app.</p>
+        <div className="flex">
+          <label>
+            <input 
+              className="input" 
+              type="text" 
+              placeholder="" 
+              required 
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <span>Firstname</span>
+          </label>
+          <label>
+            <input 
+              className="input" 
+              type="text" 
+              placeholder="" 
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+            <span>Lastname</span>
+          </label>
         </div>
-    </form>
+        <label>
+          <input 
+            className="input" 
+            type="email" 
+            placeholder="" 
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <span>Email</span>
+        </label>
+        <label>
+          <input 
+            className="input" 
+            type="password" 
+            placeholder="" 
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <span>Password</span>
+        </label>
+        <label>
+          <input 
+            className="input" 
+            type="password" 
+            placeholder="" 
+            required
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          <span>Confirm password</span>
+        </label>
+
+        {(error || apiError) && <p className="text-xs text-red-500 text-center">{error || t(apiError!)}</p>}
+
+        <button className="submit" type="submit" disabled={loading}>
+          {loading ? 'Submitting...' : 'Submit'}
+        </button>
+        <p className="signin">
+          Already have an account? <a onClick={() => onSwitchView('login')}>Signin</a>
+        </p>
+      </form>
+    </>
   );
 };
 

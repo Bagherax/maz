@@ -1,49 +1,47 @@
-import { useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 
-// This is a SIMULATED IndexedDB hook using localStorage for demonstration.
-// A production implementation would use a library like 'idb'.
-const getDbKey = (dbName: string, key: string) => `indexedDB_sim_${dbName}_${key}`;
+// This is a SIMULATED IndexedDB hook using an in-memory Map for demonstration.
+// It no longer uses localStorage to avoid "quota exceeded" errors with large state objects.
+// The data will reset on page refresh, which is the expected behavior for this simulation.
+const dbs = new Map<string, Map<string, any>>();
 
 export const useIndexedDB = (dbName: string) => {
+  const db = useRef<Map<string, any>>();
+
+  if (!dbs.has(dbName)) {
+    dbs.set(dbName, new Map<string, any>());
+  }
+  db.current = dbs.get(dbName);
+
 
   const setItem = useCallback(async <T>(key: string, value: T): Promise<void> => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       // Simulate async latency
       setTimeout(() => {
-        try {
-          localStorage.setItem(getDbKey(dbName, key), JSON.stringify(value));
-          resolve();
-        } catch (error) {
-          console.error(`IndexedDB (sim) failed to set item '${key}' in '${dbName}'`, error);
-          reject(error);
-        }
+        db.current?.set(key, value);
+        resolve();
       }, 50);
     });
-  }, [dbName]);
+  }, []);
 
   const getItem = useCallback(async <T>(key: string): Promise<T | null> => {
     return new Promise((resolve) => {
       // Simulate async latency
       setTimeout(() => {
-        try {
-          const item = localStorage.getItem(getDbKey(dbName, key));
-          resolve(item ? JSON.parse(item) : null);
-        } catch (error) {
-          console.error(`IndexedDB (sim) failed to get item '${key}' from '${dbName}'`, error);
-          resolve(null);
-        }
+        const item = db.current?.get(key);
+        resolve(item || null);
       }, 50);
     });
-  }, [dbName]);
+  }, []);
 
   const removeItem = useCallback(async (key: string): Promise<void> => {
     return new Promise(resolve => {
         setTimeout(() => {
-            localStorage.removeItem(getDbKey(dbName, key));
+            db.current?.delete(key);
             resolve();
         }, 10)
     });
-  }, [dbName]);
+  }, []);
 
   return { setItem, getItem, removeItem };
 };
