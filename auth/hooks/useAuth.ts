@@ -1,0 +1,3 @@
+// THIS FILE IS OBSOLETE. IMPORTS ARE REDIRECTED TO THE CORRECT LOCATION.
+// PLEASE UPDATE YOUR IMPORTS TO POINT TO '/hooks/useAuth.ts'
+export { useAuth } from '../../hooks/useAuth';
