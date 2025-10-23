@@ -32,9 +32,8 @@ const AdCard: React.FC<AdCardProps> = ({
     onSave
 }) => {
   const { language, t } = useLocalization();
-  const { toggleLike, isLiked } = useMarketplace();
-  // FIX: `getUserById` and guest checks are part of AuthContext.
-  const { promptLoginIfGuest, getUserById } = useAuth();
+  const { toggleLike, isLiked, getUserById } = useMarketplace();
+  const { promptLoginIfGuest } = useAuth();
   const { setView } = useView();
 
   const [editData, setEditData] = useState({

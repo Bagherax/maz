@@ -1,12 +1,14 @@
 import React from 'react';
 import { User } from '../../../../types';
 import Icon from '../../../../components/Icon';
+import { useLocalization } from '../../../../hooks/useLocalization';
 
 interface SellerInfoCardProps {
   seller: User;
 }
 
 const SellerInfoCard: React.FC<SellerInfoCardProps> = ({ seller }) => {
+  const { t } = useLocalization();
   return (
     <div 
       className="w-full max-w-[240px] mx-auto bg-gray-200 dark:bg-[#191919] rounded-3xl p-3 shadow-lg dark:shadow-[5px_5px_30px_rgb(4,4,4),-5px_-5px_30px_rgb(57,57,57)] transition-all duration-300"
@@ -21,6 +23,14 @@ const SellerInfoCard: React.FC<SellerInfoCardProps> = ({ seller }) => {
         <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 h-8 overflow-hidden text-ellipsis line-clamp-2">
           {seller.bio}
         </p>
+
+        <button 
+            onClick={() => alert(t('social_commerce.userShops') + ' feature coming soon!')}
+            className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-full text-sm hover:bg-indigo-700 transition-colors ripple"
+        >
+            <Icon name="storefront" className="w-4 h-4" />
+            <span>{t('profile.visit_shop')}</span>
+        </button>
 
         <div className="mt-3 w-full p-2 bg-gray-100 dark:bg-[#191919] rounded-full flex justify-around items-center shadow-inner dark:shadow-[3px_3px_15px_rgb(0,0,0),-3px_-3px_15px_rgb(58,58,58)]">
           <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors"><Icon name="github" className="w-4 h-4" /></a>

@@ -28,7 +28,6 @@ const FallbackUI: React.FC = () => {
 
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Initialize state within the constructor to ensure `this.state` and `this.props` are available throughout the component lifecycle, resolving property access errors.
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false };

@@ -3,12 +3,9 @@ import { useMarketplace } from '../../context/MarketplaceContext';
 import { useLocalization } from '../../hooks/useLocalization';
 import UserTierBadge from '../marketplace/components/users/UserTierBadge';
 import { User } from '../../types';
-import { useAuth } from '../../hooks/useAuth';
 
 const UserManagement: React.FC = () => {
-  const { users } = useMarketplace();
-  // FIX: User moderation functions are in AuthContext.
-  const { banUser, unbanUser } = useAuth();
+  const { users, banUser, unbanUser } = useMarketplace();
   const { t } = useLocalization();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());

@@ -74,7 +74,6 @@ const CloudSyncSettings: React.FC = () => {
                         ) : (
                             <div className="flex items-center justify-between bg-indigo-50 dark:bg-indigo-900/50 p-4 rounded-lg">
                                 <div className="flex items-center gap-3">
-                                    {/* FIX: Cast config.provider to `any` because its type is wider than the accepted icon names. */}
                                     <Icon name={config.provider as any} className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
                                     <div>
                                         <p className="font-semibold">{t(`cloud.provider.${config.provider}`)}</p>

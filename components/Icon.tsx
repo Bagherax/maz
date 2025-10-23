@@ -1,13 +1,18 @@
 import React from 'react';
 
 interface IconProps {
-  name: 'react' | 'palette' | 'globe' | 'wrench' | 'pwa' | 'sun' | 'moon' | 'user-plus' | 'logout' | 'share-network' | 'magnifying-glass-circle' | 'rocket-launch' | 'arrow-path' | 'shield-check' | 'database' | 'photo' | 'cloud-arrow-up' | 'server-stack' | 'arrows-pointing-in' | 'storefront' | 'magnifying-glass' | 'user-circle' | 'wallet' | 'squares-plus' | 'arrows-right-left' | 'queue-list' | 'arrow-down-on-square' | 'chat-bubble-left-right' | 'bolt' | 'arrow-down-tray' | 'arrow-path-rounded-square' | 'adjustments-horizontal' | 'bell' | 'chat-bubble-bottom-center-text' | 'beaker' | 'puzzle-piece' | 'cursor-arrow-rays' | 'chart-bar-square' | 'finger-print' | 'building-storefront' | 'globe-alt' | 'arrow-down-circle' | 'chart-pie' | 'google' | 'facebook' | 'twitter' | 'apple' | 'github' | 'phone' | 'eye' | 'eye-slash' | 'cog' | 'plus' | 'arrow-left' | 'arrow-right' | 'heart' | 'bookmark' | 'share' | 'check-badge' | 'truck' | 'map-pin' | 'clock' | 'trash' | 'shield-exclamation' | 'view-grid' | 'view-grid-compact' | 'view-grid-standard' | 'view-grid-detailed' | 'close' | 'document-text' | 'google-drive' | 'dropbox' | 'instagram' | 'video' | 'pencil' | 'paper-airplane' | 'chat-assistant' | 'gavel' | 'microphone' | 'paperclip' | 'ellipsis-vertical' | 'stop-circle' | 'file-earmark-arrow-down' | 'users' | 'face-smile';
+  name: 'react' | 'palette' | 'globe' | 'wrench' | 'pwa' | 'sun' | 'moon' | 'user-plus' | 'logout' | 'share-network' | 'magnifying-glass-circle' | 'rocket-launch' | 'arrow-path' | 'shield-check' | 'database' | 'photo' | 'cloud-arrow-up' | 'server-stack' | 'arrows-pointing-in' | 'storefront' | 'magnifying-glass' | 'user-circle' | 'wallet' | 'squares-plus' | 'arrows-right-left' | 'queue-list' | 'arrow-down-on-square' | 'chat-bubble-left-right' | 'bolt' | 'arrow-down-tray' | 'arrow-path-rounded-square' | 'adjustments-horizontal' | 'bell' | 'chat-bubble-bottom-center-text' | 'beaker' | 'puzzle-piece' | 'cursor-arrow-rays' | 'chart-bar-square' | 'finger-print' | 'building-storefront' | 'globe-alt' | 'arrow-down-circle' | 'chart-pie' | 'google' | 'facebook' | 'twitter' | 'apple' | 'github' | 'phone' | 'eye' | 'eye-slash' | 'cog' | 'plus' | 'arrow-left' | 'arrow-right' | 'heart' | 'bookmark' | 'share' | 'check-badge' | 'truck' | 'map-pin' | 'clock' | 'trash' | 'shield-exclamation' | 'view-grid' | 'view-grid-compact' | 'view-grid-standard' | 'view-grid-detailed' | 'close' | 'document-text' | 'google-drive' | 'dropbox' | 'instagram' | 'video' | 'pencil' | 'paper-airplane' | 'chat-assistant' | 'gavel' | 'microphone' | 'paperclip' | 'ellipsis-vertical' | 'stop-circle' | 'file-earmark-arrow-down' | 'users' | 'face-smile' | 'camera';
   className?: string;
 }
 
 const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
   const icons: { [key in IconProps['name']]: React.ReactElement } = {
-    // FIX: Add missing icon definitions
+    camera: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.776 48.776 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+        </svg>
+    ),
     truck: (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H3.375A1.125 1.125 0 002.25 5.625v1.5c0 .621.504 1.125 1.125 1.125H10.5" />
@@ -442,12 +447,10 @@ const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
     ),
     'check-badge': (
        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.--- FIX: Add closing path tag for check-badge icon
-745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
       </svg>
     ),
   };
   return icons[name];
 };
-// FIX: Add default export
 export default Icon;

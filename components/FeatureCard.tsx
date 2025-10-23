@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { useLocalization } from '../hooks/useLocalization';
 import { Feature } from '../types';
@@ -21,7 +22,12 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => {
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 ease-in-out p-6 flex flex-col">
       <div className="flex items-start justify-between">
         <div className="flex-shrink-0">{icon}</div>
-        <span className={`px-3 py-1 text-xs font-medium rounded-full ${statusColor}`}>
+        <span className={`px-3 py-1 text-xs font-medium rounded-full inline-flex items-center ${statusColor}`}>
+          {status === 'complete' && (
+            <svg className="animated-check-icon w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+              <path className="check-path" pathLength="100" strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          )}
           {statusText}
         </span>
       </div>

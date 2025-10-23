@@ -20,7 +20,6 @@ const CountrySwitcher: React.FC = () => {
       icon: <span className="text-lg">{country.flag}</span>
     }));
   
-    // FIX: Explicitly type the state with the `Option` interface to match the Dropdown's onSelect signature.
     const [selectedCountry, setSelectedCountry] = useState<Option>(() => {
         const savedCountryCode = localStorage.getItem(COUNTRY_STORAGE_KEY);
         return countryOptions.find(opt => opt.value === savedCountryCode) || countryOptions[0];

@@ -10,11 +10,11 @@ import RatingReviewSystem from '../social/RatingReviewSystem';
 import T from '../../../../components/T';
 import SellerInfoCard from '../users/SellerInfoCard';
 import { useMarketplace } from '../../../../context/MarketplaceContext';
-// FIX: Import `useAuth` to get access to the current user and user-related functions.
 import { useAuth } from '../../../../hooks/useAuth';
 import { useChat } from '../../../../hooks/useChat';
 import MazAssistant from '../assistant/MazAssistant';
 import AuctionModal from '../auction/AuctionModal';
+import TrustAndSafety from './TrustAndSafety';
 
 interface AdDetailPanelProps {
   ad?: Ad;
@@ -74,8 +74,8 @@ const ImageGallery: React.FC<{ images: string[], adTitle: string }> = ({ images,
 
 
 const AdDetailPanel: React.FC<AdDetailPanelProps> = ({ ad, isOpen, onClose }) => {
-  const { user: currentUser, getUserById, promptLoginIfGuest } = useAuth();
-  const { } = useMarketplace();
+  const { user: currentUser, promptLoginIfGuest } = useAuth();
+  const { getUserById } = useMarketplace();
   const { startOrGetConversation } = useChat();
   const { t, language } = useLocalization();
   const { setView } = useView();
@@ -180,6 +180,8 @@ const AdDetailPanel: React.FC<AdDetailPanelProps> = ({ ad, isOpen, onClose }) =>
                     <div onClick={() => { onClose(); setView({ type: 'profile', id: seller.id }); }} className="cursor-pointer">
                         <SellerInfoCard seller={seller} />
                     </div>
+
+                    <TrustAndSafety />
                     
                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <h3 className="text-lg font-semibold mb-2">{t('ad.description')}</h3>

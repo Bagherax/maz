@@ -1,11 +1,7 @@
-
-
-
 import { ReactNode, Dispatch, SetStateAction } from 'react';
 
 export type Theme = 'light' | 'dark';
 export type Language = string;
-// FIX: Add missing 'SupportedLanguage' type alias for 'Language' to resolve type errors in translation-related components. This ensures compatibility with existing code that uses this type.
 export type SupportedLanguage = Language;
 
 export type DisplayMode = 'compact' | 'standard' | 'detailed' | 'list';
@@ -31,7 +27,6 @@ export interface ThemeContextType {
 export interface LocalizationContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  // FIX: Allow `count` to be a number for pluralization.
   t: (key: string, options?: { [key: string]: string | number }) => string;
 }
 
@@ -112,7 +107,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   verify2FA: (code: string) => Promise<void>;
   register: (data: { name: string; email: string; password: string; bio?: string; avatar?: string }) => Promise<void>;
-  logout: () => void;
+  logout: (reason?: string) => void;
   loading: boolean;
   error: string | null;
   loginWithProvider: (provider: LoginMethod) => Promise<void>;
@@ -121,11 +116,6 @@ export interface AuthContextType {
   clearPostLoginAction: () => void;
   loginWithPhone: (phone: string) => Promise<void>;
   updateCloudSyncConfig: (userId: string, config: Partial<CloudSyncConfig>) => Promise<void>;
-  // Admin functions
-  banUser: (userId: string, reason: string) => Promise<void>;
-  unbanUser: (userId: string) => Promise<void>;
-  updateUserTier: (userId: string, tier: UserTier['level']) => Promise<void>;
-  getUserById: (userId: string) => User | undefined;
   refreshCurrentUser: () => void;
   // Elegant prompt state and handlers
   isLoginPromptOpen: boolean;
@@ -135,6 +125,7 @@ export interface AuthContextType {
   blockUser: (userId: string) => Promise<void>;
   unblockUser: (userId: string) => Promise<void>;
   isUserBlocked: (userId: string) => boolean;
+  updateUserAvatar: (userId: string, avatar: string) => Promise<void>;
 }
 
 
@@ -329,7 +320,6 @@ export type View =
   | { type: 'profile'; id: string } 
   | { type: 'cloud-sync' } 
   | { type: 'language-settings' }
-  // FIX: Merge chat view types into one with an optional conversationId
   | { type: 'chat'; conversationId?: string };
 
 export interface AppContextType {
@@ -356,7 +346,11 @@ export interface MarketplaceContextType extends MarketplaceState {
   shareAd: (adId: string) => void;
   // Auction
   placeBid: (adId: string, amount: number) => void;
-  // Admin Actions
+  // Admin & User Management
+  getUserById: (userId: string) => User | undefined;
+  banUser: (userId: string, reason: string) => Promise<void>;
+  unbanUser: (userId: string) => Promise<void>;
+  updateUserTier: (userId: string, tier: UserTier['level']) => Promise<void>;
   removeAd: (adId: string, reason: string) => void;
   approveAd: (adId: string) => void;
   deleteComment: (adId: string, commentId: string) => void;
@@ -403,7 +397,7 @@ export interface ChatContextType {
   startOrGetConversation: (adId: string, recipientId: string) => string;
   createOrGetAuctionGroupChat: (adId: string, sellerId: string, adTitle: string) => string;
   sendMessage: (conversationId: string, content: string) => void;
-  sendMediaMessage: (conversationId: string, file: File, type: 'image' | 'file' | 'voice') => Promise<void>;
+  sendMediaMessage: (conversationId: string, file: File, type: 'image' | 'file' | 'voice', extraMetadata?: { duration?: number }) => Promise<void>;
   markAsRead: (conversationId: string) => void;
   deleteConversation: (conversationId: string) => void;
   typingStatus: { [conversationId: string]: string | undefined }; // Stores name of typing user

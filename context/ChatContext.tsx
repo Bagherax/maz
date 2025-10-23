@@ -112,7 +112,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [user, setConversations]);
 
   // FIX: Implement sendMediaMessage
-  const sendMediaMessage = useCallback(async (conversationId: string, file: File, type: 'image' | 'file' | 'voice') => {
+  const sendMediaMessage = useCallback(async (conversationId: string, file: File, type: 'image' | 'file' | 'voice', extraMetadata?: { duration?: number }) => {
     if (!user) return;
 
     const content = await fileToBase64(file);
@@ -128,6 +128,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       metadata: {
         fileName: file.name,
         fileSize: file.size,
+        ...extraMetadata,
       },
     };
 

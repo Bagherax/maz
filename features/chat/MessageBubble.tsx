@@ -18,10 +18,11 @@ const formatBytes = (bytes: number, decimals = 2) => {
 }
 
 const formatDuration = (seconds: number) => {
+    if (isNaN(seconds) || seconds < 0) return '00:00';
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-}
+};
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const { user } = useAuth();
@@ -34,9 +35,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         return <img src={message.content} alt={message.metadata?.fileName || 'Image'} className="max-w-xs rounded-lg cursor-pointer" onClick={() => window.open(message.content, '_blank')} />;
       case 'voice':
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-56 sm:w-64">
             <audio controls src={message.content} className="w-full h-10" />
-            {message.metadata?.duration && <span className="text-xs font-mono">{formatDuration(message.metadata.duration)}</span>}
+            {message.metadata?.duration != null && <span className="text-xs font-mono">{formatDuration(message.metadata.duration)}</span>}
           </div>
         );
       case 'file':

@@ -32,7 +32,8 @@ export const MarketplaceUIProvider: React.FC<{ children: ReactNode }> = ({ child
 
     const [filters, setFilters] = useLocalStorage<Filters>('marketplaceFilters', initialFilters);
     const [displayMode, setDisplayMode] = useLocalStorage<DisplayMode>('marketplaceDisplayMode', 'standard');
-    const [sortBy, setSortBy] = useLocalStorage<SortOption>('date-new-old', 'date-new-old');
+    // FIX: Using a value as a key for localStorage can lead to conflicts. Changed to a unique key 'marketplaceSortBy'.
+    const [sortBy, setSortBy] = useLocalStorage<SortOption>('marketplaceSortBy', 'date-new-old');
 
     const filteredAds = useMemo(() => {
         return ads.filter(ad => {

@@ -402,6 +402,7 @@ export const en = {
   'profile.verified': 'Verified',
   'profile.user_not_found': 'User not found.',
   'profile.no_active_ads': 'This user has no active ads.',
+  'profile.visit_shop': 'Visit Shop',
 
   // Cloud Sync
   'cloud.connect_provider': 'Connect Cloud Storage',
@@ -528,6 +529,7 @@ export const en = {
   'social_boosters.automatedHashtags': 'Smart Hashtags',
 
   // Trust & Safety
+  'trust.title': 'Trust & Safety',
   'trust.identityVerification': 'Identity Verification (KYC)',
   'trust.dualRatingSystem': 'Dual Rating System (for Selling & Buying)',
   'trust.communityWarranty': 'Community Warranty',
@@ -638,6 +640,9 @@ export const en = {
   'smart_search.popular_categories': 'Popular Categories',
   'smart_search.trending_ads': 'Trending Ads',
   'smart_search.no_recent_searches': 'No recent searches',
+  'smart_search.wallet': 'Wallet & Transactions',
+  'smart_search.interest_groups': 'Interest Groups',
+  'smart_search.affiliate_program': 'Affiliate Program',
 
   // Ad Quick Actions
   'ad_quick_actions.boost': 'Boost',

@@ -18,6 +18,9 @@ const getUsersFromStorage = (): StoredUser[] => {
   const dbString = localStorage.getItem(USERS_DB_KEY);
   return dbString ? JSON.parse(dbString) : [];
 };
+const saveUsersToStorage = (users: StoredUser[]) => {
+  localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+};
 
 const USER_TIERS: UserTier[] = [
     { level: 'normal', benefits: { maxAds: 5, imageSlots: 3, videoUpload: false, featuredAds: 0, adDuration: 30, analytics: false, customThemes: false, prioritySupport: false, revenueShare: 0 }, requirements: { minTransactions: 0, minRating: 0, minActivity: 0 } },
@@ -98,12 +101,11 @@ const updateUserTierIfNeeded = (user: User, tiers: UserTier[]): User => {
 
 
 export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const { user: currentUser, isGuest, promptLoginIfGuest, getUserById } = useAuth();
+    const { user: currentUser, logout } = useAuth();
     const { t } = useLocalization();
     const { addNotification } = useNotification();
     
-    const [state, setAndPersistState] = useLocalStorage<Omit<MarketplaceState, 'adminConfig'>>(
-        'marketplaceState_v2',
+    const [state, setAndPersistState] = useState<Omit<MarketplaceState, 'adminConfig'>>(
         generateMockState
     );
     
@@ -111,6 +113,17 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
     const [likedAds, setLikedAds] = usePersistentSet<string>('likedAds');
     const [favoritedAds, setFavoritedAds] = usePersistentSet<string>('favoritedAds');
     
+    const refreshUsers = useCallback(() => {
+        const usersDb = getUsersFromStorage();
+        // We need to remove passwords before setting state
+        const sanitizedUsers = usersDb.map(({ password, ...rest }) => rest as User);
+        setAndPersistState(prevState => ({...prevState, users: sanitizedUsers}));
+    }, [setAndPersistState]);
+
+    useEffect(() => {
+        refreshUsers();
+    }, [refreshUsers]);
+
     const moderationQueue = useMemo((): ModerationItem[] => {
         return state.ads
             .filter(ad => ad.reports && ad.reports.length > 0 && ad.status === 'active')
@@ -264,7 +277,7 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
     const shareAd = (adId: string) => { /* ... existing implementation ... */ };
     
     const placeBid = useCallback((adId: string, amount: number) => {
-        if (promptLoginIfGuest({ type: 'ad', id: adId })) return;
+        if (!currentUser) return;
     
         setAndPersistState(prevState => {
             const adIndex = prevState.ads.findIndex(a => a.id === adId);
@@ -340,7 +353,9 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
     
             return { ...prevState, ads: updatedAds };
         });
-    }, [currentUser, setAndPersistState, promptLoginIfGuest, addNotification, t]);
+    }, [currentUser, setAndPersistState, addNotification, t]);
+
+    const getUserById = useCallback((userId: string) => state.users.find(u => u.id === userId), [state.users]);
 
     // --- Winner Determination Logic ---
     useEffect(() => {
@@ -396,19 +411,51 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
     const updateUserTiers = (updatedTiers: UserTier[]) => { setAndPersistState(prevState => ({ ...prevState, userTiers: updatedTiers })); };
     const updateAdminConfig = (newConfig: Partial<AdminConfig>) => { setAdminConfig(prev => ({ ...prev, ...newConfig })); };
 
-    const refreshUsers = useCallback(() => {
-        const usersDb = getUsersFromStorage();
-        // We need to remove passwords before setting state
-        const sanitizedUsers = usersDb.map(({ password, ...rest }) => rest as User);
-        setAndPersistState(prevState => ({...prevState, users: sanitizedUsers}));
-    }, [setAndPersistState]);
+    const banUser = useCallback(async (userId: string, reason: string): Promise<void> => {
+        let usersDb = getUsersFromStorage();
+        const userIndex = usersDb.findIndex(u => u.id === userId);
+        if (userIndex > -1) {
+            usersDb[userIndex].status = 'banned';
+            usersDb[userIndex].banReason = reason;
+            saveUsersToStorage(usersDb);
+            refreshUsers();
+            if (currentUser?.id === userId) {
+                logout('auth.error_account_suspended');
+            }
+        }
+    }, [currentUser, logout, refreshUsers]);
+    
+    const unbanUser = useCallback(async (userId: string): Promise<void> => {
+        let usersDb = getUsersFromStorage();
+        const userIndex = usersDb.findIndex(u => u.id === userId);
+        if (userIndex > -1 && usersDb[userIndex].status === 'banned') {
+            usersDb[userIndex].status = 'active';
+            delete usersDb[userIndex].banReason;
+            saveUsersToStorage(usersDb);
+            refreshUsers();
+        }
+    }, [refreshUsers]);
 
+    const updateUserTier = useCallback(async (userId: string, tier: UserTier['level']): Promise<void> => {
+        let usersDb = getUsersFromStorage();
+        const userIndex = usersDb.findIndex(u => u.id === userId);
+        if (userIndex > -1) {
+            usersDb[userIndex].tier = tier;
+            saveUsersToStorage(usersDb);
+            refreshUsers();
+        }
+    }, [refreshUsers]);
+    
     const value: MarketplaceContextType = {
         ...state, adminConfig, moderationQueue, getAdById, getAdsBySellerId, createAd, updateAd, addCategory, removeCategory,
         toggleLike, isLiked, toggleFavorite, isFavorite, addComment, addReview,
         addReplyToComment, shareAd, placeBid, removeAd, approveAd, deleteComment, updateUserTiers,
         updateAdminConfig,
         refreshUsers,
+        getUserById,
+        banUser,
+        unbanUser,
+        updateUserTier,
     };
     
     return (

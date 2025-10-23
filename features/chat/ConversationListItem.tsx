@@ -10,9 +10,8 @@ interface ConversationListItemProps {
 }
 
 const ConversationListItem: React.FC<ConversationListItemProps> = ({ conversation, isActive }) => {
-  // FIX: `getUserById` is provided by AuthContext, not MarketplaceContext.
-  const { user: currentUser, getUserById } = useAuth();
-  const { getAdById } = useMarketplace();
+  const { user: currentUser } = useAuth();
+  const { getAdById, getUserById } = useMarketplace();
   const { setView } = useView();
 
   const otherParticipantId = conversation.participants.find(p => p !== currentUser?.id);

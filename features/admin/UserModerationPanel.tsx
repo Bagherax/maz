@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User, UserTier } from '../../types';
 import { useLocalization } from '../../hooks/useLocalization';
 import Icon from '../../components/Icon';
-import { useAuth } from '../../hooks/useAuth';
+import { useMarketplace } from '../../context/MarketplaceContext';
 
 interface UserModerationPanelProps {
   userToModerate: User;
@@ -12,8 +12,8 @@ interface UserModerationPanelProps {
 const UserModerationPanel: React.FC<UserModerationPanelProps> = ({ userToModerate, onUpdate }) => {
   const [banReason, setBanReason] = useState('');
   const [selectedTier, setSelectedTier] = useState<UserTier['level']>(userToModerate.tier);
-  // FIX: Use `useAuth` hook which provides user management functions.
-  const { banUser, updateUserTier } = useAuth();
+  // User management functions are now correctly sourced from useMarketplace.
+  const { banUser, updateUserTier } = useMarketplace();
   const { t } = useLocalization();
 
   const handleBanUser = async () => {

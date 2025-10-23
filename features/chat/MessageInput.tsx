@@ -56,7 +56,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, isBlocked }
   const startRecording = async () => {
       try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          const recorder = new MediaRecorder(stream);
+          const options = { mimeType: 'audio/webm' };
+          const recorder = new MediaRecorder(stream, options);
           mediaRecorderRef.current = recorder;
           
           const audioChunks: Blob[] = [];
@@ -65,10 +66,19 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId, isBlocked }
           };
 
           recorder.onstop = () => {
-              const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-              const audioFile = new File([audioBlob], `voice-message-${Date.now()}.webm`, { type: 'audio/webm' });
-              sendMediaMessage(conversationId, audioFile, 'voice');
-              stream.getTracks().forEach(track => track.stop()); // Stop microphone access
+              const audioBlob = new Blob(audioChunks, { type: options.mimeType });
+              const audioUrl = URL.createObjectURL(audioBlob);
+
+              const audio = new Audio(audioUrl);
+              audio.onloadedmetadata = () => {
+                const duration = audio.duration;
+                const audioFile = new File([audioBlob], `voice-message-${Date.now()}.webm`, { type: options.mimeType });
+                
+                sendMediaMessage(conversationId, audioFile, 'voice', { duration });
+                URL.revokeObjectURL(audioUrl);
+              };
+              
+              stream.getTracks().forEach(track => track.stop());
           };
 
           recorder.start();

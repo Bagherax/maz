@@ -134,6 +134,24 @@
         background-position: right;
         transition-duration: 1s;
       }
+
+      .animated-check-icon {
+        display: inline-block;
+        vertical-align: middle;
+        margin-inline-end: 0.25rem; /* 4px */
+      }
+    
+      .animated-check-icon .check-path {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation: draw-check 0.4s 0.2s ease-out forwards;
+      }
+    
+      @keyframes draw-check {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
     </style>
 
     <!-- PWA Meta Tags (Manifest would be linked here) -->

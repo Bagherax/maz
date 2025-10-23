@@ -414,49 +414,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     finalizeLogin(newUser);
   }, []);
 
-  const getUserById = useCallback((userId: string): User | undefined => {
-    const usersDb = getUsersFromStorage();
-    const foundUser = usersDb.find(u => u.id === userId);
-    if(foundUser) {
-        const { password, ...rest } = foundUser;
-        return rest as User;
-    }
-    return undefined;
-  }, []);
-
-  const banUser = useCallback(async (userId: string, reason: string): Promise<void> => {
-    let usersDb = getUsersFromStorage();
-    const userIndex = usersDb.findIndex(u => u.id === userId);
-    if (userIndex > -1) {
-        usersDb[userIndex].status = 'banned';
-        usersDb[userIndex].banReason = reason;
-        saveUsersToStorage(usersDb);
-        if (user?.id === userId) {
-            logout('auth.error_account_suspended');
-        }
-    }
-  }, [user, logout]);
-  
-  const unbanUser = useCallback(async (userId: string): Promise<void> => {
-    let usersDb = getUsersFromStorage();
-    const userIndex = usersDb.findIndex(u => u.id === userId);
-    if (userIndex > -1 && usersDb[userIndex].status === 'banned') {
-        usersDb[userIndex].status = 'active';
-        delete usersDb[userIndex].banReason;
-        saveUsersToStorage(usersDb);
-    }
-  }, []);
-
-  const updateUserTier = useCallback(async (userId: string, tier: UserTier['level']): Promise<void> => {
-    let usersDb = getUsersFromStorage();
-    const userIndex = usersDb.findIndex(u => u.id === userId);
-    if (userIndex > -1) {
-        usersDb[userIndex].tier = tier;
-        saveUsersToStorage(usersDb);
-        if(user?.id === userId) refreshCurrentUser();
-    }
-  }, [user, refreshCurrentUser]);
-
   const updateCloudSyncConfig = useCallback(async (userId: string, config: Partial<CloudSyncConfig>): Promise<void> => {
     if (isGuest) return;
     let usersDb = getUsersFromStorage();
@@ -504,6 +461,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return !!user?.blockedUsers?.includes(userId);
   }, [user]);
 
+  const updateUserAvatar = useCallback(async (userId: string, avatar: string): Promise<void> => {
+    if (isGuest) return;
+    let usersDb = getUsersFromStorage();
+    const userIndex = usersDb.findIndex(u => u.id === userId);
+    if (userIndex > -1) {
+        usersDb[userIndex].avatar = avatar;
+        saveUsersToStorage(usersDb);
+        if(user?.id === userId) refreshCurrentUser();
+    } else {
+        throw new Error("User not found to update avatar");
+    }
+  }, [user, isGuest, refreshCurrentUser]);
 
   const value: AuthContextType = {
     user,
@@ -523,10 +492,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     loginWithProvider,
     loginWithPhone,
     updateCloudSyncConfig,
-    banUser,
-    unbanUser,
-    updateUserTier,
-    getUserById,
     refreshCurrentUser,
     isLoginPromptOpen,
     confirmLoginPrompt,
@@ -534,6 +499,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     blockUser,
     unblockUser,
     isUserBlocked,
+    updateUserAvatar,
   };
 
   return (

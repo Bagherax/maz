@@ -53,7 +53,7 @@ export const ar = {
 
   // Data Transfer & Communication
   'feature.api_integration.title': 'واجهات برمجة التطبيقات (REST/WebSocket)',
-  'feature.api_integration.description': 'تكامل قوي مع خدمات الواجهة الخلفية باستخدام واجهات برمجة تطبيقات REST للطلبات القياسية و WebSockets للاتصال ثنائي الاتجاه في الوقت الفعلي.',
+  'feature.api_integration.description': 'تكامل قوي עם خدمات الواجهة الخلفية باستخدام واجهات برمجة تطبيقات REST للطلبات القياسية و WebSockets للاتصال ثنائي الاتجاه في الوقت الفعلي.',
   'feature.chunked_transfer.title': 'نقل البيانات المقسم',
   'feature.chunked_transfer.description': 'يتعامل بكفاءة مع عمليات نقل الملفات الكبيرة عن طريق تقسيمها إلى أجزاء أصغر يمكن التحكم فيها، مع دعم للإيقاف المؤقت والاستئناف.',
   'feature.lazy_loading.title': 'التحميل الكسول للصور',
@@ -400,6 +400,7 @@ export const ar = {
   'profile.verified': 'موثق',
   'profile.user_not_found': 'لم يتم العثور على المستخدم.',
   'profile.no_active_ads': 'لا يوجد لدى هذا المستخدم إعلانات نشطة.',
+  'profile.visit_shop': 'زيارة المتجر',
   
   // Cloud Sync
   'cloud.connect_provider': 'ربط التخزين السحابي',
@@ -530,15 +531,16 @@ export const ar = {
   'social_boosters.automatedHashtags': 'هاشتاقات ذكية',
   
   // Trust & Safety
+  'trust.title': 'الثقة والأمان',
   'trust.identityVerification': 'التحقق من الهوية (KYC)',
   'trust.dualRatingSystem': 'نظام التقييمات المزدوج (للبيع والشراء)',
-  'trust.communityWarranty': 'الضمان الجماعي (Community Warranty)',
+  'trust.communityWarranty': 'ضمان المجتمع',
   'trust.disputeArbitration': 'التحكيم في النزاعات',
   'trust.purchaseInsurance': 'التأمين على المشتريات',
 
   // Social Commerce
   'social_commerce.userShops': 'متاجر المستخدمين',
-  'social_commerce.liveSelling': 'البث المباشر للبيع',
+  'social_commerce.liveSelling': 'البيع المباشر',
   'social_commerce.interestGroups': 'المجموعات المتخصصة',
   'social_commerce.affiliateProgram': 'نظام العمولة',
   'social_commerce.socialSharing': 'المشاركة الاجتماعية',
@@ -640,6 +642,9 @@ export const ar = {
   'smart_search.popular_categories': 'الفئات الشائعة',
   'smart_search.trending_ads': 'الإعلانات الرائجة',
   'smart_search.no_recent_searches': 'لا توجد عمليات بحث أخيرة',
+  'smart_search.wallet': 'المحفظة والمعاملات',
+  'smart_search.interest_groups': 'مجموعات الاهتمامات',
+  'smart_search.affiliate_program': 'برنامج الشراكة',
 
   // Ad Quick Actions
   'ad_quick_actions.boost': 'تعزيز',

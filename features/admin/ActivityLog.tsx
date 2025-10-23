@@ -1,14 +1,12 @@
 import React from 'react';
 import { useLocalization } from '../../hooks/useLocalization';
 import { useMarketplace } from '../../context/MarketplaceContext';
-import { useAuth } from '../../hooks/useAuth';
 
 const ActivityLog: React.FC = () => {
   const { t } = useLocalization();
   // In a real app, this data would come from a server via WebSocket or polling.
   // Here, we'll generate some mock static data for demonstration.
-  const { ads } = useMarketplace();
-  const { getUserById } = useAuth();
+  const { ads, getUserById } = useMarketplace();
   
   const mockActivities = [
     ...ads.slice(0, 3).map(ad => ({

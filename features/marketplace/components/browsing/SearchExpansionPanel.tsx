@@ -63,12 +63,16 @@ const SearchExpansionPanel: React.FC<SearchExpansionPanelProps> = ({ isExpanded,
                 <ActionButton icon="plus" label={t('smart_search.add_new_ad')} onClick={() => setView({type: 'create'})} />
                 <ActionButton icon="rocket-launch" label={t('controls.add_paid_ad')} onClick={() => alert('Paid Ads feature coming soon!')} />
                 <ActionButton icon="share" label={t('controls.social_booster')} onClick={() => alert('Social Booster feature coming soon!')} />
+                <ActionButton icon="video" label={t('social_commerce.liveSelling')} onClick={() => alert(t('social_commerce.liveSelling') + ' feature coming soon!')} iconColor="text-red-500" />
+                <ActionButton icon="users" label={t('smart_search.interest_groups')} onClick={() => alert(t('social_commerce.interestGroups') + ' feature coming soon!')} iconColor="text-teal-500" />
+                <ActionButton icon="share-network" label={t('smart_search.affiliate_program')} onClick={() => alert(t('social_commerce.affiliateProgram') + ' feature coming soon!')} iconColor="text-green-500" />
                 <ActionButton icon={theme === 'dark' ? 'sun' : 'moon'} label={t('smart_search.day_night_switch')} onClick={toggleTheme} />
             </Section>
             
             {isAuthenticated && !isGuest && user && (
                  <Section title={t('smart_search.user_controls')}>
                     <ActionButton icon="user-circle" label={t('smart_search.user_profile')} onClick={() => setView({type: 'profile', id: user.id})} />
+                    <ActionButton icon="wallet" label={t('smart_search.wallet')} onClick={() => alert(t('feature.wallet_transactions.title') + ' feature coming soon!')} />
                     <ActionButton icon="heart" label={t('smart_search.favorites')} onClick={() => alert('Favorites page coming soon!')} />
                     <ActionButton icon="queue-list" label={t('smart_search.my_ads')} onClick={() => setView({type: 'profile', id: user.id})} />
                     <ActionButton icon="chat-bubble-left-right" label={t('smart_search.messages')} onClick={() => setView({type: 'chat'})} />

@@ -5,6 +5,8 @@ import { useLocalization } from '../../../../hooks/useLocalization';
 import CountdownTimer from './CountdownTimer';
 import { useAuth } from '../../../../hooks/useAuth';
 import { useMarketplace } from '../../../../context/MarketplaceContext';
+import { useChat } from '../../../../hooks/useChat';
+import { useView } from '../../../../App';
 
 interface AuctionModalProps {
   isOpen: boolean;
@@ -13,7 +15,7 @@ interface AuctionModalProps {
 }
 
 const BidHistoryItem: React.FC<{ bid: Bid }> = ({ bid }) => {
-    const { getUserById } = useAuth();
+    const { getUserById } = useMarketplace();
     const { language } = useLocalization();
     const bidder = getUserById(bid.bidderId);
 
@@ -33,19 +35,30 @@ const BidHistoryItem: React.FC<{ bid: Bid }> = ({ bid }) => {
 
 const AuctionModal: React.FC<AuctionModalProps> = ({ isOpen, onClose, ad }) => {
   const { t, language } = useLocalization();
-  const { placeBid } = useMarketplace();
-  const { getUserById, user: currentUser } = useAuth();
+  const { placeBid, getUserById } = useMarketplace();
+  const { user: currentUser, promptLoginIfGuest } = useAuth();
+  const { createOrGetAuctionGroupChat } = useChat();
+  const { setView } = useView();
   const [bidAmount, setBidAmount] = useState<string>('');
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
   const auctionDetails = ad.auctionDetails!;
 
   const handlePlaceBid = () => {
+    if (promptLoginIfGuest({ type: 'ad', id: ad.id })) return;
     const amount = parseFloat(bidAmount);
     if (!isNaN(amount)) {
       placeBid(ad.id, amount);
       setBidAmount('');
     }
   };
+
+  const handleJoinAuctionChat = () => {
+    if (promptLoginIfGuest({ type: 'ad', id: ad.id })) return;
+
+    const conversationId = createOrGetAuctionGroupChat(ad.id, ad.seller.id, ad.title);
+    onClose();
+    setView({ type: 'chat', conversationId });
+  }
 
   const highestBidder = auctionDetails.bids.length > 0 ? getUserById(auctionDetails.bids[0].bidderId) : null;
   const isHighestBidder = highestBidder?.id === currentUser?.id;
@@ -151,6 +164,14 @@ const AuctionModal: React.FC<AuctionModalProps> = ({ isOpen, onClose, ad }) => {
                     <span className="text-red-500">{t('auction.reserve_not_met')}</span>
                 }
             </div>
+             {isAuctionActive && (
+                <div className="mt-4">
+                    <button onClick={handleJoinAuctionChat} className="w-full py-2 border-2 border-indigo-500 text-indigo-500 font-bold rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/40 transition-colors flex items-center justify-center gap-2">
+                        <Icon name="chat-bubble-left-right" className="w-5 h-5" />
+                        <span>{t('chat.join_auction_chat')}</span>
+                    </button>
+                </div>
+            )}
 
             <div>
                 <button onClick={() => setIsHistoryVisible(!isHistoryVisible)} className="font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 w-full justify-center">

@@ -13,9 +13,10 @@ interface MessageViewProps {
 }
 
 const MessageView: React.FC<MessageViewProps> = ({ conversation }) => {
-    const { getAdById } = useMarketplace();
+    // FIX: `getUserById` is sourced from useMarketplace, not useAuth.
+    const { getAdById, getUserById } = useMarketplace();
     const { setView } = useView();
-    const { user, getUserById, blockUser, unblockUser, isUserBlocked } = useAuth();
+    const { user, blockUser, unblockUser, isUserBlocked } = useAuth();
     const { typingStatus, deleteConversation } = useChat();
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
