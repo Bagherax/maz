@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useLocalization } from '../../../hooks/useLocalization';
-import CountrySwitcher from './CountrySwitcher';
+// FIX: The file `features/auth/components/CountrySwitcher.tsx` is not a module because it is an empty/obsolete file. The correct component is in the main components directory.
+import CountrySwitcher from '../../../components/CountrySwitcher';
+import Icon from '../../../components/Icon';
 
 interface PhoneVerificationFlowProps {
   onBack: () => void;
@@ -31,7 +33,7 @@ const PhoneVerificationFlow: React.FC<PhoneVerificationFlowProps> = ({ onBack })
     if (phoneNumber.length > 8) { // Simple validation
       setStep('enter-code');
     } else {
-      setError('Please enter a valid phone number.');
+      setError(t('auth.error_phone_invalid'));
     }
   };
 
@@ -93,8 +95,9 @@ const PhoneVerificationFlow: React.FC<PhoneVerificationFlowProps> = ({ onBack })
             </form>
         )}
         <div className="text-center mt-4">
-            <button onClick={onBack} className="text-sm font-medium text-gray-600 hover:underline">
-                {t('auth.back_to_login')}
+            <button onClick={onBack} className="text-sm font-medium text-gray-600 hover:underline flex items-center justify-center gap-1 mx-auto rtl:flex-row-reverse">
+                <Icon name="arrow-left" className="w-4 h-4" />
+                <span>{t('auth.back_to_login')}</span>
             </button>
         </div>
     </>

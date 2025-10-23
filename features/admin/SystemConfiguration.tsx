@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMarketplace } from '../../context/MarketplaceContext';
 import { useLocalization } from '../../hooks/useLocalization';
 import { AdminConfig, UserTier } from '../../types';
+import Icon from '../../components/Icon';
 
 const ALL_PAYMENT_METHODS = ['credit_card', 'paypal', 'crypto', 'bank_transfer'];
 
@@ -124,8 +125,9 @@ const SystemConfiguration: React.FC = () => {
       </div>
 
       <div className="pt-4 flex justify-end">
-        <button onClick={handleSave} className="bg-indigo-600 text-white font-bold py-2 px-6 rounded-md hover:bg-indigo-700">
-          {t('admin.save_changes')}
+        <button onClick={handleSave} className="bg-indigo-600 text-white font-bold py-2 px-6 rounded-md hover:bg-indigo-700 ripple flex items-center gap-2">
+          <Icon name="check-badge" className="w-5 h-5" />
+          <span>{t('admin.save_changes')}</span>
         </button>
       </div>
     </div>

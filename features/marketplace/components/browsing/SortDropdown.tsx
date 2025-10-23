@@ -1,19 +1,18 @@
 import React from 'react';
 import { SortOption } from '../../../../types';
 import { useLocalization } from '../../../../hooks/useLocalization';
-import Dropdown from '../../../../components/Dropdown';
-import Icon from '../../../../components/Icon';
+import { useGeolocation } from '../../../../hooks/useGeolocation';
 
 interface SortDropdownProps {
   selected: SortOption;
   onSelect: (option: SortOption) => void;
-  isLocationAvailable: boolean;
 }
 
-const SortDropdown: React.FC<SortDropdownProps> = ({ selected, onSelect, isLocationAvailable }) => {
+const SortDropdown: React.FC<SortDropdownProps> = ({ selected, onSelect }) => {
   const { t } = useLocalization();
+  const { location } = useGeolocation();
 
-  const sortOptions: { value: SortOption; label: string, disabled?: boolean }[] = [
+  const sortOptions: { value: SortOption; label: string; disabled?: boolean }[] = [
     { value: 'date-new-old', label: t('controls.sort.date-new-old') },
     { value: 'date-old-new', label: t('controls.sort.date-old-new') },
     { value: 'price-low-high', label: t('controls.sort.price-low-high') },
@@ -23,30 +22,23 @@ const SortDropdown: React.FC<SortDropdownProps> = ({ selected, onSelect, isLocat
     { value: 'most-liked', label: t('controls.sort.most-liked') },
     { value: 'most-viewed', label: t('controls.sort.most-viewed') },
     { value: 'verified-first', label: t('controls.sort.verified-first') },
-    { 
-      value: 'nearby-first', 
-      label: isLocationAvailable ? t('controls.sort.nearby-first') : t('controls.sort.nearby-first-disabled'),
-      disabled: !isLocationAvailable
-    },
+    { value: 'nearby-first', label: !location ? t('controls.sort.nearby-first-disabled') : t('controls.sort.nearby-first'), disabled: !location },
   ];
 
-  const selectedOption = sortOptions.find(opt => opt.value === selected) || sortOptions[0];
-
   return (
-    <div className="flex items-center">
-      <div className="relative">
-         <Dropdown
-            options={sortOptions}
-            selected={selectedOption}
-            onSelect={(option) => onSelect(option.value as SortOption)}
-            trigger={
-              <button title={t('controls.sort_by')} className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700/50">
-                <Icon name="adjustments-horizontal" className="w-5 h-5" />
-              </button>
-            }
-            menuClassName="right-0 w-56"
-        />
-      </div>
+    <div>
+      <select
+        id="sort-by"
+        value={selected}
+        onChange={(e) => onSelect(e.target.value as SortOption)}
+        className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
+      >
+        {sortOptions.map(option => (
+          <option key={option.value} value={option.value} disabled={option.disabled}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     </div>
   );
 };

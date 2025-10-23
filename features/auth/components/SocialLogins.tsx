@@ -28,7 +28,7 @@ const SocialLogins: React.FC<SocialLoginsProps> = ({ onSocialLogin }) => {
             key={method}
             type="button"
             onClick={() => onSocialLogin(method)}
-            className={`social-button ${method}`}
+            className={`social-button ${method} ripple`}
             aria-label={t(`auth.method.${method}`)}
           >
             <Icon name={method as any} className="svg" />

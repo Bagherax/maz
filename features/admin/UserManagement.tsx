@@ -6,7 +6,7 @@ import UserTierBadge from '../marketplace/components/users/UserTierBadge';
 import { User } from '../../types';
 
 const UserManagement: React.FC = () => {
-  const { users } = useMarketplace();
+  const { users, refreshUsers } = useMarketplace();
   const { banUser, unbanUser } = useAuth();
   const { t } = useLocalization();
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,15 +16,17 @@ const UserManagement: React.FC = () => {
   // In a real app this would come from a server, here we can just use the context's state.
   const allUsers = users; 
 
-  const handleBan = (userId: string, name: string) => {
-    const reason = prompt(`Enter reason for banning ${name}:`);
+  const handleBan = async (userId: string, name: string) => {
+    const reason = prompt(t('admin.ban_prompt', { name }));
     if (reason !== null) { // Handle cancel
-      banUser(userId, reason || "No reason provided.");
+      await banUser(userId, reason || t('moderation.no_reason_provided'));
+      refreshUsers();
     }
   };
   
-  const handleUnban = (userId: string) => {
-    unbanUser(userId);
+  const handleUnban = async (userId: string) => {
+    await unbanUser(userId);
+    refreshUsers();
   }
 
   const filteredUsers = useMemo(() => allUsers.filter(user =>
@@ -52,18 +54,24 @@ const UserManagement: React.FC = () => {
       }
   };
   
-  const handleBulkAction = (action: 'ban' | 'unban') => {
-      const reason = action === 'ban' ? prompt('Enter reason for banning selected users:') : '';
-      if (action === 'ban' && reason === null) return;
+  const handleBulkAction = async (action: 'ban' | 'unban') => {
+    if (action === 'ban') {
+        const reason = prompt(t('admin.bulk_ban_prompt'));
+        if (reason === null) return; // User cancelled prompt
 
-      selectedUserIds.forEach(userId => {
-          if (action === 'ban') {
-              banUser(userId, reason || 'Bulk action.');
-          } else {
-              unbanUser(userId);
-          }
-      });
-      setSelectedUserIds(new Set());
+        const promises = Array.from(selectedUserIds).map((userId: string) =>
+            banUser(userId, reason || t('moderation.bulk_action_reason'))
+        );
+        await Promise.all(promises);
+    } else { // 'unban'
+        const promises = Array.from(selectedUserIds).map((userId: string) =>
+            unbanUser(userId)
+        );
+        await Promise.all(promises);
+    }
+
+    refreshUsers();
+    setSelectedUserIds(new Set());
   }
 
   const isAllSelected = selectedUserIds.size > 0 && selectedUserIds.size === filteredUsers.length;
@@ -73,10 +81,10 @@ const UserManagement: React.FC = () => {
       <div className="sm:flex justify-between items-center">
         <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">{t('admin.user_management')}</h3>
         {selectedUserIds.size > 0 && (
-            <div className="flex items-center space-x-2 mt-2 sm:mt-0">
+            <div className="flex items-center space-x-2 rtl:space-x-reverse mt-2 sm:mt-0">
                 <span className="text-sm">{selectedUserIds.size} selected</span>
                 <select 
-                    onChange={(e) => handleBulkAction(e.target.value as any)}
+                    onChange={(e) => handleBulkAction(e.target.value as 'ban' | 'unban')}
                     value=""
                     className="p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 text-sm"
                 >
@@ -101,11 +109,11 @@ const UserManagement: React.FC = () => {
               <th scope="col" className="p-4">
                   <input type="checkbox" className="rounded" checked={isAllSelected} onChange={handleSelectAll} />
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.user')}</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.ip_address')}</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.status')}</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.tier')}</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.actions')}</th>
+              <th scope="col" className="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.user')}</th>
+              <th scope="col" className="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.ip_address')}</th>
+              <th scope="col" className="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.status')}</th>
+              <th scope="col" className="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.tier')}</th>
+              <th scope="col" className="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.actions')}</th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -119,7 +127,7 @@ const UserManagement: React.FC = () => {
                     <div className="flex-shrink-0 h-10 w-10">
                       <img className="h-10 w-10 rounded-full" src={user.avatar || `https://api.dicebear.com/8.x/initials/svg?seed=${user.name}`} alt="" />
                     </div>
-                    <div className="ml-4">
+                    <div className="ms-4">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
                       <div className="text-sm text-gray-500">{user.email}</div>
                     </div>
@@ -134,11 +142,11 @@ const UserManagement: React.FC = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <UserTierBadge tier={user.tier} />
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 rtl:space-x-reverse">
                   {user.status !== 'banned' ? (
-                    <button onClick={() => handleBan(user.id, user.name)} className="text-red-600 hover:text-red-900">{t('moderation.ban_user')}</button>
+                    <button onClick={() => handleBan(user.id, user.name)} className="text-red-600 hover:text-red-900 ripple rounded px-1">{t('moderation.ban_user')}</button>
                   ) : (
-                    <button onClick={() => handleUnban(user.id)} className="text-green-600 hover:text-green-900">{t('moderation.unban_user')}</button>
+                    <button onClick={() => handleUnban(user.id)} className="text-green-600 hover:text-green-900 ripple rounded px-1">{t('moderation.unban_user')}</button>
                   )}
                 </td>
               </tr>

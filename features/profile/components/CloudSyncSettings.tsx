@@ -43,7 +43,7 @@ const CloudSyncSettings: React.FC = () => {
         // We call refreshCurrentUser to ensure the user object in context is up-to-date.
         refreshCurrentUser();
         setIsSaving(false);
-        alert('Settings saved!');
+        alert(t('admin.save_success'));
     };
     
     const providerConnected = config.provider !== 'none';
@@ -51,9 +51,8 @@ const CloudSyncSettings: React.FC = () => {
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg relative">
-                <button onClick={() => setView({ type: 'profile', id: user!.id })} className="absolute top-4 left-4 flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
-                    <Icon name="arrow-left" className="w-4 h-4 mr-2" />
-                    {t('aria.go_back')}
+                <button onClick={() => setView({ type: 'profile', id: user!.id })} title={t('aria.go_back')} className="absolute top-4 left-4 rtl:left-auto rtl:right-4 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full ripple">
+                    <Icon name="arrow-left" className="w-5 h-5" />
                 </button>
                 <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">{t('profile.cloud_sync_title')}</h1>
 
@@ -63,11 +62,11 @@ const CloudSyncSettings: React.FC = () => {
                         <h2 className="text-lg font-semibold mb-4">{t('cloud.connect_provider')}</h2>
                         {!providerConnected ? (
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <button onClick={() => handleConnect('google-drive')} className="flex-1 flex items-center justify-center gap-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <button onClick={() => handleConnect('google-drive')} className="flex-1 flex items-center justify-center gap-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 ripple">
                                     <Icon name="google-drive" className="w-6 h-6" />
                                     <span>{t('cloud.provider.google-drive')}</span>
                                 </button>
-                                <button onClick={() => handleConnect('dropbox')} className="flex-1 flex items-center justify-center gap-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <button onClick={() => handleConnect('dropbox')} className="flex-1 flex items-center justify-center gap-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 ripple">
                                     <Icon name="dropbox" className="w-6 h-6" />
                                     <span>{t('cloud.provider.dropbox')}</span>
                                 </button>
@@ -81,7 +80,7 @@ const CloudSyncSettings: React.FC = () => {
                                         <p className="text-sm text-gray-600 dark:text-gray-400">{t('cloud.connected_as', { email: user!.email })}</p>
                                     </div>
                                 </div>
-                                <button onClick={handleDisconnect} className="text-sm font-medium text-red-600 hover:underline">{t('cloud.disconnect')}</button>
+                                <button onClick={handleDisconnect} className="text-sm font-medium text-red-600 hover:underline ripple rounded px-1">{t('cloud.disconnect')}</button>
                             </div>
                         )}
                     </div>
@@ -112,8 +111,9 @@ const CloudSyncSettings: React.FC = () => {
                     </div>
 
                     <div className="flex justify-end">
-                        <button onClick={handleSave} disabled={isSaving} className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400">
-                            {isSaving ? 'Saving...' : t('cloud.save_settings')}
+                        <button onClick={handleSave} disabled={isSaving} className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400 ripple flex items-center justify-center gap-2">
+                            <Icon name="check-badge" className="w-5 h-5" />
+                            <span>{isSaving ? 'Saving...' : t('cloud.save_settings')}</span>
                         </button>
                     </div>
                 </div>

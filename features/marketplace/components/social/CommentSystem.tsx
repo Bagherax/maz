@@ -16,10 +16,13 @@ const CommentForm: React.FC<{
 }> = ({ adId, parentId, onCommentPosted }) => {
   const { t } = useLocalization();
   const { addComment, addReplyToComment } = useMarketplace();
+  const { promptLoginIfGuest } = useAuth();
   const [text, setText] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (promptLoginIfGuest({ type: 'ad', id: adId })) return;
+
     if (text.trim()) {
       if (parentId) {
         addReplyToComment(adId, parentId, text);
@@ -55,12 +58,12 @@ const CommentItem: React.FC<{ adId: string, comment: Comment, level?: number }> 
   const [showReplyForm, setShowReplyForm] = useState(false);
 
   return (
-    <div className={`flex items-start space-x-3 rtl:space-x-reverse ${level > 0 ? 'ml-8 rtl:mr-8' : ''}`}>
+    <div className={`flex items-start space-x-3 rtl:space-x-reverse ${level > 0 ? 'ms-8' : ''}`}>
       <img className="h-10 w-10 rounded-full" src={comment.author.avatar || `https://api.dicebear.com/8.x/initials/svg?seed=${comment.author.name}`} alt={comment.author.name} />
       <div className="flex-1">
         <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-          <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm">{comment.author.name}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{comment.text}</p>
+          <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm truncate">{comment.author.name}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 break-all">{comment.text}</p>
         </div>
         <div className="flex items-center space-x-4 rtl:space-x-reverse text-xs text-gray-500 mt-1">
           <button onClick={() => setShowReplyForm(!showReplyForm)} className="hover:underline">{t('social.reply')}</button>
@@ -68,9 +71,9 @@ const CommentItem: React.FC<{ adId: string, comment: Comment, level?: number }> 
             <button 
               onClick={() => deleteComment(adId, comment.id)}
               title={t('moderation.delete_comment')} 
-              className="text-gray-400 hover:text-red-500 flex items-center"
+              className="text-gray-400 hover:text-red-500 ripple rounded-full p-1"
             >
-              <Icon name="trash" className="w-3 h-3 mr-1" /> {t('moderation.delete_comment')}
+              <Icon name="trash" className="w-4 h-4" />
             </button>
           )}
         </div>

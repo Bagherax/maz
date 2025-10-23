@@ -10,9 +10,9 @@ const AdManagement: React.FC = () => {
   const [selectedAdIds, setSelectedAdIds] = useState<Set<string>>(new Set());
 
   const handleRemove = (adId: string, title: string) => {
-    const reason = prompt(`Enter reason for removing "${title}":`);
+    const reason = prompt(t('admin.remove_ad_prompt', { title }));
     if (reason !== null) {
-      removeAd(adId, reason || "No reason provided");
+      removeAd(adId, reason || t('moderation.no_reason_provided'));
     }
   };
 
@@ -37,9 +37,9 @@ const AdManagement: React.FC = () => {
   };
 
   const handleBulkRemove = () => {
-      const reason = prompt('Enter reason for removing selected ads:');
+      const reason = prompt(t('admin.bulk_remove_ad_prompt'));
       if (reason !== null) {
-          selectedAdIds.forEach(adId => removeAd(adId, reason || 'Bulk action.'));
+          selectedAdIds.forEach(adId => removeAd(adId, reason || t('moderation.bulk_action_reason')));
           setSelectedAdIds(new Set());
       }
   };
@@ -51,9 +51,9 @@ const AdManagement: React.FC = () => {
       <div className="sm:flex justify-between items-center">
         <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">{t('admin.ad_management')}</h3>
          {selectedAdIds.size > 0 && (
-            <div className="flex items-center space-x-2 mt-2 sm:mt-0">
+            <div className="flex items-center space-x-2 rtl:space-x-reverse mt-2 sm:mt-0">
                 <span className="text-sm">{selectedAdIds.size} selected</span>
-                <button onClick={handleBulkRemove} className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700">{t('admin.remove_selected')}</button>
+                <button onClick={handleBulkRemove} className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 ripple">{t('admin.remove_selected')}</button>
             </div>
         )}
       </div>
@@ -71,10 +71,10 @@ const AdManagement: React.FC = () => {
               <th scope="col" className="p-4">
                   <input type="checkbox" className="rounded" checked={isAllSelected} onChange={handleSelectAll} />
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.ad_title')}</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.seller')}</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.status')}</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.actions')}</th>
+              <th scope="col" className="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.ad_title')}</th>
+              <th scope="col" className="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.seller')}</th>
+              <th scope="col" className="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.status')}</th>
+              <th scope="col" className="px-6 py-3 text-left rtl:text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin.actions')}</th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -96,7 +96,7 @@ const AdManagement: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                    {ad.status !== 'banned' && (
-                    <button onClick={() => handleRemove(ad.id, ad.title)} className="text-red-600 hover:text-red-900">{t('moderation.remove_ad')}</button>
+                    <button onClick={() => handleRemove(ad.id, ad.title)} className="text-red-600 hover:text-red-900 ripple rounded px-1">{t('moderation.remove_ad')}</button>
                   )}
                 </td>
               </tr>

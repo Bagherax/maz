@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocalization } from '../../../hooks/useLocalization';
+import Icon from '../../../components/Icon';
 
 interface ForgotPasswordFlowProps {
   onBack: () => void;
@@ -18,16 +19,16 @@ const ForgotPasswordFlow: React.FC<ForgotPasswordFlowProps> = ({ onBack }) => {
 
   return (
     <>
-      <div className="auth-heading">Reset Password</div>
+      <div className="auth-heading">{t('auth.forgot_password_title')}</div>
 
       {submitted ? (
         <div className="text-center my-6">
-          <p className="text-gray-600">If an account with that email exists, we've sent a password reset link to it.</p>
+          <p className="text-gray-600">{t('auth.reset_link_sent')}</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="auth-form">
             <p className="text-center text-sm text-gray-600">
-                Enter your email address and we'll send you a link to reset your password.
+                {t('auth.forgot_password_prompt')}
             </p>
             <input
                 required
@@ -40,14 +41,15 @@ const ForgotPasswordFlow: React.FC<ForgotPasswordFlowProps> = ({ onBack }) => {
                 onChange={(e) => setEmail(e.target.value)}
             />
             <button className="login-button" type="submit">
-                Send Reset Link
+                {t('auth.send_reset_link')}
             </button>
         </form>
       )}
 
       <div className="text-center mt-4">
-        <button onClick={onBack} className="text-sm font-medium text-gray-600 hover:underline">
-          {t('auth.back_to_login')}
+        <button onClick={onBack} className="text-sm font-medium text-gray-600 hover:underline flex items-center justify-center gap-1 mx-auto rtl:flex-row-reverse">
+            <Icon name="arrow-left" className="w-4 h-4" />
+            <span>{t('auth.back_to_login')}</span>
         </button>
       </div>
     </>

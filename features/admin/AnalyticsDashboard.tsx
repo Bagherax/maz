@@ -28,7 +28,7 @@ const BarChart: React.FC<{ data: { label: string, value: number }[], color: stri
                     <span className="w-24 text-sm text-gray-600 dark:text-gray-300 truncate">{item.label}</span>
                     <div className="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-4">
                         <div 
-                            className={`${color} h-4 rounded-full text-white text-xs flex items-center justify-end pr-2`}
+                            className={`${color} h-4 rounded-full text-white text-xs flex items-center justify-end px-2`}
                             style={{ width: `${(item.value / maxValue) * 100}%` }}
                         >
                             {item.value.toLocaleString()}
@@ -90,38 +90,38 @@ const AnalyticsDashboard: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">{"Analytics"}</h3>
+            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">{t('admin.analytics')}</h3>
             
             {/* Metric Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <MetricCard title={"Total Users"} value={users.length} />
-                <MetricCard title={"Total Active Ads"} value={ads.filter(a => a.status === 'active').length} />
-                <MetricCard title={"Est. Total Revenue"} value={totalRevenue.toLocaleString('en-US', { style: 'currency', currency: 'USD' })} />
+                <MetricCard title={t('admin.total_users')} value={users.length} />
+                <MetricCard title={t('admin.total_active_ads')} value={ads.filter(a => a.status === 'active').length} />
+                <MetricCard title={t('admin.est_total_revenue')} value={totalRevenue.toLocaleString('en-US', { style: 'currency', currency: 'USD' })} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ChartContainer title={"User Growth"}>
+                <ChartContainer title={t('admin.user_growth')}>
                     <BarChart data={userGrowthData} color="bg-blue-500" />
                 </ChartContainer>
-                <ChartContainer title={"Estimated Revenue by Tier"}>
+                <ChartContainer title={t('admin.revenue_by_tier')}>
                     <BarChart data={revenueByTier} color="bg-green-500" />
                 </ChartContainer>
-                <ChartContainer title={"Content Performance (Ads by Category)"}>
+                <ChartContainer title={t('admin.ads_by_category')}>
                     <BarChart data={adsByCategory} color="bg-purple-500" />
                 </ChartContainer>
-                 <ChartContainer title={"Geographic Distribution (Ads by Country)"}>
+                 <ChartContainer title={t('admin.ads_by_country')}>
                     <BarChart data={usersByCountry} color="bg-yellow-500" />
                 </ChartContainer>
             </div>
-             <ChartContainer title={"System Health Monitoring"}>
-                <div className="flex space-x-8">
+             <ChartContainer title={t('admin.system_health')}>
+                <div className="flex space-x-8 rtl:space-x-reverse">
                     <div className="text-center">
                         <p className="text-2xl font-bold text-green-500">120ms</p>
-                        <p className="text-sm text-gray-500">Avg. API Response</p>
+                        <p className="text-sm text-gray-500">{t('admin.avg_response')}</p>
                     </div>
                      <div className="text-center">
                         <p className="text-2xl font-bold text-yellow-500">35%</p>
-                        <p className="text-sm text-gray-500">Server Load</p>
+                        <p className="text-sm text-gray-500">{t('admin.server_load')}</p>
                     </div>
                 </div>
             </ChartContainer>

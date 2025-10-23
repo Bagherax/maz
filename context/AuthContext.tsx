@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
 // FIX: Added CloudSyncConfig to the import list to be used for default user creation.
-import { AuthContextType, User, LoginMethod, UserTier, CloudSyncConfig } from '../types';
+import { AuthContextType, User, LoginMethod, UserTier, CloudSyncConfig, View } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -91,12 +91,21 @@ const defaultCloudSync: CloudSyncConfig = {
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isGuest, setIsGuest] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
   // State for 2FA flow
   const [isAwaiting2FA, setIsAwaiting2FA] = useState<boolean>(false);
   const [pending2FAUser, setPending2FAUser] = useState<StoredUser | null>(null);
+  
+  // State for post-login actions
+  const [postLoginAction, setPostLoginAction] = useState<View | null>(null);
+
+  // New state for the elegant login prompt
+  const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
+  const [loginPromptAction, setLoginPromptAction] = useState<View | null>(null);
+
 
   // --- Session Management ---
   useEffect(() => {
@@ -106,6 +115,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const userFromToken = parseMockToken(token);
         if (userFromToken) {
           setUser(userFromToken);
+          setIsGuest(false);
         } else {
           localStorage.removeItem(JWT_TOKEN_KEY);
         }
@@ -134,6 +144,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const token = createMockToken(userData as User);
       localStorage.setItem(JWT_TOKEN_KEY, token);
       setUser(userData as User);
+      setIsGuest(false);
       setIsAwaiting2FA(false);
       setPending2FAUser(null);
       clearLoginAttempts(loggedInUser.email);
@@ -182,7 +193,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         if (foundUser) {
           if (foundUser.status === 'banned') {
-            setError('This account has been suspended.');
+            setError('auth.error_account_suspended');
             setLoading(false);
             reject(new Error('Account suspended'));
             return;
@@ -274,11 +285,57 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   
   const logout = useCallback((reason?: string) => {
     setUser(null);
+    setIsGuest(false);
     localStorage.removeItem(JWT_TOKEN_KEY);
     if (reason) {
         // Use a temporary storage item to show a message after reload
         sessionStorage.setItem('logoutReason', reason);
     }
+  }, []);
+
+  const loginAsGuest = useCallback(() => {
+    const guestUser: User = {
+        id: `guest-${Date.now()}`,
+        name: 'Guest',
+        email: '',
+        tier: 'normal',
+        createdAt: new Date(),
+        bio: 'Browsing the marketplace as a guest.',
+        isVerified: false,
+        rating: 0,
+        reviewCount: 0,
+        status: 'active',
+        cloudSync: defaultCloudSync,
+    };
+    setUser(guestUser);
+    setIsGuest(true);
+    if (loading) setLoading(false);
+  }, [loading]);
+
+  const promptLoginIfGuest = useCallback((nextAction?: View) => {
+    if (isGuest) {
+        setLoginPromptAction(nextAction || null);
+        setIsLoginPromptOpen(true);
+        return true;
+    }
+    return false;
+  }, [isGuest]);
+
+  const confirmLoginPrompt = useCallback(() => {
+    setPostLoginAction(loginPromptAction);
+    setIsLoginPromptOpen(false);
+    setLoginPromptAction(null);
+    logout();
+  }, [loginPromptAction, logout]);
+
+  const cancelLoginPrompt = useCallback(() => {
+    setIsLoginPromptOpen(false);
+    setLoginPromptAction(null);
+  }, []);
+
+
+  const clearPostLoginAction = useCallback(() => {
+    setPostLoginAction(null);
   }, []);
 
   useEffect(() => {
@@ -331,14 +388,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
   
   const refreshCurrentUser = useCallback(() => {
-    if (user) {
+    if (user && !isGuest) {
       const usersDb = getUsersFromStorage();
       const updatedUser = usersDb.find(u => u.id === user.id);
       if (updatedUser) {
         finalizeLogin(updatedUser);
       }
     }
-  }, [user]);
+  }, [user, isGuest]);
 
   const loginWithPhone = useCallback(async (phone: string): Promise<void> => {
      // ... logic to create or find phone user
@@ -375,7 +432,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         usersDb[userIndex].banReason = reason;
         saveUsersToStorage(usersDb);
         if (user?.id === userId) {
-            logout('Your account has been suspended.');
+            logout('auth.error_account_suspended');
         }
     }
   }, [user, logout]);
@@ -401,6 +458,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [user, refreshCurrentUser]);
 
   const updateCloudSyncConfig = useCallback(async (userId: string, config: Partial<CloudSyncConfig>): Promise<void> => {
+    if (isGuest) return;
     let usersDb = getUsersFromStorage();
     const userIndex = usersDb.findIndex(u => u.id === userId);
     if (userIndex > -1) {
@@ -412,18 +470,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         saveUsersToStorage(usersDb);
         if(user?.id === userId) refreshCurrentUser();
     }
-  }, [user, refreshCurrentUser]);
+  }, [user, isGuest, refreshCurrentUser]);
 
   const value = {
     user,
     isAuthenticated: !!user,
+    isGuest,
     isAwaiting2FA,
+    postLoginAction,
     login,
     verify2FA,
     register,
     logout,
     loading,
     error,
+    loginAsGuest,
+    promptLoginIfGuest,
+    clearPostLoginAction,
     loginWithProvider,
     loginWithPhone,
     updateCloudSyncConfig,
@@ -431,7 +494,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     unbanUser,
     updateUserTier,
     getUserById,
-    refreshCurrentUser
+    refreshCurrentUser,
+    isLoginPromptOpen,
+    confirmLoginPrompt,
+    cancelLoginPrompt
   };
 
   return (

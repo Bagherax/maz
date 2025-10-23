@@ -24,8 +24,9 @@ const DisplayModeSelector: React.FC<DisplayModeSelectorProps> = ({ selected, onS
         <button
           key={mode.name}
           onClick={() => onSelect(mode.name)}
-          title={t(`controls.view.${mode.name}`)}
-          className={`p-2 rounded-md transition-colors duration-200 ${
+          aria-label={t(`controls.view.${mode.name}`)}
+          aria-pressed={selected === mode.name}
+          className={`p-2 rounded-md transition-colors duration-200 ripple ${
             selected === mode.name
               ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-600 dark:text-indigo-400'
               : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700/50'

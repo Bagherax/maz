@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocalization } from '../hooks/useLocalization';
 
 interface PaginationProps {
   currentPage: number;
@@ -7,6 +8,8 @@ interface PaginationProps {
 }
 
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
+  const { t } = useLocalization();
+
   if (totalPages <= 1) return null;
 
   const handlePrevious = () => {
@@ -60,9 +63,9 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       <button
         onClick={handlePrevious}
         disabled={currentPage === 1}
-        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 ripple"
       >
-        Previous
+        {t('pagination.previous')}
       </button>
       <div className="hidden sm:flex items-baseline space-x-1">
         {pageNumbers.map((page, index) =>
@@ -70,7 +73,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
             <button
               key={index}
               onClick={() => onPageChange(page)}
-              className={`px-4 py-2 text-sm font-medium rounded-md ${
+              className={`px-4 py-2 text-sm font-medium rounded-md ripple ${
                 currentPage === page
                   ? 'bg-indigo-600 text-white'
                   : 'text-gray-700 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -88,9 +91,9 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
        <button
         onClick={handleNext}
         disabled={currentPage === totalPages}
-        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 ripple"
       >
-        Next
+        {t('pagination.next')}
       </button>
     </nav>
   );

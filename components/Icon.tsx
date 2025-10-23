@@ -1,12 +1,17 @@
 import React from 'react';
 
 interface IconProps {
-  name: 'react' | 'palette' | 'globe' | 'wrench' | 'pwa' | 'sun' | 'moon' | 'user-plus' | 'logout' | 'share-network' | 'magnifying-glass-circle' | 'rocket-launch' | 'arrow-path' | 'shield-check' | 'database' | 'photo' | 'cloud-arrow-up' | 'server-stack' | 'arrows-pointing-in' | 'storefront' | 'magnifying-glass' | 'user-circle' | 'wallet' | 'squares-plus' | 'arrows-right-left' | 'queue-list' | 'arrow-down-on-square' | 'chat-bubble-left-right' | 'bolt' | 'arrow-down-tray' | 'arrow-path-rounded-square' | 'adjustments-horizontal' | 'bell' | 'chat-bubble-bottom-center-text' | 'beaker' | 'puzzle-piece' | 'cursor-arrow-rays' | 'chart-bar-square' | 'finger-print' | 'building-storefront' | 'globe-alt' | 'arrow-down-circle' | 'chart-pie' | 'google' | 'facebook' | 'twitter' | 'apple' | 'github' | 'phone' | 'eye' | 'eye-slash' | 'cog' | 'plus' | 'arrow-left' | 'heart' | 'bookmark' | 'share' | 'check-badge' | 'truck' | 'map-pin' | 'clock' | 'trash' | 'shield-exclamation' | 'view-grid' | 'view-grid-compact' | 'view-grid-standard' | 'view-grid-detailed' | 'close' | 'document-text' | 'google-drive' | 'dropbox' | 'instagram' | 'video';
+  name: 'react' | 'palette' | 'globe' | 'wrench' | 'pwa' | 'sun' | 'moon' | 'user-plus' | 'logout' | 'share-network' | 'magnifying-glass-circle' | 'rocket-launch' | 'arrow-path' | 'shield-check' | 'database' | 'photo' | 'cloud-arrow-up' | 'server-stack' | 'arrows-pointing-in' | 'storefront' | 'magnifying-glass' | 'user-circle' | 'wallet' | 'squares-plus' | 'arrows-right-left' | 'queue-list' | 'arrow-down-on-square' | 'chat-bubble-left-right' | 'bolt' | 'arrow-down-tray' | 'arrow-path-rounded-square' | 'adjustments-horizontal' | 'bell' | 'chat-bubble-bottom-center-text' | 'beaker' | 'puzzle-piece' | 'cursor-arrow-rays' | 'chart-bar-square' | 'finger-print' | 'building-storefront' | 'globe-alt' | 'arrow-down-circle' | 'chart-pie' | 'google' | 'facebook' | 'twitter' | 'apple' | 'github' | 'phone' | 'eye' | 'eye-slash' | 'cog' | 'plus' | 'arrow-left' | 'arrow-right' | 'heart' | 'bookmark' | 'share' | 'check-badge' | 'truck' | 'map-pin' | 'clock' | 'trash' | 'shield-exclamation' | 'view-grid' | 'view-grid-compact' | 'view-grid-standard' | 'view-grid-detailed' | 'close' | 'document-text' | 'google-drive' | 'dropbox' | 'instagram' | 'video' | 'pencil';
   className?: string;
 }
 
 const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
   const icons: { [key in IconProps['name']]: React.ReactElement } = {
+    'pencil': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+      </svg>
+    ),
     'video': (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9A2.25 2.25 0 0013.5 5.25h-9A2.25 2.25 0 002.25 7.5v9A2.25 2.25 0 004.5 18.75z" />
@@ -334,6 +339,11 @@ const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
     'arrow-left': (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+    ),
+    'arrow-right': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
       </svg>
     ),
     heart: (

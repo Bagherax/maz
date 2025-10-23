@@ -187,8 +187,8 @@ const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView })
         }
       `}</style>
       <form className="custom-reg-form" onSubmit={handleSubmit}>
-        <p className="title">Register</p>
-        <p className="message">Signup now and get full access to our app.</p>
+        <p className="title">{t('auth.registration.title')}</p>
+        <p className="message">{t('auth.registration.message')}</p>
         <div className="flex">
           <label>
             <input 
@@ -199,7 +199,7 @@ const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView })
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
             />
-            <span>Firstname</span>
+            <span>{t('auth.registration.firstname')}</span>
           </label>
           <label>
             <input 
@@ -210,7 +210,7 @@ const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView })
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
             />
-            <span>Lastname</span>
+            <span>{t('auth.registration.lastname')}</span>
           </label>
         </div>
         <label>
@@ -222,7 +222,7 @@ const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView })
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <span>Email</span>
+          <span>{t('auth.email')}</span>
         </label>
         <label>
           <input 
@@ -233,7 +233,7 @@ const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView })
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <span>Password</span>
+          <span>{t('auth.password')}</span>
         </label>
         <label>
           <input 
@@ -244,16 +244,17 @@ const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView })
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-          <span>Confirm password</span>
+          <span>{t('auth.confirm_password')}</span>
         </label>
 
         {(error || apiError) && <p className="text-xs text-red-500 text-center">{error || t(apiError!)}</p>}
 
-        <button className="submit" type="submit" disabled={loading}>
-          {loading ? 'Submitting...' : 'Submit'}
+        <button className="submit ripple" type="submit" disabled={loading}>
+          {loading ? t('auth.registration.submitting') : t('auth.registration.submit')}
         </button>
         <p className="signin">
-          Already have an account? <a onClick={() => onSwitchView('login')}>Signin</a>
+          {t('auth.go_to_login')}{' '}
+          <a onClick={() => onSwitchView('login')}>{t('auth.go_to_login_link')}</a>
         </p>
       </form>
     </>

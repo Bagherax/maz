@@ -4,10 +4,19 @@ import { useAuth } from '../hooks/useAuth';
 import { MOCK_ADS, MOCK_SELLERS } from '../data/mockAds';
 import { useLocalStorage } from '../hooks/usePersistentState';
 import { usePersistentSet } from '../hooks/usePersistentSetState';
+import { useLocalization } from '../hooks/useLocalization';
 
 export const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
 
 // --- MOCK DATA GENERATION ---
+
+// TODO: Move storage helpers to a shared utils file to avoid duplication with AuthContext
+const USERS_DB_KEY = 'mazdady_users_db';
+type StoredUser = User & { password?: string };
+const getUsersFromStorage = (): StoredUser[] => {
+  const dbString = localStorage.getItem(USERS_DB_KEY);
+  return dbString ? JSON.parse(dbString) : [];
+};
 
 const USER_TIERS: UserTier[] = [
     { level: 'normal', benefits: { maxAds: 5, imageSlots: 3, videoUpload: false, featuredAds: 0, adDuration: 30, analytics: false, customThemes: false, prioritySupport: false, revenueShare: 0 }, requirements: { minTransactions: 0, minRating: 0, minActivity: 0 } },
@@ -89,14 +98,13 @@ const updateUserTierIfNeeded = (user: User, tiers: UserTier[]): User => {
 
 export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { user: currentUser } = useAuth();
+    const { t } = useLocalization();
     
-    // Use localStorage for persistence. This fixes the data reset on refresh bug.
     const [state, setAndPersistState] = useLocalStorage<Omit<MarketplaceState, 'adminConfig'>>(
-        'marketplaceState_v2', // Use a new key to avoid conflicts with old structure
+        'marketplaceState_v2',
         generateMockState
     );
     
-    // Preferences and smaller sets can still use localStorage for simplicity and speed
     const [adminConfig, setAdminConfig] = useLocalStorage<AdminConfig>('adminConfig', DEFAULT_ADMIN_CONFIG);
     const [likedAds, setLikedAds] = usePersistentSet<string>('likedAds');
     const [favoritedAds, setFavoritedAds] = usePersistentSet<string>('favoritedAds');
@@ -115,6 +123,26 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
 
     const getAdById = useCallback((id: string) => state.ads.find(ad => ad.id === id), [state.ads]);
     const getAdsBySellerId = useCallback((sellerId: string) => state.ads.filter(ad => ad.seller.id === sellerId), [state.ads]);
+    
+    const addCategory = (category: Category) => {
+        setAndPersistState(prevState => {
+            if (prevState.categories.some(c => c.id === category.id || c.name.toLowerCase() === category.name.toLowerCase())) {
+                alert(t('controls.category_exists_alert'));
+                return prevState;
+            }
+            return {
+                ...prevState,
+                categories: [...prevState.categories, category]
+            };
+        });
+    };
+    
+    const removeCategory = (categoryId: string) => {
+        setAndPersistState(prevState => ({
+            ...prevState,
+            categories: prevState.categories.filter(c => c.id !== categoryId)
+        }));
+    };
 
     const createAd = async (adData: any): Promise<string> => {
         if (!currentUser) throw new Error("User not authenticated");
@@ -134,6 +162,17 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
         };
         setAndPersistState(prevState => ({ ...prevState, ads: [newAd, ...prevState.ads] }));
         return newAd.id;
+    };
+
+    const updateAd = (adId: string, updatedData: Partial<Ad>) => {
+        setAndPersistState(prevState => ({
+            ...prevState,
+            ads: prevState.ads.map(ad => 
+                ad.id === adId 
+                ? { ...ad, ...updatedData, stats: { ...ad.stats, updatedAt: new Date().toISOString() } } 
+                : ad
+            ),
+        }));
     };
 
     const toggleLike = (adId: string) => {
@@ -167,14 +206,12 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
     
     const addReview = (adId: string, rating: number, text: string) => {
         if (!currentUser) return;
-        // Normalize 1-10 rating from input to 1-5 for storage and calculations
         const normalizedRating = rating / 2.0;
         const newReview: Review = { id: `review-${Date.now()}`, author: currentUser, text, rating: normalizedRating, likes: 0, replies: [], createdAt: new Date(), isEdited: false };
         
         setAndPersistState(prevState => {
             let sellerIdToUpdate: string | null = null;
     
-            // 1. Update the ad with the new review and recalculate its own average rating.
             const updatedAds = prevState.ads.map(ad => {
                 if (ad.id === adId) {
                     sellerIdToUpdate = ad.seller.id;
@@ -190,13 +227,11 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
                 return { ...prevState, ads: updatedAds };
             }
     
-            // 2. Recalculate the seller's overall rating across all their ads.
             const allSellerAds = updatedAds.filter(ad => ad.seller.id === sellerIdToUpdate);
             const allSellerReviews = allSellerAds.flatMap(ad => ad.reviews);
             const totalRatingSum = allSellerReviews.reduce((sum, review) => sum + (review.rating || 0), 0);
             const newSellerRating = allSellerReviews.length > 0 ? totalRatingSum / allSellerReviews.length : 0;
     
-            // 3. Update the seller in the users array, including tier progression.
             const updatedUsers = prevState.users.map(user => {
                 if (user.id === sellerIdToUpdate) {
                     const userWithNewRating = {
@@ -204,7 +239,6 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
                         rating: newSellerRating,
                         reviewCount: allSellerReviews.length,
                     };
-                    // Check for tier promotion/demotion
                     return updateUserTierIfNeeded(userWithNewRating, prevState.userTiers);
                 }
                 return user;
@@ -236,11 +270,19 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
     const updateUserTiers = (updatedTiers: UserTier[]) => { setAndPersistState(prevState => ({ ...prevState, userTiers: updatedTiers })); };
     const updateAdminConfig = (newConfig: Partial<AdminConfig>) => { setAdminConfig(prev => ({ ...prev, ...newConfig })); };
 
+    const refreshUsers = useCallback(() => {
+        const usersDb = getUsersFromStorage();
+        // We need to remove passwords before setting state
+        const sanitizedUsers = usersDb.map(({ password, ...rest }) => rest as User);
+        setAndPersistState(prevState => ({...prevState, users: sanitizedUsers}));
+    }, [setAndPersistState]);
+
     const value: MarketplaceContextType = {
-        ...state, adminConfig, moderationQueue, getAdById, getAdsBySellerId, createAd,
+        ...state, adminConfig, moderationQueue, getAdById, getAdsBySellerId, createAd, updateAd, addCategory, removeCategory,
         toggleLike, isLiked, toggleFavorite, isFavorite, addComment, addReview,
         addReplyToComment, shareAd, removeAd, approveAd, deleteComment, updateUserTiers,
         updateAdminConfig,
+        refreshUsers,
     };
     
     return (

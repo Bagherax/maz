@@ -3,6 +3,7 @@ import { Ad } from '../../../../types';
 import { useLocalization } from '../../../../hooks/useLocalization';
 import { useMarketplace } from '../../../../context/MarketplaceContext';
 import Icon from '../../../../components/Icon';
+import { useAuth } from '../../../../hooks/useAuth';
 
 interface RatingReviewSystemProps {
   ad: Ad;
@@ -91,12 +92,15 @@ const HeartRating: React.FC<{ rating: number; setRating: (rating: number) => voi
 const RatingReviewSystem: React.FC<RatingReviewSystemProps> = ({ ad }) => {
   const { t } = useLocalization();
   const { addReview } = useMarketplace();
+  const { promptLoginIfGuest } = useAuth();
   const [rating, setRating] = useState(0);
   const [text, setText] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (promptLoginIfGuest({ type: 'ad', id: ad.id })) return;
+
     if (rating > 0 && text.trim()) {
       addReview(ad.id, rating, text); // rating is 1-10
       setSubmitted(true);
@@ -141,7 +145,7 @@ const RatingReviewSystem: React.FC<RatingReviewSystemProps> = ({ ad }) => {
                   {review.rating && (
                      <div className="flex items-center font-bold text-amber-500">
                         <span>{review.rating.toFixed(1)}</span>
-                        <Icon name="heart" className="w-4 h-4 ml-1 fill-current" />
+                        <Icon name="heart" className="w-4 h-4 ms-1 fill-current" />
                      </div>
                   )}
                 </div>

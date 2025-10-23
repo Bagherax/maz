@@ -1,140 +1,52 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useMarketplace } from '../../context/MarketplaceContext';
-import { Ad, SortOption, DisplayMode } from '../../types';
-import MarketplaceControls, { Filters } from './components/browsing/MarketplaceControls';
+import React, { useState, useEffect } from 'react';
 import Pagination from '../../components/Pagination';
-import { useDisplayMode } from '../../hooks/useDisplayMode';
 import { useSorting } from '../../hooks/useSorting';
-import MarketplaceToolbar from './components/browsing/MarketplaceToolbar';
 import AdGrid from './components/ads/AdGrid';
 import { useGeolocation } from '../../hooks/useGeolocation';
-import { useLocalStorage } from '../../hooks/usePersistentState';
 import { useView } from '../../App';
+import { useMarketplaceUI } from '../../context/MarketplaceUIContext';
 
 const ADS_PER_PAGE = 12;
 
-interface MarketplacePageProps {
-    filters: Filters;
-    onFilterChange: (newFilters: Partial<Filters>) => void;
-    onResetFilters: () => void;
-}
-
-const MarketplacePage: React.FC<MarketplacePageProps> = ({
-    filters,
-    onFilterChange,
-    onResetFilters,
-}) => {
-    const { ads, users } = useMarketplace();
-    const { displayMode, setDisplayMode } = useDisplayMode();
-    const [sortBy, setSortBy] = useLocalStorage<SortOption>('marketplaceSortBy', 'date-new-old');
+const MarketplacePage: React.FC = () => {
+    const { filteredAds, displayMode, sortBy } = useMarketplaceUI();
     const [currentPage, setCurrentPage] = useState(1);
-    const { location: userLocation, error: locationError } = useGeolocation();
-    const { view, setView } = useView();
-    
-    const filteredAds = useMemo(() => {
-        return ads.filter(ad => {
-            const { query, categories, condition, priceRange, sellerTiers } = filters;
-            const seller = users.find(u => u.id === ad.seller.id);
-
-            if (ad.status !== 'active') return false;
-            if (query && !ad.title.toLowerCase().includes(query.toLowerCase()) && !ad.description.toLowerCase().includes(query.toLowerCase())) return false;
-            if (categories.length > 0 && !categories.includes(ad.category)) return false;
-            if (condition !== 'all' && ad.condition !== condition) return false;
-            if (ad.price < priceRange[0] || ad.price > priceRange[1]) return false;
-            if (sellerTiers.length > 0 && (!seller || !sellerTiers.includes(seller.tier))) return false;
-            
-            return true;
-        });
-    }, [ads, filters, users]);
+    const { location: userLocation } = useGeolocation();
+    const { setView } = useView();
     
     const sortedAds = useSorting(filteredAds, sortBy, userLocation);
 
-    // Effect to handle navigation to a specific ad (e.g., from a profile page)
-    useEffect(() => {
-        if (view.type === 'ad' && view.id) {
-            const adIndex = sortedAds.findIndex(ad => ad.id === view.id);
-            if (adIndex !== -1) {
-                const targetPage = Math.floor(adIndex / ADS_PER_PAGE) + 1;
-                setCurrentPage(prevPage => {
-                    if (prevPage !== targetPage) {
-                        return targetPage;
-                    }
-                    return prevPage;
-                });
-            }
-        }
-    }, [view, sortedAds]);
+    const handleAdClick = (adId: string) => {
+        setView({ type: 'ad', id: adId });
+    };
 
     const totalPages = Math.ceil(sortedAds.length / ADS_PER_PAGE);
     const paginatedAds = sortedAds.slice((currentPage - 1) * ADS_PER_PAGE, currentPage * ADS_PER_PAGE);
 
-    const handleFilterChangeWithReset = (newFilters: Partial<Filters>) => {
-        onFilterChange(newFilters);
-        setCurrentPage(1);
-    };
-
-    const handleResetWithReset = () => {
-        onResetFilters();
-        setCurrentPage(1);
-    }
-    
-    const expandedAdId = view.type === 'ad' ? view.id : null;
-
-    const handleAdExpand = (adId: string | null) => {
-        if (expandedAdId === adId) { // If clicking the same ad, close it
-            setView({ type: 'marketplace' });
-        } else if (adId) { // If clicking a new ad, open it
-            setView({ type: 'ad', id: adId });
-        }
-    };
-
-    const isLocationAvailable = !!userLocation && !locationError;
-
     return (
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-8">
-            <div className="lg:grid lg:grid-cols-4 lg:gap-8">
-                {/* Desktop Sidebar */}
-                <aside className="hidden lg:block lg:col-span-1">
-                    <MarketplaceControls
-                        filters={filters}
-                        onFilterChange={handleFilterChangeWithReset}
-                        onReset={handleResetWithReset}
-                    />
-                </aside>
-
-                <div className="lg:col-span-3 mt-8 lg:mt-0">
-                    <MarketplaceToolbar
-                        sortBy={sortBy}
-                        onSortChange={setSortBy}
-                        displayMode={displayMode}
-                        onDisplayModeChange={setDisplayMode}
-                        resultsCount={sortedAds.length}
-                        isLocationAvailable={isLocationAvailable}
-                    />
-
-                    {paginatedAds.length > 0 ? (
-                        <>
-                            <AdGrid
-                                ads={paginatedAds}
-                                displayMode={displayMode}
-                                expandedAdId={expandedAdId}
-                                onAdExpand={handleAdExpand}
+            <div className="mt-8 lg:mt-0">
+                {paginatedAds.length > 0 ? (
+                    <>
+                        <AdGrid
+                            ads={paginatedAds}
+                            displayMode={displayMode}
+                            onAdClick={handleAdClick}
+                        />
+                        <div className="mt-8">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
                             />
-                            <div className="mt-8">
-                                <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    onPageChange={setCurrentPage}
-                                />
-                            </div>
-                        </>
-                    ) : (
-                        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-lg shadow">
-                            <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300">No results found</h2>
-                            <p className="text-gray-500 mt-2">Try adjusting your filters.</p>
                         </div>
-                    )}
-                </div>
+                    </>
+                ) : (
+                    <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-lg shadow">
+                        <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300">No results found</h2>
+                        <p className="text-gray-500 mt-2">Try adjusting your filters.</p>
+                    </div>
+                )}
             </div>
         </div>
     );

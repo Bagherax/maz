@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, ReactNode } from 'react';
 
 interface Option {
   value: string;
@@ -11,7 +11,7 @@ interface DropdownProps {
   options: Option[];
   selected: Option;
   onSelect: (option: Option) => void;
-  label?: string;
+  label?: ReactNode;
   trigger?: React.ReactNode;
   menuClassName?: string;
 }

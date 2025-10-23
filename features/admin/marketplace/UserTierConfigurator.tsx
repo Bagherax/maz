@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMarketplace } from '../../../context/MarketplaceContext';
 import { UserTier } from '../../../types';
 import { useLocalization } from '../../../hooks/useLocalization';
+import Icon from '../../../components/Icon';
 
 const UserTierConfigurator: React.FC = () => {
     const { userTiers, updateUserTiers } = useMarketplace();
@@ -32,8 +33,7 @@ const UserTierConfigurator: React.FC = () => {
 
     const handleSave = () => {
         updateUserTiers(editableTiers);
-        // Optionally, show a success message
-        alert('User tiers updated successfully!');
+        alert(t('admin.user_tiers_updated_success'));
     };
 
     const handleNumberInputChange = (level: string, key: keyof UserTier['benefits'], value: string) => {
@@ -99,9 +99,10 @@ const UserTierConfigurator: React.FC = () => {
              <div className="pt-4 flex justify-end">
                 <button
                     onClick={handleSave}
-                    className="bg-indigo-600 text-white font-bold py-2 px-6 rounded-md hover:bg-indigo-700 transition-colors"
+                    className="bg-indigo-600 text-white font-bold py-2 px-6 rounded-md hover:bg-indigo-700 transition-colors flex items-center gap-2"
                 >
-                    {t('admin.save_changes')}
+                    <Icon name="check-badge" className="w-5 h-5" />
+                    <span>{t('admin.save_changes')}</span>
                 </button>
             </div>
         </div>

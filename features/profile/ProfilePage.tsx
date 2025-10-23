@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useLocalization } from '../../hooks/useLocalization';
 import { useMarketplace } from '../../context/MarketplaceContext';
@@ -15,16 +15,18 @@ interface ProfilePageProps {
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
   const { user: currentUser, getUserById, refreshCurrentUser } = useAuth();
-  const { getAdsBySellerId } = useMarketplace();
+  const { getAdsBySellerId, updateAd } = useMarketplace();
   const { t, language } = useLocalization();
   const { setView } = useView();
+
+  const [editingAdId, setEditingAdId] = useState<string | null>(null);
 
   // Determine if we are viewing our own profile or someone else's
   const viewedUser = getUserById(userId);
   const ads = getAdsBySellerId(userId);
 
   if (!viewedUser) {
-    return <div className="text-center p-8">User not found.</div>;
+    return <div className="text-center p-8">{t('profile.user_not_found')}</div>;
   }
 
   const isBanned = viewedUser.status === 'banned';
@@ -37,6 +39,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
     // Ideally, we'd have a way to refresh any user, but for now this works if an admin moderates themself.
     // A full solution requires a more robust state management.
     console.log("Moderation action performed. State updated.");
+  };
+
+  const handleSaveAd = (adId: string, updatedData: { title: string; description: string; price: number }) => {
+    updateAd(adId, updatedData);
+    setEditingAdId(null);
   };
 
   return (
@@ -55,7 +62,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-40 pb-12">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center justify-center space-x-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center justify-center space-x-2 rtl:space-x-reverse break-all">
             <span>{viewedUser.name}</span>
             {viewedUser.isVerified && <Icon name="check-badge" className="w-7 h-7 text-blue-500" title={t('profile.verified')} />}
           </h1>
@@ -68,7 +75,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         </div>
         
         {isBanned && (
-            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md my-6 max-w-2xl mx-auto" role="alert">
+            <div className="bg-red-100 border-s-4 border-red-500 text-red-700 p-4 rounded-md my-6 max-w-2xl mx-auto" role="alert">
                 <p className="font-bold">{t('moderation.banned_user_banner')}</p>
                 {viewedUser.banReason && <p>{viewedUser.banReason}</p>}
             </div>
@@ -83,7 +90,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
           <div className="md:col-span-1 space-y-6">
             <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
               <h3 className="text-lg font-semibold mb-2">{t('profile.bio')}</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">{viewedUser.bio}</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm break-all">{viewedUser.bio}</p>
             </div>
              <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
               <h3 className="text-lg font-semibold mb-2">{t('profile.reputation')}</h3>
@@ -99,14 +106,26 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
             </div>
             {isOwnProfile && (
               <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
-                <h3 className="text-lg font-semibold mb-4">{t('profile.settings')}</h3>
-                <button 
-                  onClick={() => setView({ type: 'cloud-sync'})}
-                  className="w-full flex items-center justify-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition-colors"
-                >
-                  <Icon name="cloud-arrow-up" className="w-5 h-5" />
-                  <span>{t('profile.cloud_sync_title')}</span>
-                </button>
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Icon name="cog" className="w-6 h-6" />
+                  <span>{t('profile.settings')}</span>
+                </h3>
+                <div className="space-y-2">
+                  <button 
+                    onClick={() => setView({ type: 'cloud-sync'})}
+                    className="w-full flex items-center justify-center space-x-2 rtl:space-x-reverse bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition-colors"
+                  >
+                    <Icon name="cloud-arrow-up" className="w-5 h-5" />
+                    <span>{t('profile.cloud_sync_title')}</span>
+                  </button>
+                  <button 
+                    onClick={() => setView({ type: 'language-settings' })}
+                    className="w-full flex items-center justify-center space-x-2 rtl:space-x-reverse bg-gray-600 text-white px-4 py-2 rounded-md font-medium hover:bg-gray-700 transition-colors"
+                  >
+                    <Icon name="globe-alt" className="w-5 h-5" />
+                    <span>{t('profile.language_region')}</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -121,9 +140,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
                     ad={ad} 
                     displayMode="standard" 
                     onExpandClick={() => setView({ type: 'ad', id: ad.id })}
+                    isEditable={isOwnProfile}
+                    isEditing={editingAdId === ad.id}
+                    onEditClick={() => setEditingAdId(ad.id)}
+                    onCancel={() => setEditingAdId(null)}
+                    onSave={(updatedData) => handleSaveAd(ad.id, updatedData)}
                 />
               )) : (
-                <p className="text-gray-500 col-span-2">This user has no active ads.</p>
+                <p className="text-gray-500 col-span-2">{t('profile.no_active_ads')}</p>
               )}
             </div>
           </div>

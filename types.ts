@@ -1,8 +1,11 @@
+
+
 import { ReactNode, Dispatch, SetStateAction } from 'react';
 
 export type Theme = 'light' | 'dark';
-export type Language = 'en' | 'ar';
-export type SupportedLanguage = 'en' | 'ar' | 'es' | 'fr' | 'de';
+export type Language = string;
+// FIX: Add missing 'SupportedLanguage' type alias for 'Language' to resolve type errors in translation-related components. This ensures compatibility with existing code that uses this type.
+export type SupportedLanguage = Language;
 
 export type DisplayMode = 'compact' | 'standard' | 'detailed' | 'list';
 
@@ -27,7 +30,8 @@ export interface ThemeContextType {
 export interface LocalizationContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string, options?: { [key: string]: string }) => string;
+  // FIX: Allow `count` to be a number for pluralization.
+  t: (key: string, options?: { [key: string]: string | number }) => string;
 }
 
 export interface Feature {
@@ -98,7 +102,9 @@ export interface User {
 export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isGuest: boolean;
   isAwaiting2FA: boolean;
+  postLoginAction: View | null;
   login: (email: string, password: string) => Promise<void>;
   verify2FA: (code: string) => Promise<void>;
   register: (data: { name: string; email: string; password: string; bio?: string; avatar?: string }) => Promise<void>;
@@ -106,6 +112,9 @@ export interface AuthContextType {
   loading: boolean;
   error: string | null;
   loginWithProvider: (provider: LoginMethod) => Promise<void>;
+  loginAsGuest: () => void;
+  promptLoginIfGuest: (nextAction?: View) => boolean;
+  clearPostLoginAction: () => void;
   loginWithPhone: (phone: string) => Promise<void>;
   updateCloudSyncConfig: (userId: string, config: Partial<CloudSyncConfig>) => Promise<void>;
   // Admin functions
@@ -114,6 +123,10 @@ export interface AuthContextType {
   updateUserTier: (userId: string, tier: UserTier['level']) => Promise<void>;
   getUserById: (userId: string) => User | undefined;
   refreshCurrentUser: () => void;
+  // Elegant prompt state and handlers
+  isLoginPromptOpen: boolean;
+  confirmLoginPrompt: () => void;
+  cancelLoginPrompt: () => void;
 }
 
 
@@ -273,7 +286,7 @@ export interface MarketplaceState {
   adminConfig: AdminConfig;
 }
 
-export type View = { type: 'marketplace' } | { type: 'ad'; id: string } | { type: 'create' } | { type: 'profile'; id: string } | { type: 'cloud-sync' };
+export type View = { type: 'marketplace' } | { type: 'ad'; id: string } | { type: 'create' } | { type: 'profile'; id: string } | { type: 'cloud-sync' } | { type: 'language-settings' };
 
 export interface AppContextType {
     view: View;
@@ -285,6 +298,9 @@ export interface MarketplaceContextType extends MarketplaceState {
   getAdById: (id: string) => Ad | undefined;
   getAdsBySellerId: (sellerId: string) => Ad[];
   createAd: (adData: Omit<Ad, 'id' | 'seller' | 'rating' | 'reviews' | 'comments' | 'reports' | 'status' | 'bannedReason' | 'stats'>) => Promise<string>;
+  updateAd: (adId: string, updatedData: Partial<Ad>) => void;
+  addCategory: (category: Category) => void;
+  removeCategory: (categoryId: string) => void;
   // Social Interactions
   toggleLike: (adId: string) => void;
   isLiked: (adId: string) => boolean;
@@ -300,15 +316,16 @@ export interface MarketplaceContextType extends MarketplaceState {
   deleteComment: (adId: string, commentId: string) => void;
   updateUserTiers: (updatedTiers: UserTier[]) => void;
   updateAdminConfig: (newConfig: Partial<AdminConfig>) => void;
+  refreshUsers: () => void;
 }
 
 // --- Google Translate Integration ---
 export interface TranslationConfig {
-  targetLanguage: SupportedLanguage;
+  targetLanguage: Language;
   showOriginal: boolean;
 }
 
-export type TranslationCache = Record<string, Record<SupportedLanguage, string>>;
+export type TranslationCache = Record<string, Record<Language, string>>;
 
 export interface TranslationContextType {
   config: TranslationConfig;

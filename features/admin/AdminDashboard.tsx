@@ -7,6 +7,7 @@ import ModerationQueue from './ModerationQueue';
 import ActivityLog from './ActivityLog';
 import SystemConfiguration from './SystemConfiguration';
 import AnalyticsDashboard from './AnalyticsDashboard';
+import Icon from '../../components/Icon';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -45,7 +46,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
   const TabButton: React.FC<{tabName: AdminTab, label: string}> = ({ tabName, label}) => (
      <button
         onClick={() => setActiveTab(tabName)}
-        className={`px-3 py-2 text-sm font-medium transition-colors duration-200 whitespace-nowrap ${activeTab === tabName ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 border-b-2 border-transparent'}`}
+        className={`px-3 py-2 text-sm font-medium transition-colors duration-200 whitespace-nowrap ripple ${activeTab === tabName ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 border-b-2 border-transparent'}`}
       >
         {label}
       </button>
@@ -60,13 +61,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
         <header className="p-4 border-b dark:border-gray-700 shrink-0">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">{t('admin.dashboard_title')}</h2>
-            <button onClick={onClose} aria-label={t('aria.close_admin_panel')} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 text-2xl font-light">
-              &times;
+            <button onClick={onClose} aria-label={t('aria.close_admin_panel')} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 ripple">
+              <Icon name="close" className="w-6 h-6" />
             </button>
           </div>
           <nav className="mt-4 -mb-px">
             <div className="flex border-b dark:border-gray-600 overflow-x-auto">
-               <TabButton tabName="analytics" label={"Analytics"} />
+               <TabButton tabName="analytics" label={t('admin.analytics')} />
                <TabButton tabName="moderationQueue" label={t('admin.moderation_queue')} />
                <TabButton tabName="activityLog" label={t('admin.activity_log')} />
                <TabButton tabName="userManagement" label={t('admin.user_management')} />

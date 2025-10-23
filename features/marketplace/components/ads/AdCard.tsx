@@ -1,5 +1,6 @@
 
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Ad, DisplayMode } from '../../../../types';
 import { useLocalization } from '../../../../hooks/useLocalization';
 import { useMarketplace } from '../../../../context/MarketplaceContext';
@@ -14,13 +15,43 @@ interface AdCardProps {
   ad: Ad;
   displayMode: DisplayMode;
   onExpandClick: () => void;
+  isEditable?: boolean;
+  isEditing?: boolean;
+  onEditClick?: () => void;
+  onCancel?: () => void;
+  onSave?: (updatedData: { title: string; description: string; price: number }) => void;
 }
 
-const AdCard: React.FC<AdCardProps> = ({ ad, displayMode, onExpandClick }) => {
-  const { language } = useLocalization();
+const AdCard: React.FC<AdCardProps> = ({ 
+    ad, 
+    displayMode, 
+    onExpandClick,
+    isEditable = false,
+    isEditing = false,
+    onEditClick,
+    onCancel,
+    onSave
+}) => {
+  const { language, t } = useLocalization();
   const { toggleLike, isLiked } = useMarketplace();
-  const { getUserById } = useAuth();
+  const { getUserById, promptLoginIfGuest } = useAuth();
   const { setView } = useView();
+
+  const [editData, setEditData] = useState({
+    title: ad.title,
+    description: ad.description,
+    price: ad.price,
+  });
+
+  useEffect(() => {
+    if (!isEditing) {
+        setEditData({
+            title: ad.title,
+            description: ad.description,
+            price: ad.price,
+        });
+    }
+  }, [isEditing, ad]);
 
   const seller = getUserById(ad.seller.id);
 
@@ -32,75 +63,152 @@ const AdCard: React.FC<AdCardProps> = ({ ad, displayMode, onExpandClick }) => {
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (promptLoginIfGuest({ type: 'ad', id: ad.id })) return;
     toggleLike(ad.id);
   };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onEditClick?.();
+  };
+  
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onSave?.(editData);
+  }
+
+  const handleCancel = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onCancel?.();
+  }
   
   const isCompact = displayMode === 'compact';
   const isDetailed = displayMode === 'detailed';
 
   const imageSizeClass = isCompact ? 'h-32' : isDetailed ? 'h-64' : 'h-48';
   const paddingClass = isCompact ? 'p-2' : 'p-4';
+  const cardMainClass = isEditing ? '' : 'cursor-pointer group';
+
+  const inputClass = "w-full p-1 rounded bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:ring-1 focus:ring-indigo-500 focus:outline-none";
 
   return (
     <div 
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden cursor-pointer group transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col" 
-      onClick={onExpandClick}
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col ${cardMainClass}`} 
+      onClick={isEditing ? undefined : onExpandClick}
     >
       <div className="relative">
         <img src={ad.images[0]} alt={ad.title} className={`${imageSizeClass} w-full object-cover`} />
         
-        <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm flex items-center space-x-1">
+        <div className="absolute top-2 left-2 rtl:left-auto rtl:right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm flex items-center space-x-1 rtl:space-x-reverse">
           <Icon name={mediaSource === 'P2P' ? 'share-network' : 'cloud-arrow-up'} className="w-3 h-3" />
           <span>{mediaSource}</span>
         </div>
 
-        <button 
-          onClick={handleLike}
-          aria-label="Like ad"
-          className="absolute top-2 right-2 bg-white/70 dark:bg-gray-900/70 p-2 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity z-20"
-        >
-          <Icon name="heart" className={`w-5 h-5 transition-colors ${isLiked(ad.id) ? 'text-red-500 fill-current' : 'text-gray-600 dark:text-gray-300'}`} />
-        </button>
+        {!isEditing && (
+            <button 
+            onClick={handleLike}
+            aria-label={t('aria.like_ad')}
+            className="absolute top-2 right-2 rtl:right-auto rtl:left-2 bg-white/70 dark:bg-gray-900/70 p-2 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity z-20"
+            >
+            <Icon name="heart" className={`w-5 h-5 transition-colors ${isLiked(ad.id) ? 'text-red-500 fill-current' : 'text-gray-600 dark:text-gray-300'}`} />
+            </button>
+        )}
+        
+        {isEditable && !isEditing && (
+             <button 
+                onClick={handleEditClick}
+                aria-label={t('aria.edit_ad')}
+                className="absolute top-12 right-2 rtl:right-auto rtl:left-2 bg-white/70 dark:bg-gray-900/70 p-2 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity z-20"
+             >
+                <Icon name="pencil" className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            </button>
+        )}
 
-        <SeeMoreButton onClick={onExpandClick} />
+        {!isEditing && <SeeMoreButton onClick={onExpandClick} />}
 
         {!isCompact && seller && (
-            <div className="absolute bottom-2 left-2">
+            <div className="absolute bottom-2 left-2 rtl:left-auto rtl:right-2">
                 <UserTierBadge tier={seller.tier} />
             </div>
         )}
       </div>
       <div className={`${paddingClass} flex-grow flex flex-col`}>
-        {!isCompact && <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{ad.category}</p>}
-        <h3 className={`font-semibold truncate text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mt-1 ${isCompact ? 'text-sm' : 'text-lg'}`}>{ad.title}</h3>
+        {!isCompact && !isEditing && <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider truncate">{ad.category}</p>}
+        
+        {isEditing ? (
+            <input 
+                name="title"
+                value={editData.title}
+                onChange={(e) => setEditData(p => ({...p, title: e.target.value}))}
+                className={`${inputClass} font-semibold text-lg`}
+                onClick={e => e.stopPropagation()}
+            />
+        ) : (
+             <h3 className={`font-semibold truncate text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mt-1 ${isCompact ? 'text-sm' : 'text-lg'}`}>{ad.title}</h3>
+        )}
         
         {!isCompact && (
             <div className="flex-grow mt-2">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                {ad.location.city}, {ad.location.country}
-                </p>
-                {isDetailed && (
-                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-2 line-clamp-2">{ad.description}</p>
+                {isEditing ? (
+                    <textarea 
+                        name="description"
+                        value={editData.description}
+                        onChange={(e) => setEditData(p => ({...p, description: e.target.value}))}
+                        className={`${inputClass} text-sm h-16`}
+                        onClick={e => e.stopPropagation()}
+                    />
+                ) : (
+                    <>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {ad.location.city}, {ad.location.country}
+                        </p>
+                        {isDetailed && (
+                            <p className="text-xs text-gray-600 dark:text-gray-300 mt-2 line-clamp-2">{ad.description}</p>
+                        )}
+                    </>
                 )}
             </div>
         )}
 
         <div className={`flex justify-between items-center ${isCompact ? 'mt-1' : 'mt-4'}`}>
-          <p className={`text-indigo-500 dark:text-indigo-400 font-bold ${isCompact ? 'text-base' : 'text-xl'}`}>
-            {new Intl.NumberFormat(language, { style: 'currency', currency: ad.currency, notation: isCompact ? 'compact' : 'standard' }).format(ad.price)}
-          </p>
-          {!isCompact && seller && (
+          {isEditing ? (
+             <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                <span className="text-indigo-500 dark:text-indigo-400 font-bold text-xl">{ad.currency}</span>
+                <input 
+                    type="number"
+                    name="price"
+                    value={editData.price}
+                    onChange={(e) => setEditData(p => ({...p, price: Number(e.target.value)}))}
+                    className={`${inputClass} font-bold text-xl w-28`}
+                />
+            </div>
+          ) : (
+            <p className={`text-indigo-500 dark:text-indigo-400 font-bold ${isCompact ? 'text-base' : 'text-xl'}`}>
+                {new Intl.NumberFormat(language, { style: 'currency', currency: ad.currency, notation: isCompact ? 'compact' : 'standard' }).format(ad.price)}
+            </p>
+          )}
+          {!isCompact && seller && !isEditing && (
             <div className="flex items-center space-x-2 rtl:space-x-reverse hover:opacity-80" onClick={(e) => { e.stopPropagation(); setView({type: 'profile', id: seller.id })}}>
              <img className="h-8 w-8 rounded-full" src={seller.avatar || `https://api.dicebear.com/8.x/initials/svg?seed=${seller.name}`} alt={seller.name} />
              {!isDetailed && (
-                <div className="text-right">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{seller.name}</p>
-                    <p className="text-xs text-gray-500 flex items-center justify-end">{seller.rating.toFixed(1)} <Icon name="heart" className="w-3 h-3 ml-0.5 fill-current text-amber-500" /></p>
+                <div className="text-right rtl:text-left min-w-0">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{seller.name}</p>
+                    <p className="text-xs text-gray-500 flex items-center justify-end rtl:justify-start">{seller.rating.toFixed(1)} <Icon name="heart" className="w-3 h-3 ms-0.5 fill-current text-amber-500" /></p>
                 </div>
              )}
           </div>
           )}
         </div>
+        {isEditing && (
+            <div className="flex justify-end items-center gap-2 mt-4">
+                <button onClick={handleCancel} title={t('general.cancel_edit')} className="p-2 border rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 ripple">
+                    <Icon name="close" className="w-5 h-5" />
+                </button>
+                <button onClick={handleSave} title={t('admin.save_changes')} className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 ripple">
+                    <Icon name="check-badge" className="w-5 h-5" />
+                </button>
+            </div>
+        )}
       </div>
     </div>
   );

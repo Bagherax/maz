@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useLocalization } from '../../../hooks/useLocalization';
+import Icon from '../../../components/Icon';
 
 interface TwoFactorAuthFlowProps {
   onBack: () => void;
@@ -51,9 +52,10 @@ const TwoFactorAuthFlow: React.FC<TwoFactorAuthFlowProps> = ({ onBack }) => {
        <div className="text-center mt-4">
         <button
             onClick={onBack}
-            className="text-sm font-medium text-gray-600 hover:underline"
+            className="text-sm font-medium text-gray-600 hover:underline flex items-center justify-center gap-1 mx-auto rtl:flex-row-reverse"
         >
-            {t('auth.back_to_login')}
+            <Icon name="arrow-left" className="w-4 h-4" />
+            <span>{t('auth.back_to_login')}</span>
         </button>
       </div>
     </>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import Skeleton from './Skeleton';
+import { useLocalization } from '../hooks/useLocalization';
 
 interface TProps {
   children: ReactNode;
@@ -8,6 +9,7 @@ interface TProps {
 
 const T: React.FC<TProps> = ({ children }) => {
   const { translate, config, isTranslating } = useTranslation();
+  const { t } = useLocalization();
   const originalText = typeof children === 'string' ? children : '';
   const [translatedText, setTranslatedText] = useState(originalText);
 
@@ -29,6 +31,7 @@ const T: React.FC<TProps> = ({ children }) => {
   }, [originalText, config.targetLanguage, translate]);
 
   const isLoading = isTranslating(originalText);
+  const hasBeenTranslated = translatedText !== originalText;
 
   if (isLoading) {
     // Render skeleton with an approximate width based on text length
@@ -36,18 +39,18 @@ const T: React.FC<TProps> = ({ children }) => {
     return <Skeleton className="w-full max-w-[--w]" style={{'--w': `${approxWidth}ch`} as React.CSSProperties} />;
   }
   
-  if (config.showOriginal && translatedText !== originalText) {
+  if (config.showOriginal && hasBeenTranslated) {
     return (
-      <>
+      <span title={originalText}>
         {translatedText}
         <span className="block text-xs text-gray-400 dark:text-gray-500 opacity-80 mt-1">
-          (Original: {originalText})
+          {t('translation.original_text', { text: originalText })}
         </span>
-      </>
+      </span>
     );
   }
 
-  return <>{translatedText}</>;
+  return <span title={hasBeenTranslated ? originalText : undefined}>{translatedText}</span>;
 };
 
 export default T;

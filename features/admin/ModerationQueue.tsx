@@ -38,8 +38,8 @@ const ModerationQueue: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.reportCount}</td>
                     <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{item.reason}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <button onClick={() => approveAd(ad.id)} className="text-green-600 hover:text-green-900">{t('admin.approve')}</button>
-                      <button onClick={() => removeAd(ad.id, 'Removed after review.')} className="text-red-600 hover:text-red-900">{t('admin.remove')}</button>
+                      <button onClick={() => approveAd(ad.id)} className="text-green-600 hover:text-green-900 ripple rounded px-1">{t('admin.approve')}</button>
+                      <button onClick={() => removeAd(ad.id, 'Removed after review.')} className="text-red-600 hover:text-red-900 ripple rounded px-1">{t('admin.remove')}</button>
                     </td>
                   </tr>
                 );

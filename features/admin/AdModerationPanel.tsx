@@ -14,8 +14,8 @@ const AdModerationPanel: React.FC<AdModerationPanelProps> = ({ ad }) => {
   const { t } = useLocalization();
 
   const handleRemoveAd = () => {
-    if (window.confirm('Are you sure you want to remove this ad? This action cannot be undone.')) {
-      removeAd(ad.id, reason || 'No reason provided.');
+    if (window.confirm(t('moderation.remove_ad_confirm'))) {
+      removeAd(ad.id, reason || t('moderation.no_reason_provided'));
       setReason('');
     }
   };
@@ -25,7 +25,7 @@ const AdModerationPanel: React.FC<AdModerationPanelProps> = ({ ad }) => {
   return (
     <div className="border-2 border-red-500 rounded-lg p-4 my-6 bg-red-50 dark:bg-gray-800">
       <h3 className="text-lg font-bold text-red-700 dark:text-red-400 flex items-center">
-        <Icon name="shield-exclamation" className="w-6 h-6 mr-2 rtl:ml-2" />
+        <Icon name="shield-exclamation" className="w-6 h-6 me-2" />
         {t('moderation.ad_panel_title')}
       </h3>
       <div className="mt-4 space-y-4">

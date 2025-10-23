@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Ad } from '../../../../types';
 import { useLocalization } from '../../../../hooks/useLocalization';
@@ -20,14 +21,14 @@ const ListViewItem: React.FC<ListViewItemProps> = ({ ad, onExpandClick }) => {
     >
         <div className="flex" onClick={onExpandClick}>
             <img src={ad.images[0]} alt={ad.title} className="h-full w-32 md:w-48 object-cover flex-shrink-0" />
-            <div className="p-4 flex-grow flex flex-col justify-between relative">
+            <div className="p-4 flex-grow flex flex-col justify-between relative min-w-0">
                 <div>
                     <div className="flex justify-between items-start">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">{ad.category}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider truncate">{ad.category}</p>
                         <UserTierBadge tier={ad.seller.tier} />
                     </div>
                     <h3 className="font-semibold text-lg truncate text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mt-1">{ad.title}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
                     {ad.location.city}, {ad.location.country}
                     </p>
                 </div>

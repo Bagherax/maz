@@ -3,17 +3,9 @@ import { Ad, Category } from '../../../../types';
 import { useMarketplace } from '../../../../context/MarketplaceContext';
 import { useLocalization } from '../../../../hooks/useLocalization';
 import Icon from '../../../../components/Icon';
+import { useLocalStorage } from '../../../../hooks/usePersistentState';
 
 // --- HELPER COMPONENTS ---
-
-const formatBytes = (bytes: number, decimals = 2) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-}
 
 const Modal: React.FC<{ title: string; onClose: () => void; children: ReactNode }> = ({ title, onClose, children }) => {
     return (
@@ -38,6 +30,7 @@ const Modal: React.FC<{ title: string; onClose: () => void; children: ReactNode 
 const ImageUploadModalContent: React.FC<{ onSave: (images: string[]) => void; onClose: () => void }> = ({ onSave, onClose }) => {
     const [files, setFiles] = useState<File[]>([]);
     const [previews, setPreviews] = useState<string[]>([]);
+    const { t } = useLocalization();
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -88,7 +81,7 @@ const ImageUploadModalContent: React.FC<{ onSave: (images: string[]) => void; on
                     <Icon name="photo" className="mx-auto h-12 w-12 text-gray-400" />
                     <div className="flex text-sm text-gray-600 dark:text-gray-400">
                         <label htmlFor="image-upload-modal" className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
-                            <span>Upload images</span>
+                            <span>{t('ad.create.upload_photos')}</span>
                             <input id="image-upload-modal" name="image-upload-modal" type="file" className="sr-only" onChange={handleFileChange} accept="image/*" multiple />
                         </label>
                     </div>
@@ -100,7 +93,7 @@ const ImageUploadModalContent: React.FC<{ onSave: (images: string[]) => void; on
                 </div>
             )}
             <div className="flex justify-end pt-4">
-                 <button onClick={handleSave} className="px-6 py-2 bg-indigo-600 text-white rounded-md">Add Images</button>
+                 <button onClick={handleSave} className="px-6 py-2 bg-indigo-600 text-white rounded-md">{t('ad.create.add_photos')}</button>
             </div>
         </div>
     );
@@ -108,6 +101,7 @@ const ImageUploadModalContent: React.FC<{ onSave: (images: string[]) => void; on
 
 const VideoUploadModalContent: React.FC<{ onSave: (videoUrl: string) => void; onClose: () => void }> = ({ onSave, onClose }) => {
     const [url, setUrl] = useState('');
+    const { t } = useLocalization();
 
     const handleSave = () => {
         if (url.trim()) {
@@ -118,17 +112,17 @@ const VideoUploadModalContent: React.FC<{ onSave: (videoUrl: string) => void; on
     
     return (
         <div className="space-y-4">
-            <label htmlFor="video-url" className="block text-sm font-medium">Video URL (e.g., YouTube)</label>
+            <label htmlFor="video-url" className="block text-sm font-medium">{t('ad.create.video_url_label')}</label>
             <input 
                 id="video-url"
                 type="url"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://www.youtube.com/watch?v=..."
+                placeholder={t('ad.create.video_url_placeholder')}
                 className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm"
             />
              <div className="flex justify-end pt-4">
-                 <button onClick={handleSave} className="px-6 py-2 bg-indigo-600 text-white rounded-md">Add Video</button>
+                 <button onClick={handleSave} className="px-6 py-2 bg-indigo-600 text-white rounded-md">{t('ad.create.add_video')}</button>
             </div>
         </div>
     )
@@ -137,6 +131,7 @@ const VideoUploadModalContent: React.FC<{ onSave: (videoUrl: string) => void; on
 const DocumentUploadModalContent: React.FC<{ onSave: (doc: Ad['documents'][0]) => void; onClose: () => void }> = ({ onSave, onClose }) => {
     const [name, setName] = useState('');
     const [url, setUrl] = useState('');
+    const { t } = useLocalization();
 
     const handleSave = () => {
         if (name.trim() && url.trim()) {
@@ -148,15 +143,15 @@ const DocumentUploadModalContent: React.FC<{ onSave: (doc: Ad['documents'][0]) =
     return (
         <div className="space-y-4">
             <div>
-                <label htmlFor="doc-name" className="block text-sm font-medium">Document Name</label>
-                <input id="doc-name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Product Manual" className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm" />
+                <label htmlFor="doc-name" className="block text-sm font-medium">{t('ad.create.doc_name_label')}</label>
+                <input id="doc-name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('ad.create.doc_name_placeholder')} className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm" />
             </div>
             <div>
-                <label htmlFor="doc-url" className="block text-sm font-medium">Document URL</label>
-                <input id="doc-url" type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm" />
+                <label htmlFor="doc-url" className="block text-sm font-medium">{t('ad.create.doc_url_label')}</label>
+                <input id="doc-url" type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder={t('ad.create.doc_url_placeholder')} className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm" />
             </div>
              <div className="flex justify-end pt-4">
-                 <button onClick={handleSave} className="px-6 py-2 bg-indigo-600 text-white rounded-md">Add Document</button>
+                 <button onClick={handleSave} className="px-6 py-2 bg-indigo-600 text-white rounded-md">{t('ad.create.add_document')}</button>
             </div>
         </div>
     )
@@ -171,9 +166,7 @@ interface AdCreationWizardProps {
 
 type AdFormData = Omit<Ad, 'id' | 'seller' | 'rating' | 'reviews' | 'comments' | 'reports' | 'status' | 'bannedReason' | 'stats'>;
 
-const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCancel }) => {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<Partial<AdFormData>>({
+const initialFormData: Partial<AdFormData> = {
     title: '',
     description: '',
     price: 0,
@@ -186,26 +179,19 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
     documents: [],
     delivery: { available: false, cost: 0, time: '', type: 'pickup', instructions: '' },
     location: { city: 'Metropolis', country: 'USA' },
-  });
+};
+
+
+const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCancel }) => {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useLocalStorage<Partial<AdFormData>>('adCreationDraft', initialFormData);
   
-  const [isMediaMenuOpen, setIsMediaMenuOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isDocModalOpen, setIsDocModalOpen] = useState(false);
 
   const { createAd, categories } = useMarketplace();
   const { t } = useLocalization();
-  const mediaButtonRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (mediaButtonRef.current && !mediaButtonRef.current.contains(event.target as Node)) {
-        setIsMediaMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -249,10 +235,18 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
     e.preventDefault();
     try {
       const newAdId = await createAd(formData as AdFormData);
+      setFormData(initialFormData); // Clear draft
       onAdCreated(newAdId);
     } catch (error) {
       console.error("Failed to create ad:", error);
-      alert("Failed to create ad. Please try again.");
+      alert(t('ad.create.error'));
+    }
+  };
+
+  const handleCancel = () => {
+    if (window.confirm(t('ad.create.cancel_confirm'))) {
+        setFormData(initialFormData); // Clear draft
+        onCancel();
     }
   };
   
@@ -291,17 +285,17 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
                 <div>
                     <label htmlFor="category" className="block text-sm font-medium">{t('ad.create.category_label')}</label>
                     <select name="category" id="category" value={formData.category} onChange={handleInputChange} className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm" required>
-                        <option value="">Select Category</option>
+                        <option value="">{t('ad.create.select_category')}</option>
                         {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
                     </select>
                 </div>
                  <div>
                     <label className="block text-sm font-medium">{t('ad.create.condition_label')}</label>
-                    <div className="flex space-x-4 mt-2">
+                    <div className="flex space-x-4 rtl:space-x-reverse mt-2">
                         {(['new', 'used', 'refurbished'] as const).map(cond => (
                             <label key={cond} className="flex items-center">
                                 <input type="radio" name="condition" value={cond} checked={formData.condition === cond} onChange={handleInputChange} className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"/>
-                                <span className="ml-2 capitalize">{t(`ad.create.condition_${cond}`)}</span>
+                                <span className="ms-2 capitalize">{t(`ad.create.condition_${cond}`)}</span>
                             </label>
                         ))}
                     </div>
@@ -310,38 +304,39 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
           </div>
         );
       case 2: // Media
+        const mediaButtonClass = "w-full flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-indigo-500 hover:text-indigo-500 transition-colors";
         return (
              <div className="space-y-6">
-                <style>{`
-                  .input-container { display: flex; background: white; border-radius: 1rem; background: linear-gradient(135deg, #5c87df 0%, #14161a 100%); box-shadow: 10px 10px 20px #0e1013, -10px -10px 40px #383e4b; padding: 0.3rem; gap: 0.3rem; }
-                  .input-container input { border-radius: 0.8rem 0 0 0.8rem; background: #23272F; box-shadow: inset 5px 5px 10px #0e1013, inset -5px -5px 10px #383e4b, 0px 0px 100px rgba(255, 212, 59, 0), 0px 0px 100px rgba(255, 102, 0, 0); width: 100%; flex-basis: 75%; padding: 1rem; border: none; border: 1px solid transparent; color: white; transition: all 0.2s ease-in-out; }
-                  .input-container input:focus { border: 1px solid #418fa5; outline: none; box-shadow: inset 0px 0px 10px rgba(87, 173, 184, 0.5), inset 0px 0px 10px rgba(34, 133, 109, 0.5), 0px 0px 100px rgba(62, 143, 156, 0.5), 0px 0px 100px rgba(85, 184, 179, 0.5); }
-                  .input-container button { flex-basis: 25%; padding: 1rem; background: linear-gradient(135deg, rgb(59, 255, 232) 0%, rgb(0, 204, 255) 100%); box-shadow: 0px 0px 1px rgba(59, 255, 232, 0.5), 0px 0px 1px rgba(0, 204, 255, 0.5); font-weight: 900; letter-spacing: 0.3rem; text-transform: uppercase; color: #23272F; border: none; width: 100%; border-radius: 0 1rem 1rem 0; transition: all 0.2s ease-in-out; cursor: pointer; }
-                  .input-container button:hover { background: linear-gradient(135deg, rgb(59, 255, 232) 50%, rgb(0, 204, 255) 100%); box-shadow: 0px 0px 100px rgba(59, 255, 232, 0.5), 0px 0px 100px rgba(0, 204, 255, 0.5); }
-                  @media (max-width: 500px) { .input-container { flex-direction: column; } .input-container input { border-radius: 0.8rem; } .input-container button { padding: 1rem; border-radius: 0.8rem; } }
-                `}</style>
-                <div className="input-container" ref={mediaButtonRef}>
-                    <input type="text" placeholder="Add Item" readOnly onClick={() => setIsMediaMenuOpen(true)} />
-                    <div className="relative">
-                        <button type="button" onClick={() => setIsMediaMenuOpen(prev => !prev)}>Add</button>
-                        {isMediaMenuOpen && (
-                            <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10">
-                                <button onClick={() => { setIsImageModalOpen(true); setIsMediaMenuOpen(false); }} className="w-full text-left flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700"><Icon name="photo" className="w-5 h-5 mr-2" /> Photos</button>
-                                <button onClick={() => { setIsVideoModalOpen(true); setIsMediaMenuOpen(false); }} className="w-full text-left flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700"><Icon name="video" className="w-5 h-5 mr-2" /> Video</button>
-                                <button onClick={() => { setIsDocModalOpen(true); setIsMediaMenuOpen(false); }} className="w-full text-left flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700"><Icon name="document-text" className="w-5 h-5 mr-2" /> Document</button>
-                            </div>
-                        )}
-                    </div>
+                 <div>
+                    <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200">{t('ad.create.media_title')}</h3>
+                    <p className="text-sm text-gray-500">{t('ad.create.media_prompt')}</p>
                 </div>
 
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-                    {formData.images?.map((src, i) => (
-                        <div key={i} className="relative group">
-                            <img src={src} className="w-full h-24 object-cover rounded" alt="upload preview" />
-                            <button type="button" onClick={() => handleRemoveMedia('images', i)} className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100"><Icon name="close" className="w-4 h-4" /></button>
-                        </div>
-                    ))}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button type="button" onClick={() => setIsImageModalOpen(true)} className={mediaButtonClass}>
+                        <Icon name="photo" className="w-8 h-8"/>
+                        <span className="font-semibold text-sm">{t('ad.create.add_photos')}</span>
+                    </button>
+                    <button type="button" onClick={() => setIsVideoModalOpen(true)} className={mediaButtonClass}>
+                        <Icon name="video" className="w-8 h-8"/>
+                        <span className="font-semibold text-sm">{t('ad.create.add_video')}</span>
+                    </button>
+                    <button type="button" onClick={() => setIsDocModalOpen(true)} className={mediaButtonClass}>
+                        <Icon name="document-text" className="w-8 h-8"/>
+                        <span className="font-semibold text-sm">{t('ad.create.add_document')}</span>
+                    </button>
                 </div>
+
+                {(formData.images?.length || 0) > 0 && (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                        {formData.images?.map((src, i) => (
+                            <div key={i} className="relative group">
+                                <img src={src} className="w-full h-24 object-cover rounded" alt="upload preview" />
+                                <button type="button" onClick={() => handleRemoveMedia('images', i)} className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100"><Icon name="close" className="w-4 h-4" /></button>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         );
       case 3: // Delivery
@@ -353,10 +348,10 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
                 <div className="space-y-2">
                     <label className="flex items-center">
                         <input type="checkbox" checked={offersHome} onChange={() => handleDeliveryTypeChange('home')} className="h-4 w-4 rounded text-indigo-600" />
-                        <span className="ml-2">{t('delivery.create_home_delivery_label')}</span>
+                        <span className="ms-2">{t('delivery.create_home_delivery_label')}</span>
                     </label>
                      {offersHome && (
-                        <div className="pl-6 space-y-2">
+                        <div className="ps-6 space-y-2">
                              <input type="number" name="cost" placeholder={t('delivery.create_cost_placeholder')} value={formData.delivery?.cost} onChange={handleDeliveryInputChange} className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm" />
                              <input type="text" name="time" placeholder={t('delivery.create_days_placeholder')} value={formData.delivery?.time} onChange={handleDeliveryInputChange} className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm" />
                         </div>
@@ -365,10 +360,10 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
                  <div className="space-y-2">
                     <label className="flex items-center">
                         <input type="checkbox" checked={offersPickup} onChange={() => handleDeliveryTypeChange('pickup')} className="h-4 w-4 rounded text-indigo-600" />
-                        <span className="ml-2">{t('delivery.create_pickup_label')}</span>
+                        <span className="ms-2">{t('delivery.create_pickup_label')}</span>
                     </label>
                      {offersPickup && (
-                        <div className="pl-6">
+                        <div className="ps-6">
                            <textarea name="instructions" placeholder={t('delivery.create_instructions_placeholder')} value={formData.delivery?.instructions} onChange={handleDeliveryInputChange} rows={3} className="mt-1 w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm"></textarea>
                         </div>
                      )}
@@ -397,12 +392,15 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
     <form onSubmit={handleSubmit}>
       {/* Stepper UI */}
       <div className="mb-8">
-        <ol className="flex items-center w-full">
+        <ol className="grid grid-cols-4 -mx-4">
           {steps.map((stepName, index) => (
-            <li key={stepName} className={`flex w-full items-center ${index + 1 < steps.length ? "after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block" : ''} ${index + 1 <= step ? 'text-indigo-600 dark:text-indigo-400 after:border-indigo-600' : 'after:border-gray-200'}`}>
-              <span className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${index + 1 <= step ? 'bg-indigo-100 dark:bg-indigo-800' : 'bg-gray-100 dark:bg-gray-700'}`}>
-                {index + 1}
-              </span>
+            <li key={stepName} className={`relative flex justify-center items-center ${index + 1 < steps.length ? "after:content-[''] after:absolute after:start-1/2 after:top-5 after:w-full after:h-1 after:border-b after:border-4" : ''} ${index + 1 <= step ? 'after:border-indigo-600' : 'after:border-gray-200 dark:after:border-gray-700'}`}>
+              <div className="z-10 flex flex-col items-center">
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 transition-colors ${index + 1 <= step ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
+                  {index + 1}
+                </div>
+                <p className={`mt-2 text-xs text-center font-semibold whitespace-nowrap ${index + 1 <= step ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500'}`}>{stepName}</p>
+              </div>
             </li>
           ))}
         </ol>
@@ -416,7 +414,7 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
         {step > 1 ? (
           <button type="button" onClick={prevStep} className="px-6 py-2 border rounded-md">{t('ad.create.prev_step')}</button>
         ) : (
-          <button type="button" onClick={onCancel} className="px-6 py-2 border rounded-md">Cancel</button>
+          <button type="button" onClick={handleCancel} className="px-6 py-2 border rounded-md">{t('ad.create.cancel')}</button>
         )}
         
         {step < 4 ? (
@@ -427,7 +425,7 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
       </div>
     </form>
      {isImageModalOpen && (
-        <Modal title="Upload Photos" onClose={() => setIsImageModalOpen(false)}>
+        <Modal title={t('ad.create.upload_photos')} onClose={() => setIsImageModalOpen(false)}>
             <ImageUploadModalContent 
                 onSave={(images) => setFormData(prev => ({...prev, images: [...(prev.images || []), ...images]}))}
                 onClose={() => setIsImageModalOpen(false)} 
@@ -435,7 +433,7 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
         </Modal>
     )}
     {isVideoModalOpen && (
-        <Modal title="Upload Video" onClose={() => setIsVideoModalOpen(false)}>
+        <Modal title={t('ad.create.upload_video')} onClose={() => setIsVideoModalOpen(false)}>
             <VideoUploadModalContent 
                 onSave={(url) => setFormData(prev => ({ ...prev, videos: [...(prev.videos || []), url] }))}
                 onClose={() => setIsVideoModalOpen(false)}
@@ -443,7 +441,7 @@ const AdCreationWizard: React.FC<AdCreationWizardProps> = ({ onAdCreated, onCanc
         </Modal>
     )}
     {isDocModalOpen && (
-        <Modal title="Upload Document" onClose={() => setIsDocModalOpen(false)}>
+        <Modal title={t('ad.create.upload_document')} onClose={() => setIsDocModalOpen(false)}>
             <DocumentUploadModalContent
                  onSave={(doc) => setFormData(prev => ({ ...prev, documents: [...(prev.documents || []), doc] }))}
                  onClose={() => setIsDocModalOpen(false)}
