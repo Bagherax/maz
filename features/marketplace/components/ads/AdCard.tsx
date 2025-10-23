@@ -133,10 +133,11 @@ const AdCard: React.FC<AdCardProps> = ({
 
         {!isEditing && <SeeMoreButton onClick={onExpandClick} />}
 
-        <div className="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-2">
-            <AdQuickActions adId={ad.id} />
-        </div>
-
+        {!isCompact && seller && (
+            <div className="absolute bottom-2 left-2 rtl:left-auto rtl:right-2">
+                <UserTierBadge tier={seller.tier} />
+            </div>
+        )}
       </div>
       <div className={`${paddingClass} flex-grow flex flex-col`}>
         {!isCompact && !isEditing && <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider truncate">{ad.category}</p>}
@@ -225,6 +226,7 @@ const AdCard: React.FC<AdCardProps> = ({
             </div>
         )}
       </div>
+      {!isEditing && <AdQuickActions ad={ad} />}
     </div>
   );
 };

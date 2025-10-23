@@ -62,7 +62,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center justify-center space-x-2 rtl:space-x-reverse break-all">
             <span>{viewedUser.name}</span>
-            {/* FIX: Wrap Icon in a span to apply the title attribute for tooltips. */}
+            {/* FIX: Wrap Icon in a span to provide a title attribute for the tooltip */}
             {viewedUser.isVerified && <span title={t('profile.verified')}><Icon name="check-badge" className="w-7 h-7 text-blue-500" /></span>}
           </h1>
           <div className="mt-2">

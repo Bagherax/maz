@@ -471,39 +471,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if(user?.id === userId) refreshCurrentUser();
     }
   }, [user, isGuest, refreshCurrentUser]);
-
+  
   // FIX: Implement missing chat moderation functions
-  const blockUser = useCallback(async (userId: string): Promise<void> => {
+  const blockUser = useCallback(async (userIdToBlock: string): Promise<void> => {
     if (!user || isGuest) return;
-    let usersDb = getUsersFromStorage();
+    const usersDb = getUsersFromStorage();
     const userIndex = usersDb.findIndex(u => u.id === user.id);
     if (userIndex > -1) {
-      const currentUserInDb = usersDb[userIndex];
-      const blocked = new Set(currentUserInDb.blockedUsers || []);
-      blocked.add(userId);
-      currentUserInDb.blockedUsers = Array.from(blocked);
-      saveUsersToStorage(usersDb);
-      refreshCurrentUser();
+        const currentUser = usersDb[userIndex];
+        const blocked = new Set(currentUser.blockedUsers || []);
+        blocked.add(userIdToBlock);
+        currentUser.blockedUsers = Array.from(blocked);
+        saveUsersToStorage(usersDb);
+        refreshCurrentUser();
     }
   }, [user, isGuest, refreshCurrentUser]);
 
-  const unblockUser = useCallback(async (userId: string): Promise<void> => {
-    if (!user || isGuest) return;
-    let usersDb = getUsersFromStorage();
-    const userIndex = usersDb.findIndex(u => u.id === user.id);
-    if (userIndex > -1) {
-      const currentUserInDb = usersDb[userIndex];
-      if (currentUserInDb.blockedUsers) {
-        currentUserInDb.blockedUsers = currentUserInDb.blockedUsers.filter(id => id !== userId);
-        saveUsersToStorage(usersDb);
-        refreshCurrentUser();
+  const unblockUser = useCallback(async (userIdToUnblock: string): Promise<void> => {
+      if (!user || isGuest) return;
+      const usersDb = getUsersFromStorage();
+      const userIndex = usersDb.findIndex(u => u.id === user.id);
+      if (userIndex > -1) {
+          const currentUser = usersDb[userIndex];
+          if (!currentUser.blockedUsers) return;
+          currentUser.blockedUsers = currentUser.blockedUsers.filter(id => id !== userIdToUnblock);
+          saveUsersToStorage(usersDb);
+          refreshCurrentUser();
       }
-    }
   }, [user, isGuest, refreshCurrentUser]);
 
   const isUserBlocked = useCallback((userId: string): boolean => {
-    return user?.blockedUsers?.includes(userId) ?? false;
+      return !!user?.blockedUsers?.includes(userId);
   }, [user]);
+
 
   const value: AuthContextType = {
     user,

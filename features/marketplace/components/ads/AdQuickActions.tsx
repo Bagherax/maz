@@ -1,46 +1,44 @@
 import React from 'react';
 import Icon from '../../../../components/Icon';
 import { useTheme } from '../../../../hooks/useTheme';
+import { useView } from '../../../../App';
+import { Ad } from '../../../../types';
+import { useLocalization } from '../../../../hooks/useLocalization';
 
 interface AdQuickActionsProps {
-  adId: string;
+  ad: Ad;
 }
 
-const AdQuickActions: React.FC<AdQuickActionsProps> = ({ adId }) => {
-  const { theme, toggleTheme } = useTheme();
+const QuickActionButton: React.FC<{ icon: React.ComponentProps<typeof Icon>['name'], label: string, onClick: (e: React.MouseEvent) => void }> = ({ icon, label, onClick }) => {
+    const stopPropagation = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onClick(e);
+    }
+    return (
+        <button onClick={stopPropagation} title={label} className="flex-1 flex items-center justify-center gap-1.5 p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs">
+            <Icon name={icon} className="w-4 h-4" />
+            <span className="font-semibold">{label}</span>
+        </button>
+    );
+};
 
-  const handleActionClick = (e: React.MouseEvent, action: string) => {
-    e.stopPropagation();
-    alert(`${action} for Ad ID: ${adId} is coming soon!`);
-  };
-  
-  const handleThemeToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toggleTheme();
-  };
 
-  const buttonClass = "flex-1 flex flex-col items-center justify-center text-white text-[10px] font-semibold hover:bg-white/20 p-1 rounded-md transition-colors";
+const AdQuickActions: React.FC<AdQuickActionsProps> = ({ ad }) => {
+  const { toggleTheme } = useTheme();
+  const { setView } = useView();
+  const { t } = useLocalization();
+
+  const handleBoost = () => alert('Paid Boost feature coming soon!');
+  const handleSocial = () => alert('Social Media Boost feature coming soon!');
+  const handleCreateSimilar = () => setView({ type: 'create' });
 
   return (
-    <div className="flex items-center justify-around gap-1 w-full h-full">
-      <button className={buttonClass} onClick={(e) => handleActionClick(e, 'Paid Boost')}>
-        <Icon name="rocket-launch" className="w-4 h-4 mb-0.5" />
-        <span>Boost</span>
-      </button>
-      <button className={buttonClass} onClick={(e) => handleActionClick(e, 'Social Media Boost')}>
-        <Icon name="share" className="w-4 h-4 mb-0.5" />
-        <span>Social</span>
-      </button>
-      <button className={buttonClass} onClick={handleThemeToggle}>
-        <Icon name={theme === 'dark' ? 'sun' : 'moon'} className="w-4 h-4 mb-0.5" />
-        <span>Theme</span>
-      </button>
-      <button className={buttonClass} onClick={(e) => handleActionClick(e, 'Quick Similar Ad')}>
-        <Icon name="plus" className="w-4 h-4 mb-0.5" />
-        <span>Similar</span>
-      </button>
+    <div className="flex justify-around items-center p-1 border-t border-gray-100 dark:border-gray-700/50">
+      <QuickActionButton icon="rocket-launch" label={t('ad_quick_actions.boost')} onClick={handleBoost} />
+      <QuickActionButton icon="share" label={t('ad_quick_actions.social')} onClick={handleSocial} />
+      <QuickActionButton icon="moon" label={t('ad_quick_actions.theme')} onClick={() => toggleTheme()} />
+      <QuickActionButton icon="plus" label={t('ad_quick_actions.similar')} onClick={handleCreateSimilar} />
     </div>
   );
 };
-
 export default AdQuickActions;

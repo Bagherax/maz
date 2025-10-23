@@ -625,6 +625,28 @@ export const ar = {
   'auction.suggested_bid': 'زاود بـ {amount}',
   'chat.join_auction_chat': 'انضم إلى دردشة المزاد',
 
+  // Smart Search Dropdown
+  'smart_search.quick_actions': '⚡ إجراءات سريعة',
+  'smart_search.add_new_ad': 'إضافة إعلان جديد',
+  'smart_search.day_night_switch': 'تبديل الوضع',
+  'smart_search.user_controls': '👤 تحكم المستخدم',
+  'smart_search.user_profile': 'الملف الشخصي',
+  'smart_search.favorites': 'المفضلة',
+  'smart_search.my_ads': 'إعلاناتي',
+  'smart_search.messages': 'الرسائل',
+  'smart_search.view_options': '🎨 خيارات العرض',
+  'smart_search.quick_navigation': '🧭 تنقل سريع',
+  'smart_search.recent_searches': 'عمليات البحث الأخيرة',
+  'smart_search.popular_categories': 'الفئات الشائعة',
+  'smart_search.trending_ads': 'الإعلانات الرائجة',
+  'smart_search.no_recent_searches': 'لا توجد عمليات بحث أخيرة',
+
+  // Ad Quick Actions
+  'ad_quick_actions.boost': 'تعزيز',
+  'ad_quick_actions.social': 'نشر',
+  'ad_quick_actions.theme': 'السمة',
+  'ad_quick_actions.similar': 'مشابه',
+
   // Revenue Model
   'revenue_model.title': 'نموذج الإيرادات',
   'revenue_model.paidAds.title': 'الإعلانات المدفوعة',

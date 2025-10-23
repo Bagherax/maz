@@ -161,7 +161,7 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
         await api.banUser(userId, reason);
         setState(prev => {
             if (!prev) return null;
-            // FIX: Use 'as const' to ensure TypeScript treats the status as a literal type.
+            // FIX: Use 'as const' to prevent type widening from 'banned' to 'string'.
             const newUsers = prev.users.map(u => u.id === userId ? { ...u, status: 'banned' as const, banReason: reason } : u);
             return { ...prev, users: newUsers };
         });
@@ -174,7 +174,7 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
         await api.unbanUser(userId);
         setState(prev => {
             if (!prev) return null;
-            // FIX: Use 'as const' to ensure TypeScript treats the status as a literal type.
+            // FIX: Use 'as const' to prevent type widening from 'active' to 'string'.
             const newUsers = prev.users.map(u => u.id === userId ? { ...u, status: 'active' as const, banReason: '' } : u);
             return { ...prev, users: newUsers };
         });

@@ -68,7 +68,7 @@ const OAuthHandler: React.FC<OAuthHandlerProps> = ({ provider, onBack }) => {
 
   return (
     <div className="mt-8 text-center space-y-4">
-        {/* FIX: Cast provider to `any` to satisfy Icon's `name` prop type, as `LoginMethod` is too broad. */}
+        {/* FIX: Cast provider to `any` because its type `LoginMethod` is wider than the accepted icon names. */}
         <Icon name={provider as any} className="w-16 h-16 mx-auto animate-pulse" style={{ color: 'var(--auth-color-primary)'}} />
         <p className="text-lg font-medium">
             {t('auth.connecting_to', { provider: providerName })}

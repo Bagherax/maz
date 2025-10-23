@@ -1,17 +1,10 @@
 import React, { createContext, useContext, useMemo, ReactNode } from 'react';
 // FIX: Imported UserTier and defined the Filters interface locally,
 // as the original import source is now obsolete and was causing a module resolution error.
-import { Ad, DisplayMode, SortOption, UserTier } from '../types';
+import { Ad, DisplayMode, SortOption, UserTier, Filters } from '../types';
 import { useLocalStorage } from '../hooks/usePersistentState';
 import { useMarketplace } from './MarketplaceContext';
 
-export interface Filters {
-    query: string;
-    categories: string[];
-    condition: 'all' | 'new' | 'used' | 'refurbished';
-    priceRange: [number, number];
-    sellerTiers: UserTier['level'][];
-}
 interface MarketplaceUIContextType {
     filters: Filters;
     onFilterChange: (newFilters: Partial<Filters>) => void;

@@ -1,127 +1,130 @@
-import React, { useState } from 'react';
+import React from 'react';
+import CategoryManager from './CategoryManager';
 import { useMarketplaceUI } from '../../../../context/MarketplaceUIContext';
 import { useAuth } from '../../../../hooks/useAuth';
 import { useLocalization } from '../../../../hooks/useLocalization';
 import SortDropdown from './SortDropdown';
 import DisplayModeSelector from './DisplayModeSelector';
 import Icon from '../../../../components/Icon';
-import CategoryManager from './CategoryManager';
 import { Filters, UserTier } from '../../../../types';
-import ThemeSwitcher from '../../../../components/ThemeSwitcher';
 import { useView } from '../../../../App';
+import { useTheme } from '../../../../hooks/useTheme';
 
-interface SmartSearchDropdownProps {
+interface SearchExpansionPanelProps {
   isExpanded: boolean;
-  onClose: () => void;
-  onOpenAdminDashboard: () => void;
+  recentSearches: string[];
+  onRecentSearchSelect: (query: string) => void;
 }
 
-const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <div className="py-4">
-    <h3 className="px-2 mb-3 text-xs font-bold uppercase text-gray-400 tracking-wider">{title}</h3>
-    <div className="px-1">{children}</div>
+const Section: React.FC<{ title: string; children: React.ReactNode, className?: string }> = ({ title, children, className = '' }) => (
+  <div className={`space-y-3 ${className}`}>
+    <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1">{title}</h3>
+    {children}
   </div>
 );
 
-const QuickButton: React.FC<{icon: React.ComponentProps<typeof Icon>['name'], label: string, onClick?: () => void, children?: React.ReactNode}> = ({icon, label, onClick, children}) => {
-    if (children) {
-        return <div className="p-2 w-full text-left rtl:text-right text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 flex items-center justify-between">{children}</div>
-    }
-    return (
-        <button onClick={onClick} className="p-2 w-full text-left rtl:text-right text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 flex items-center gap-3">
-            <Icon name={icon} className="w-5 h-5 text-gray-500" />
-            <span>{label}</span>
-        </button>
-    );
-};
+const ActionButton: React.FC<{ icon: React.ComponentProps<typeof Icon>['name'], label: string, onClick: () => void, iconColor?: string }> = ({ icon, label, onClick, iconColor = 'text-indigo-500' }) => (
+    <button onClick={onClick} className="w-full flex items-center gap-3 p-2 rounded-lg text-left text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+        <Icon name={icon} className={`w-5 h-5 ${iconColor}`} />
+        <span>{label}</span>
+    </button>
+);
 
-const SmartSearchDropdown: React.FC<SmartSearchDropdownProps> = ({ isExpanded, onClose, onOpenAdminDashboard }) => {
+
+const SearchExpansionPanel: React.FC<SearchExpansionPanelProps> = ({ isExpanded, recentSearches, onRecentSearchSelect }) => {
   const { 
-    filters, onFilterChange, displayMode, onDisplayModeChange, sortBy, onSortChange 
+    filters, 
+    onFilterChange,
+    displayMode,
+    onDisplayModeChange,
+    sortBy,
+    onSortChange
   } = useMarketplaceUI();
-  const { user, isGuest } = useAuth();
+  const { user, isAuthenticated, isGuest } = useAuth();
   const { t } = useLocalization();
   const { setView } = useView();
+  const { theme, toggleTheme } = useTheme();
 
   const handleCategorySelect = (categoryName: string) => {
-    onFilterChange({ categories: filters.categories.includes(categoryName) ? [] : [categoryName] });
-  };
-  
-  // FIX: Renamed function to `handleAction` to match its usage in onClick handlers.
-  const handleAction = (action: () => void) => {
-    action();
-    onClose();
+    onFilterChange({
+      categories: filters.categories.includes(categoryName) ? [] : [categoryName],
+    });
   };
 
   return (
     <div className={`
       overflow-hidden transition-all duration-500 ease-in-out
-      ${isExpanded ? 'max-h-[70vh] opacity-100' : 'max-h-0 opacity-0'}
+      ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}
     `}>
-      <div className="pb-4 space-y-2 animate-slide-down-fast overflow-y-auto max-h-[70vh]">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6">
+      <div className="py-4 grid grid-cols-1 md:grid-cols-4 gap-x-6 gap-y-6 animate-slide-down-fast">
+        {/* Section 1 & 2 */}
+        <div className="md:col-span-1 space-y-6">
+            <Section title={t('smart_search.quick_actions')}>
+                <ActionButton icon="plus" label={t('smart_search.add_new_ad')} onClick={() => setView({type: 'create'})} />
+                <ActionButton icon="rocket-launch" label={t('controls.add_paid_ad')} onClick={() => alert('Paid Ads feature coming soon!')} />
+                <ActionButton icon="share" label={t('controls.social_booster')} onClick={() => alert('Social Booster feature coming soon!')} />
+                <ActionButton icon={theme === 'dark' ? 'sun' : 'moon'} label={t('smart_search.day_night_switch')} onClick={toggleTheme} />
+            </Section>
             
-            {/* SECTION 1: QUICK ACTIONS */}
-            <Section title={t('controls.actions')}>
-                <div className="space-y-1">
-                    <QuickButton icon="plus" label={t('createAd')} onClick={() => handleAction(() => setView({type: 'create'}))} />
-                    <QuickButton icon="bolt" label={t('controls.add_paid_ad')} onClick={() => alert('Paid Ads promotions coming soon!')} />
-                    <QuickButton icon="share" label={t('controls.social_booster')} onClick={() => alert('Social Media Booster coming soon!')} />
-                    <QuickButton icon="cog" label={t('admin.title')} onClick={() => handleAction(onOpenAdminDashboard)} />
-                    <QuickButton icon="palette" label="Theme">
-                        <ThemeSwitcher />
-                    </QuickButton>
-                </div>
-            </Section>
+            {isAuthenticated && !isGuest && user && (
+                 <Section title={t('smart_search.user_controls')}>
+                    <ActionButton icon="user-circle" label={t('smart_search.user_profile')} onClick={() => setView({type: 'profile', id: user.id})} />
+                    <ActionButton icon="heart" label={t('smart_search.favorites')} onClick={() => alert('Favorites page coming soon!')} />
+                    <ActionButton icon="queue-list" label={t('smart_search.my_ads')} onClick={() => setView({type: 'profile', id: user.id})} />
+                    <ActionButton icon="chat-bubble-left-right" label={t('smart_search.messages')} onClick={() => setView({type: 'chat'})} />
+                </Section>
+            )}
+        </div>
 
-            {/* SECTION 2: USER MANAGEMENT */}
-            <Section title={t('controls.user_section')}>
-                 <div className="space-y-1">
-                    {!isGuest && user && <QuickButton icon="user-circle" label={t('bottom_nav.profile')} onClick={() => handleAction(() => setView({ type: 'profile', id: user.id }))} />}
-                    {!isGuest && <QuickButton icon="heart" label={t('bottom_nav.favorites')} onClick={() => alert('Favorites page coming soon!')} />}
-                    {!isGuest && <QuickButton icon="queue-list" label={t('profile.my_ads')} onClick={() => alert('My Ads page coming soon!')} />}
-                    {!isGuest && <QuickButton icon="chat-bubble-left-right" label={t('bottom_nav.messages')} onClick={() => handleAction(() => setView({type: 'chat'}))} />}
-                </div>
-            </Section>
-
-            {/* SECTION 3: DISPLAY CONTROLS */}
-            <Section title={t('controls.display_options')}>
-                <div className="space-y-4">
-                     <div>
-                        <label className="text-sm font-medium text-gray-500">{t('controls.view.mode')}</label>
-                        <div className="mt-2">
-                            <DisplayModeSelector selected={displayMode} onSelect={onDisplayModeChange} />
-                        </div>
+        {/* Section 3 */}
+        <div className="md:col-span-2 space-y-6">
+            <Section title={t('smart_search.view_options')}>
+                <div className="p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400">{t('controls.display')}</label>
+                    <div className="mt-1">
+                        <DisplayModeSelector selected={displayMode} onSelect={onDisplayModeChange} />
                     </div>
-                    <div>
-                        <label htmlFor="sort-by" className="text-sm font-medium text-gray-500">{t('controls.sort_by')}</label>
-                        <div className="mt-2">
-                            <SortDropdown selected={sortBy} onSelect={onSortChange} />
-                        </div>
+                </div>
+                 <div className="p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                    <label htmlFor="sort-by" className="text-xs font-semibold text-gray-500 dark:text-gray-400">{t('controls.sort_by')}</label>
+                    <div className="mt-1">
+                        <SortDropdown selected={sortBy} onSelect={onSortChange} />
                     </div>
                 </div>
             </Section>
-            
-             {/* SECTION 4: QUICK NAVIGATION */}
-            <Section title="Navigation">
-                 <div className="space-y-1">
-                    <QuickButton icon="magnifying-glass" label="Recent: iPhone" onClick={() => onFilterChange({ query: 'iPhone'})} />
-                    <QuickButton icon="bolt" label="Popular: Electronics" onClick={() => handleCategorySelect('Electronics')} />
-                    <QuickButton icon="rocket-launch" label="Trending: Laptops" onClick={() => onFilterChange({ query: 'Laptop'})} />
+             <Section title={t('controls.categories')}>
+                 <CategoryManager 
+                    selectedCategory={filters.categories.length > 0 ? filters.categories[0] : undefined}
+                    onSelectCategory={handleCategorySelect}
+                    isAdmin={!!user?.isAdmin}
+                />
+            </Section>
+        </div>
+
+        {/* Section 4 */}
+        <div className="md:col-span-1 space-y-6">
+            <Section title={t('smart_search.quick_navigation')}>
+                <div>
+                    <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2">{t('smart_search.recent_searches')}</h4>
+                    {recentSearches.length > 0 ? (
+                        <div className="space-y-1">
+                            {recentSearches.map(term => (
+                                <button key={term} onClick={() => onRecentSearchSelect(term)} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-2">
+                                    <Icon name="arrow-path" className="w-4 h-4 text-gray-400" />
+                                    <span>{term}</span>
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-xs text-gray-500">{t('smart_search.no_recent_searches')}</p>
+                    )}
                 </div>
             </Section>
+        </div>
 
-        </div>
-        <div className="border-t dark:border-gray-700 pt-4 mt-2">
-            <CategoryManager 
-                selectedCategory={filters.categories.length > 0 ? filters.categories[0] : undefined}
-                onSelectCategory={handleCategorySelect}
-                isAdmin={!!user?.isAdmin}
-            />
-        </div>
       </div>
     </div>
   );
 };
 
-export default SmartSearchDropdown;
+export default SearchExpansionPanel;

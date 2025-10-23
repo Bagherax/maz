@@ -329,8 +329,8 @@ export type View =
   | { type: 'profile'; id: string } 
   | { type: 'cloud-sync' } 
   | { type: 'language-settings' }
-  | { type: 'chat' }
-  | { type: 'chat'; conversationId: string };
+  // FIX: Merge chat view types into one with an optional conversationId
+  | { type: 'chat'; conversationId?: string };
 
 export interface AppContextType {
     view: View;

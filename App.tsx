@@ -65,7 +65,7 @@ const AppContent: React.FC = () => {
       case 'language-settings':
         return <LanguageSettings />;
       case 'chat':
-        // FIX: Check if `conversationId` exists on the view object before accessing it.
+        // FIX: Check for conversationId's existence before passing it down.
         return <ChatPage conversationId={'conversationId' in view ? view.conversationId : undefined} />;
       case 'marketplace':
       case 'ad': // MarketplacePage is always visible now, panel slides over
@@ -79,9 +79,8 @@ const AppContent: React.FC = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <SearchBar onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)} />
         <main className="pt-20 pb-16 md:pb-0 transition-all duration-500" style={{ filter: selectedAd ? 'blur(4px)' : 'none' }}>
-          {/* FIX: Wrap renderMainView in a fragment to ensure it's treated as a valid child element for ErrorBoundary. */}
           <ErrorBoundary>
-            <>{renderMainView()}</>
+            {renderMainView()}
           </ErrorBoundary>
         </main>
         <AdDetailPanel ad={selectedAd} isOpen={!!selectedAd} onClose={() => setView({ type: 'marketplace' })} />

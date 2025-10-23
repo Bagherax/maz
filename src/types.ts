@@ -1,5 +1,6 @@
 
 
+
 import { ReactNode, Dispatch, SetStateAction } from 'react';
 
 export type Theme = 'light' | 'dark';
@@ -243,7 +244,8 @@ export interface Ad {
   reviews: Review[];
   comments: Comment[];
   reports: Report[];
-  status: 'active' | 'sold' | 'expired' | 'banned';
+  // FIX: Add 'sold_auction' to the status union type
+  status: 'active' | 'sold' | 'expired' | 'banned' | 'sold_auction';
   bannedReason?: string;
 }
 

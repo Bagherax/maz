@@ -13,7 +13,7 @@ const UserModerationPanel: React.FC<UserModerationPanelProps> = ({ userToModerat
   const [banReason, setBanReason] = useState('');
   const [selectedTier, setSelectedTier] = useState<UserTier['level']>(userToModerate.tier);
   // FIX: Use `useAuth` hook which provides user management functions.
-  const { banUser, unbanUser, updateUserTier } = useAuth();
+  const { banUser, updateUserTier } = useAuth();
   const { t } = useLocalization();
 
   const handleBanUser = async () => {

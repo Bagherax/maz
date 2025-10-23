@@ -623,7 +623,27 @@ export const en = {
   'auction.suggested_bid': 'Bid {amount}',
   'chat.join_auction_chat': 'Join Auction Chat',
 
+  // Smart Search Dropdown
+  'smart_search.quick_actions': '⚡ Quick Actions',
+  'smart_search.add_new_ad': 'Add New Ad',
+  'smart_search.day_night_switch': 'Day/Night Switch',
+  'smart_search.user_controls': '👤 User Controls',
+  'smart_search.user_profile': 'User Profile',
+  'smart_search.favorites': 'Favorites',
+  'smart_search.my_ads': 'My Ads',
+  'smart_search.messages': 'Messages',
+  'smart_search.view_options': '🎨 View Options',
+  'smart_search.quick_navigation': '🧭 Quick Navigation',
+  'smart_search.recent_searches': 'Recent Searches',
+  'smart_search.popular_categories': 'Popular Categories',
+  'smart_search.trending_ads': 'Trending Ads',
+  'smart_search.no_recent_searches': 'No recent searches',
 
+  // Ad Quick Actions
+  'ad_quick_actions.boost': 'Boost',
+  'ad_quick_actions.social': 'Social',
+  'ad_quick_actions.theme': 'Theme',
+  'ad_quick_actions.similar': 'Similar',
 
   // Revenue Model
   'revenue_model.title': 'Revenue Model',

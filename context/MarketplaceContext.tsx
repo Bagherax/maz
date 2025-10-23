@@ -362,7 +362,7 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
                                 if (winner.id === currentUser?.id) {
                                     addNotification(t('auction.winner_notification_body', { title: ad.title }), 'success');
                                 }
-                                // FIX: Use `as const` to ensure TypeScript treats the status as a literal type.
+                                // FIX: Use 'as const' to ensure TypeScript infers the literal type, not 'string'
                                 return { ...ad, status: 'sold_auction' as const, auctionDetails: { ...ad.auctionDetails, winnerId: winner.id } };
                             }
                         }
@@ -370,7 +370,7 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
                         if (currentUser && finalBids.some(b => b.bidderId === currentUser.id)) {
                              addNotification(t('auction.loser_notification_body', { title: ad.title }), 'info');
                         }
-                        // FIX: Use `as const` to ensure TypeScript treats the status as a literal type.
+                        // FIX: Use 'as const' to ensure TypeScript infers the literal type, not 'string'
                         return { ...ad, status: 'expired' as const };
                     }
                     return ad;
