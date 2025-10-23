@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useMarketplace } from '../../context/MarketplaceContext';
-import { useAuth } from '../../hooks/useAuth';
 import { useLocalization } from '../../hooks/useLocalization';
 import UserTierBadge from '../marketplace/components/users/UserTierBadge';
 import { User } from '../../types';
+import { useAuth } from '../../hooks/useAuth';
 
 const UserManagement: React.FC = () => {
-  const { users, refreshUsers } = useMarketplace();
+  const { users } = useMarketplace();
+  // FIX: User moderation functions are in AuthContext.
   const { banUser, unbanUser } = useAuth();
   const { t } = useLocalization();
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,13 +21,11 @@ const UserManagement: React.FC = () => {
     const reason = prompt(t('admin.ban_prompt', { name }));
     if (reason !== null) { // Handle cancel
       await banUser(userId, reason || t('moderation.no_reason_provided'));
-      refreshUsers();
     }
   };
   
   const handleUnban = async (userId: string) => {
     await unbanUser(userId);
-    refreshUsers();
   }
 
   const filteredUsers = useMemo(() => allUsers.filter(user =>
@@ -70,7 +69,6 @@ const UserManagement: React.FC = () => {
         await Promise.all(promises);
     }
 
-    refreshUsers();
     setSelectedUserIds(new Set());
   }
 

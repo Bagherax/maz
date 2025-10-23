@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { Ad, DisplayMode } from '../../../../types';
 import { useLocalization } from '../../../../hooks/useLocalization';
@@ -9,6 +7,7 @@ import { useAuth } from '../../../../hooks/useAuth';
 import UserTierBadge from '../users/UserTierBadge';
 import SeeMoreButton from '../../../../components/SeeMoreButton';
 import { useView } from '../../../../App';
+import AdQuickActions from './AdQuickActions';
 
 
 interface AdCardProps {
@@ -34,7 +33,8 @@ const AdCard: React.FC<AdCardProps> = ({
 }) => {
   const { language, t } = useLocalization();
   const { toggleLike, isLiked } = useMarketplace();
-  const { getUserById, promptLoginIfGuest } = useAuth();
+  // FIX: `getUserById` and guest checks are part of AuthContext.
+  const { promptLoginIfGuest, getUserById } = useAuth();
   const { setView } = useView();
 
   const [editData, setEditData] = useState({
@@ -99,10 +99,17 @@ const AdCard: React.FC<AdCardProps> = ({
       <div className="relative">
         <img src={ad.images[0]} alt={ad.title} className={`${imageSizeClass} w-full object-cover`} />
         
-        <div className="absolute top-2 left-2 rtl:left-auto rtl:right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm flex items-center space-x-1 rtl:space-x-reverse">
-          <Icon name={mediaSource === 'P2P' ? 'share-network' : 'cloud-arrow-up'} className="w-3 h-3" />
-          <span>{mediaSource}</span>
-        </div>
+        {ad.isAuction ? (
+             <div className="absolute top-2 left-2 rtl:left-auto rtl:right-2 bg-indigo-600 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-lg">
+                <Icon name="gavel" className="w-3 h-3" />
+                <span>{t('auction.title')}</span>
+            </div>
+        ) : (
+            <div className="absolute top-2 left-2 rtl:left-auto rtl:right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm flex items-center space-x-1 rtl:space-x-reverse">
+                <Icon name={mediaSource === 'P2P' ? 'share-network' : 'cloud-arrow-up'} className="w-3 h-3" />
+                <span>{mediaSource}</span>
+            </div>
+        )}
 
         {!isEditing && (
             <button 
@@ -126,11 +133,10 @@ const AdCard: React.FC<AdCardProps> = ({
 
         {!isEditing && <SeeMoreButton onClick={onExpandClick} />}
 
-        {!isCompact && seller && (
-            <div className="absolute bottom-2 left-2 rtl:left-auto rtl:right-2">
-                <UserTierBadge tier={seller.tier} />
-            </div>
-        )}
+        <div className="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-2">
+            <AdQuickActions adId={ad.id} />
+        </div>
+
       </div>
       <div className={`${paddingClass} flex-grow flex flex-col`}>
         {!isCompact && !isEditing && <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider truncate">{ad.category}</p>}
@@ -183,9 +189,18 @@ const AdCard: React.FC<AdCardProps> = ({
                 />
             </div>
           ) : (
-            <p className={`text-indigo-500 dark:text-indigo-400 font-bold ${isCompact ? 'text-base' : 'text-xl'}`}>
-                {new Intl.NumberFormat(language, { style: 'currency', currency: ad.currency, notation: isCompact ? 'compact' : 'standard' }).format(ad.price)}
-            </p>
+            ad.isAuction && ad.auctionDetails ? (
+                <div className={`font-bold ${isCompact ? 'text-base' : 'text-xl'}`}>
+                    <span className="text-sm font-normal text-gray-500 dark:text-gray-400 block -mb-1">{t('auction.current_bid')}</span>
+                    <span className="text-indigo-500 dark:text-indigo-400">
+                        {new Intl.NumberFormat(language, { style: 'currency', currency: ad.currency, notation: 'compact' }).format(ad.auctionDetails.currentBid)}
+                    </span>
+                </div>
+            ) : (
+                <p className={`text-indigo-500 dark:text-indigo-400 font-bold ${isCompact ? 'text-base' : 'text-xl'}`}>
+                    {new Intl.NumberFormat(language, { style: 'currency', currency: ad.currency, notation: isCompact ? 'compact' : 'standard' }).format(ad.price)}
+                </p>
+            )
           )}
           {!isCompact && seller && !isEditing && (
             <div className="flex items-center space-x-2 rtl:space-x-reverse hover:opacity-80" onClick={(e) => { e.stopPropagation(); setView({type: 'profile', id: seller.id })}}>

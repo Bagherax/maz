@@ -83,7 +83,21 @@ export const MOCK_ADS: Ad[] = [
     specifications: { brand: 'Dell', model: 'XPS 15 9520', color: 'Silver', warranty: true },
     stats: { views: 850, likes: 65, shares: 8, createdAt: '2024-05-18T14:00:00Z', updatedAt: '2024-05-21T10:00:00Z' },
     delivery: { available: true, cost: 25, time: '2-4 days', type: 'delivery' },
-    availability: { quantity: 1, inStock: true }
+    availability: { quantity: 1, inStock: true },
+    isAuction: true,
+    auctionDetails: {
+      startTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      endTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      startingBid: 1200,
+      currentBid: 1600,
+      bids: [
+        { bidderId: 'seller-3', amount: 1300, timestamp: new Date(Date.now() - 20 * 60 * 60 * 1000).toISOString() },
+        { bidderId: 'seller-4', amount: 1500, timestamp: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString() },
+        { bidderId: 'seller-2', amount: 1600, timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
+      ],
+      reservePrice: 1500,
+      buyNowPrice: 2000,
+    }
   }),
   createAd(3, 6, {
     title: 'Brand New Sony WH-1000XM5 Headphones', description: 'Unopened, factory-sealed Sony noise-cancelling headphones. Won them in a contest but already have a pair.', price: 350, currency: 'USD',
@@ -219,7 +233,7 @@ export const MOCK_ADS: Ad[] = [
   // 3 Vehicles
   createAd(17, 3, {
     title: '2019 Toyota RAV4 Hybrid', description: 'Excellent condition, one owner, low mileage (35,000 miles). All-wheel drive, great fuel economy. All service records available.', price: 28000, currency: 'USD',
-    images: ['https://images.unsplash.com/photo-1626953424151-487213425e43?q=80&w=500', 'https://images.unsplash.com/photo-1617469739922-26645e12f1a6?q=80&w=500'], category: 'Vehicles', condition: 'used',
+    images: ['https://images.unsplash.com/photo-1626953424151-487213425e43?q=80&w=500', 'https://images.unsplash.com/photo-1617469739922-26645e1a6?q=80&w=500'], category: 'Vehicles', condition: 'used',
     location: { city: 'Denver', country: 'USA', coordinates: { lat: 39.7392, lng: -104.9903 } },
     specifications: { brand: 'Toyota', model: 'RAV4 Hybrid XLE', color: 'Magnetic Gray', warranty: false },
     stats: { views: 3500, likes: 250, shares: 40, createdAt: '2024-05-20T15:00:00Z', updatedAt: '2024-05-21T11:00:00Z' },
@@ -230,246 +244,9 @@ export const MOCK_ADS: Ad[] = [
     title: 'Custom Cafe Racer Motorcycle', description: 'Beautifully restored and customized 1978 Honda CB750. A real head-turner. Runs perfectly.', price: 8500, currency: 'USD',
     images: ['https://images.unsplash.com/photo-1558981403-c5f9899a28bc?q=80&w=500', 'https://images.unsplash.com/photo-1558981852-426c6c22a060?q=80&w=500'], category: 'Vehicles', condition: 'used',
     location: { city: 'Berlin', country: 'Germany', coordinates: { lat: 52.5200, lng: 13.4050 } },
-    specifications: { brand: 'Honda', model: 'CB750 Custom', color: 'Matte Black', warranty: false },
-    stats: { views: 1900, likes: 300, shares: 50, createdAt: '2024-05-18T20:00:00Z', updatedAt: '2024-05-20T21:00:00Z' },
+    specifications: { brand: 'Honda', model: 'CB750 Custom', color: 'Black', warranty: false },
+    stats: { views: 4200, likes: 450, shares: 80, createdAt: '2024-05-15T18:00:00Z', updatedAt: '2024-05-22T20:00:00Z' },
     delivery: { available: false, cost: 0, time: 'N/A', type: 'pickup' },
     availability: { quantity: 1, inStock: true }
-  }),
-  createAd(19, 7, {
-    title: 'Trek Marlin 5 Mountain Bike', description: 'Brand new Marlin 5, size M/L. Great for trails and city commuting. Never ridden.', price: 650, currency: 'USD',
-    images: ['https://images.unsplash.com/photo-1576426863848-c21f68c6aa92?q=80&w=500', 'https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?q=80&w=500'], category: 'Vehicles', condition: 'new',
-    location: { city: 'Vancouver', country: 'Canada', coordinates: { lat: 49.2827, lng: -123.1207 } },
-    specifications: { brand: 'Trek', model: 'Marlin 5', color: 'Red', size: 'M/L', warranty: true },
-    stats: { views: 500, likes: 45, shares: 10, createdAt: '2024-05-22T14:00:00Z', updatedAt: '2024-05-22T14:00:00Z' },
-    delivery: { available: false, cost: 0, time: 'N/A', type: 'pickup' },
-    availability: { quantity: 1, inStock: true }
-  }),
-  // 3 Real Estate
-  createAd(20, 4, {
-    title: 'Downtown Loft Apartment for Rent', description: 'Spacious 1-bedroom loft with high ceilings, exposed brick, and city views. 12-month lease. Price is per month.', price: 3200, currency: 'USD',
-    images: ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=500', 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=500'], category: 'Real Estate', condition: 'used', // 'used' for rentals
-    location: { city: 'New York', country: 'USA', coordinates: { lat: 40.7128, lng: -74.0060 } },
-    specifications: { brand: 'N/A', model: 'Apartment', color: 'N/A', size: '800 sqft', warranty: false },
-    stats: { views: 5600, likes: 300, shares: 50, createdAt: '2024-05-15T10:00:00Z', updatedAt: '2024-05-20T12:00:00Z' },
-    delivery: { available: false, cost: 0, time: 'N/A', type: 'pickup' },
-    availability: { quantity: 1, inStock: true }
-  }),
-  createAd(21, 4, {
-    title: 'Luxury Villa with Pool for Sale', description: 'Stunning 5-bedroom villa in a gated community. Features a private pool, home theater, and modern kitchen.', price: 2500000, currency: 'USD',
-    images: ['https://images.unsplash.com/photo-1600585152220-90363fe7e115?q=80&w=500', 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=500'], category: 'Real Estate', condition: 'used', // 'used' for resales
-    location: { city: 'Dubai', country: 'UAE', coordinates: { lat: 25.276987, lng: 55.296249 } },
-    specifications: { brand: 'N/A', model: 'Villa', color: 'N/A', size: '6,000 sqft', warranty: false },
-    stats: { views: 8900, likes: 800, shares: 120, createdAt: '2024-05-10T11:00:00Z', updatedAt: '2024-05-19T17:00:00Z' },
-    delivery: { available: false, cost: 0, time: 'N/A', type: 'pickup' },
-    availability: { quantity: 1, inStock: true }
-  }),
-  createAd(22, 4, {
-    title: 'Cozy Suburban House', description: 'Charming 3-bed, 2-bath house with a large backyard. Perfect for a family. Located in a great school district.', price: 650000, currency: 'USD',
-    images: ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=500', 'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?q=80&w=500'], category: 'Real Estate', condition: 'used',
-    location: { city: 'Sydney', country: 'Australia', coordinates: { lat: -33.8688, lng: 151.2093 } },
-    specifications: { brand: 'N/A', model: 'House', color: 'N/A', size: '2,200 sqft', warranty: false },
-    stats: { views: 4500, likes: 420, shares: 80, createdAt: '2024-05-17T13:00:00Z', updatedAt: '2024-05-22T10:00:00Z' },
-    delivery: { available: false, cost: 0, time: 'N/A', type: 'pickup' },
-    availability: { quantity: 1, inStock: true }
-  }),
-  // 2 Services
-  createAd(23, 5, {
-    title: 'Freelance Web Development', description: 'Professional website design and development services. Specializing in React, Node.js, and e-commerce solutions. Price is per hour.', price: 75, currency: 'USD',
-    images: ['https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=500', 'https://images.unsplash.com/photo-1522071820081-009f0129c7da?q=80&w=500'], category: 'Services', condition: 'new',
-    location: { city: 'Remote', country: 'Worldwide', coordinates: { lat: 0, lng: 0 } },
-    specifications: { brand: 'N/A', model: 'Web Development', warranty: false, color: 'N/A' },
-    stats: { views: 1300, likes: 90, shares: 15, createdAt: '2024-05-21T11:00:00Z', updatedAt: '2024-05-21T11:00:00Z' },
-    delivery: { available: false, cost: 0, time: 'N/A', type: 'delivery' },
-    availability: { quantity: 99, inStock: true }
-  }, [
-    { id: 'rep3', reporter: MOCK_SELLERS[1] as User, reason: 'This seems like spam.', createdAt: new Date('2024-05-21T15:00:00Z') }
-  ]),
-  createAd(24, 6, {
-    title: 'Math & Physics Tutoring', description: 'Experienced tutor available for high school and university level math and physics. Online sessions via Zoom. Price is per hour.', price: 50, currency: 'USD',
-    images: ['https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=500', 'https://images.unsplash.com/photo-1596495577886-d9256f442323?q=80&w=500'], category: 'Services', condition: 'new',
-    location: { city: 'Remote', country: 'Worldwide', coordinates: { lat: 0, lng: 0 } },
-    specifications: { brand: 'N/A', model: 'Tutoring', warranty: false, color: 'N/A' },
-    stats: { views: 450, likes: 30, shares: 3, createdAt: '2024-04-18T17:00:00Z', updatedAt: '2024-05-18T17:00:00Z' },
-    delivery: { available: false, cost: 0, time: 'N/A', type: 'delivery' },
-    availability: { quantity: 99, inStock: true },
-    documents: [{
-      name: 'Course_Syllabus.pdf',
-      url: '#', // In a real app, this would be a URL to the PDF file
-      previewUrl: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=500' // A placeholder image simulating the first page
-    }]
   }),
 ];
-
-// --- Augment Ads with Social Data ---
-
-// Ad 1: iPhone 14 Pro
-const ad01 = MOCK_ADS.find(ad => ad.id === 'ad-01');
-if (ad01) {
-    ad01.reviews = [
-        {
-            id: 'review-1-1', author: MOCK_SELLERS[2] as User, text: "Got the phone, it's exactly as described. Flawless condition. Thanks Tom!",
-            rating: 5, likes: 12, replies: [], createdAt: new Date('2024-05-23T10:00:00Z'), isEdited: false,
-        },
-        {
-            id: 'review-1-2', author: MOCK_SELLERS[1] as User, text: "Fast shipping and great communication. The phone is perfect.",
-            rating: 5, likes: 8, replies: [], createdAt: new Date('2024-05-24T11:00:00Z'), isEdited: false,
-        },
-    ];
-    ad01.comments = [
-        {
-            id: 'comment-1-1', author: MOCK_SELLERS[6] as User, text: "Is the price negotiable?",
-            likes: 2,
-            replies: [
-                {
-                    id: 'reply-1-1-1', author: MOCK_SELLERS[0] as User, text: "Hi Nick, the price is firm for now as it's already a good deal for its condition. Thanks for your interest!",
-                    likes: 5, replies: [], createdAt: new Date('2024-05-21T14:00:00Z'), isEdited: false,
-                }
-            ],
-            createdAt: new Date('2024-05-21T12:30:00Z'), isEdited: false,
-        },
-        {
-            id: 'comment-1-2', author: MOCK_SELLERS[3] as User, text: "Does it come with a case?",
-            likes: 1, replies: [], createdAt: new Date('2024-05-22T09:00:00Z'), isEdited: false,
-        }
-    ];
-    const totalRating = ad01.reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
-    ad01.rating = totalRating / (ad01.reviews.length || 1);
-}
-
-// Ad 7: Vintage Levi's Denim Jacket
-const ad07 = MOCK_ADS.find(ad => ad.id === 'ad-07');
-if (ad07) {
-    ad07.reviews = [
-        {
-            id: 'review-7-1', author: MOCK_SELLERS[3] as User, text: "This jacket is even better in person. Perfectly worn in. A real classic.",
-            rating: 5, likes: 15, replies: [], createdAt: new Date('2024-05-21T18:00:00Z'), isEdited: false,
-        },
-        {
-            id: 'review-7-2', author: MOCK_SELLERS[6] as User, text: "Shipping was a bit slow, but the item is great.",
-            rating: 4, likes: 2, replies: [], createdAt: new Date('2024-05-22T19:00:00Z'), isEdited: false,
-        },
-    ];
-    ad07.comments = [
-        {
-            id: 'comment-7-1', author: MOCK_SELLERS[2] as User, text: "What are the measurements (pit to pit, length)?",
-            likes: 4, 
-            replies: [
-                {
-                    id: 'reply-7-1-1', author: MOCK_SELLERS[1] as User, text: "Sure! It's 22 inches pit to pit and 25 inches from collar to hem.",
-                    likes: 3, replies: [], createdAt: new Date('2024-05-20T10:00:00Z'), isEdited: false,
-                }
-            ], 
-            createdAt: new Date('2024-05-19T20:00:00Z'), isEdited: false,
-        }
-    ];
-    const totalRating = ad07.reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
-    ad07.rating = totalRating / (ad07.reviews.length || 1);
-}
-
-// Ad 17: Toyota RAV4 - Add a review
-const ad17 = MOCK_ADS.find(ad => ad.id === 'ad-17');
-if (ad17) {
-    ad17.reviews = [
-        {
-            id: 'review-17-1', author: MOCK_SELLERS[0] as User, text: "Gary is a true professional. The car was in even better condition than described. Smooth transaction.",
-            rating: 5, likes: 10, replies: [], createdAt: new Date('2024-05-23T18:00:00Z'), isEdited: false,
-        }
-    ];
-    ad17.comments = [
-        {
-            id: 'comment-17-1', author: MOCK_SELLERS[2] as User, text: "Has the car been in any accidents?",
-            likes: 7, 
-            replies: [
-                {
-                    id: 'reply-17-1-1', author: MOCK_SELLERS[3] as User, text: "Nope, clean title and no accidents. Happy to provide the CARFAX report.",
-                    likes: 9, replies: [], createdAt: new Date('2024-05-21T10:00:00Z'), isEdited: false,
-                }
-            ], 
-            createdAt: new Date('2024-05-20T21:00:00Z'), isEdited: false,
-        }
-    ];
-    const totalRating = ad17.reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
-    ad17.rating = totalRating / (ad17.reviews.length || 1);
-}
-
-// Ad 2: Dell XPS 15 Laptop
-const ad02 = MOCK_ADS.find(ad => ad.id === 'ad-02');
-if (ad02) {
-    ad02.reviews = [
-        {
-            id: 'review-2-1', author: MOCK_SELLERS[6] as User, text: "Laptop is a beast! Arrived quickly and was packaged securely. Exactly as described.",
-            rating: 5, likes: 7, replies: [], createdAt: new Date('2024-05-22T10:00:00Z'), isEdited: false,
-        },
-        {
-            id: 'review-2-2', author: MOCK_SELLERS[5] as User, text: "Great laptop, fair price. There was a minor issue with a driver but the seller was super helpful in resolving it.",
-            rating: 4, likes: 3, replies: [], createdAt: new Date('2024-05-23T11:00:00Z'), isEdited: false,
-        },
-    ];
-    ad02.comments = [
-        {
-            id: 'comment-2-1', author: MOCK_SELLERS[5] as User, text: "Is the RAM user-upgradeable on this model?",
-            likes: 3,
-            replies: [
-                {
-                    id: 'reply-2-1-1', author: MOCK_SELLERS[0] as User, text: "Yes, it is. This model has two SODIMM slots and supports up to 64GB of RAM.",
-                    likes: 6, replies: [], createdAt: new Date('2024-05-20T14:00:00Z'), isEdited: false,
-                }
-            ],
-            createdAt: new Date('2024-05-20T12:30:00Z'), isEdited: false,
-        },
-    ];
-    const totalRating = ad02.reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
-    ad02.rating = totalRating / (ad02.reviews.length || 1);
-}
-
-// Ad 8: Gucci Marmont Handbag
-const ad08 = MOCK_ADS.find(ad => ad.id === 'ad-08');
-if (ad08) {
-    ad08.reviews = [
-        {
-            id: 'review-8-1', author: MOCK_SELLERS[4] as User, text: "Absolutely stunning bag. It's authentic and in perfect condition. Fiona is a pleasure to buy from.",
-            rating: 5, likes: 22, replies: [], createdAt: new Date('2024-05-23T14:00:00Z'), isEdited: false,
-        }
-    ];
-    ad08.comments = [
-         {
-            id: 'comment-8-1', author: MOCK_SELLERS[6] as User, text: "Hi, can you confirm its authenticity? Any proof of purchase?",
-            likes: 5,
-            replies: [
-                {
-                    id: 'reply-8-1-1', author: MOCK_SELLERS[1] as User, text: "Hi! Absolutely, it's 100% authentic. I have the original receipt from the Gucci boutique and all authenticity cards, which will be included.",
-                    likes: 8, replies: [], createdAt: new Date('2024-05-22T16:00:00Z'), isEdited: false,
-                }
-            ],
-            createdAt: new Date('2024-05-22T15:30:00Z'), isEdited: false,
-        },
-    ];
-    const totalRating = ad08.reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
-    ad08.rating = totalRating / (ad08.reviews.length || 1);
-}
-
-// Ad 13: Mid-Century Modern Sofa
-const ad13 = MOCK_ADS.find(ad => ad.id === 'ad-13');
-if (ad13) {
-    ad13.reviews = [
-         {
-            id: 'review-13-1', author: MOCK_SELLERS[1] as User, text: "Love the sofa! It's the perfect centerpiece for my living room. Henry was very helpful during pickup.",
-            rating: 5, likes: 4, replies: [], createdAt: new Date('2024-05-22T15:00:00Z'), isEdited: false,
-        },
-    ];
-    ad13.comments = [
-        {
-            id: 'comment-13-1', author: MOCK_SELLERS[6] as User, text: "Are there any stains or tears on the fabric? And would you be able to help load it into a truck?",
-            likes: 2,
-            replies: [
-                {
-                    id: 'reply-13-1-1', author: MOCK_SELLERS[2] as User, text: "No stains or tears at all! And yes, I can definitely help you load it.",
-                    likes: 3, replies: [], createdAt: new Date('2024-05-18T11:00:00Z'), isEdited: false,
-                }
-            ],
-            createdAt: new Date('2024-05-18T10:00:00Z'), isEdited: false,
-        },
-    ];
-    const totalRating = ad13.reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
-    ad13.rating = totalRating / (ad13.reviews.length || 1);
-}

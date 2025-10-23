@@ -1,11 +1,9 @@
 
 
-
 import { ReactNode, Dispatch, SetStateAction } from 'react';
 
 export type Theme = 'light' | 'dark';
 export type Language = string;
-// FIX: Add missing 'SupportedLanguage' type alias for 'Language' to resolve type errors in translation-related components. This ensures compatibility with existing code that uses this type.
 export type SupportedLanguage = Language;
 
 export type DisplayMode = 'compact' | 'standard' | 'detailed' | 'list';
@@ -31,7 +29,6 @@ export interface ThemeContextType {
 export interface LocalizationContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  // FIX: Allow `count` to be a number for pluralization.
   t: (key: string, options?: { [key: string]: string | number }) => string;
 }
 
@@ -98,9 +95,6 @@ export interface User {
   // Security fields
   twoFactorEnabled?: boolean;
   twoFactorSecret?: string; // In a real app, this would be handled securely on the backend
-  // Chat features
-  blockedUsers?: string[];
-  isOnline?: boolean;
 }
 
 export interface AuthContextType {
@@ -121,20 +115,11 @@ export interface AuthContextType {
   clearPostLoginAction: () => void;
   loginWithPhone: (phone: string) => Promise<void>;
   updateCloudSyncConfig: (userId: string, config: Partial<CloudSyncConfig>) => Promise<void>;
-  // Admin functions
-  banUser: (userId: string, reason: string) => Promise<void>;
-  unbanUser: (userId: string) => Promise<void>;
-  updateUserTier: (userId: string, tier: UserTier['level']) => Promise<void>;
-  getUserById: (userId: string) => User | undefined;
   refreshCurrentUser: () => void;
   // Elegant prompt state and handlers
   isLoginPromptOpen: boolean;
   confirmLoginPrompt: () => void;
   cancelLoginPrompt: () => void;
-  // Chat moderation
-  blockUser: (userId: string) => Promise<void>;
-  unblockUser: (userId: string) => Promise<void>;
-  isUserBlocked: (userId: string) => boolean;
 }
 
 
@@ -211,24 +196,6 @@ export interface Report {
   createdAt: Date;
 }
 
-export interface Bid {
-  bidderId: string;
-  amount: number;
-  timestamp: string | Date;
-}
-
-export interface AuctionDetails {
-  startTime: string | Date;
-  endTime: string | Date;
-  startingBid: number;
-  currentBid: number;
-  bids: Bid[];
-  reservePrice?: number;
-  buyNowPrice?: number;
-  bidIncrement?: number;
-  winnerId?: string;
-}
-
 export interface Ad {
   id: string;
   title: string;
@@ -276,11 +243,8 @@ export interface Ad {
   reviews: Review[];
   comments: Comment[];
   reports: Report[];
-  status: 'active' | 'sold' | 'expired' | 'banned' | 'sold_auction';
+  status: 'active' | 'sold' | 'expired' | 'banned';
   bannedReason?: string;
-  // Auction fields
-  isAuction?: boolean;
-  auctionDetails?: AuctionDetails;
 }
 
 export interface Filters {
@@ -313,34 +277,25 @@ export interface AdminConfig {
   paymentMethods: string[];
 }
 
-export interface MarketplaceState {
-  ads: Ad[];
-  users: User[];
-  categories: Category[];
-  userTiers: UserTier[];
-  reports: Report[];
-  adminConfig: AdminConfig;
-}
-
-export type View = 
-  | { type: 'marketplace' } 
-  | { type: 'ad'; id: string } 
-  | { type: 'create' } 
-  | { type: 'profile'; id: string } 
-  | { type: 'cloud-sync' } 
-  | { type: 'language-settings' }
-  | { type: 'chat' }
-  | { type: 'chat'; conversationId: string };
+export type View = { type: 'marketplace' } | { type: 'ad'; id: string } | { type: 'create' } | { type: 'profile'; id: string } | { type: 'cloud-sync' } | { type: 'language-settings' };
 
 export interface AppContextType {
     view: View;
     setView: Dispatch<SetStateAction<View>>;
 }
 
-export interface MarketplaceContextType extends MarketplaceState {
+export interface MarketplaceContextType {
+  ads: Ad[];
+  users: User[];
+  categories: Category[];
+  userTiers: UserTier[];
+  reports: Report[];
+  adminConfig: AdminConfig;
+  loading: boolean;
   moderationQueue: ModerationItem[];
   getAdById: (id: string) => Ad | undefined;
   getAdsBySellerId: (sellerId: string) => Ad[];
+  getUserById: (userId: string) => User | undefined;
   createAd: (adData: Omit<Ad, 'id' | 'seller' | 'rating' | 'reviews' | 'comments' | 'reports' | 'status' | 'bannedReason' | 'stats'>) => Promise<string>;
   updateAd: (adId: string, updatedData: Partial<Ad>) => void;
   addCategory: (category: Category) => void;
@@ -354,63 +309,17 @@ export interface MarketplaceContextType extends MarketplaceState {
   addReview: (adId: string, rating: number, text: string) => void;
   addReplyToComment: (adId: string, parentCommentId: string, text: string) => void;
   shareAd: (adId: string) => void;
-  // Auction
-  placeBid: (adId: string, amount: number) => void;
   // Admin Actions
   removeAd: (adId: string, reason: string) => void;
   approveAd: (adId: string) => void;
   deleteComment: (adId: string, commentId: string) => void;
   updateUserTiers: (updatedTiers: UserTier[]) => void;
   updateAdminConfig: (newConfig: Partial<AdminConfig>) => void;
-  refreshUsers: () => void;
+  // FIX: Add missing user management functions to MarketplaceContextType.
+  banUser: (userId: string, reason: string) => Promise<void>;
+  unbanUser: (userId: string) => Promise<void>;
+  updateUserTier: (userId: string, tier: UserTier['level']) => Promise<void>;
 }
-
-// --- P2P Chat System ---
-export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
-export type MessageType = 'text' | 'image' | 'file' | 'voice' | 'video_call';
-
-export interface Message {
-  id: string;
-  conversationId: string;
-  senderId: string;
-  content: string; // For text, this is the message. For media, this is a data URL.
-  type: MessageType;
-  timestamp: number;
-  status: MessageStatus;
-  metadata?: {
-    fileName?: string;
-    fileSize?: number; // in bytes
-    duration?: number; // in seconds for audio/video
-  };
-  reactions?: { [emoji: string]: string[] }; // user IDs
-}
-
-export interface Conversation {
-  id: string;
-  participants: string[]; // Array of user IDs
-  adId: string;
-  messages: Message[];
-  lastMessage?: Message;
-  unreadCount: number;
-  type: 'private' | 'group';
-  name?: string; // For group chats
-}
-
-export interface ChatContextType {
-  conversations: Conversation[];
-  getConversationById: (id: string) => Conversation | undefined;
-  getConversationsForUser: (userId: string) => Conversation[];
-  startOrGetConversation: (adId: string, recipientId: string) => string;
-  createOrGetAuctionGroupChat: (adId: string, sellerId: string, adTitle: string) => string;
-  sendMessage: (conversationId: string, content: string) => void;
-  sendMediaMessage: (conversationId: string, file: File, type: 'image' | 'file' | 'voice') => Promise<void>;
-  markAsRead: (conversationId: string) => void;
-  deleteConversation: (conversationId: string) => void;
-  typingStatus: { [conversationId: string]: string | undefined }; // Stores name of typing user
-  setTyping: (conversationId: string) => void;
-  reactToMessage: (conversationId: string, messageId: string, emoji: string) => void;
-}
-
 
 // --- Google Translate Integration ---
 export interface TranslationConfig {
@@ -425,19 +334,4 @@ export interface TranslationContextType {
   setConfig: Dispatch<SetStateAction<TranslationConfig>>;
   translate: (text: string) => Promise<string>;
   isTranslating: (text: string) => boolean;
-}
-
-// --- Notification System ---
-export type NotificationType = 'info' | 'success' | 'warning' | 'error';
-
-export interface Notification {
-  id: number;
-  message: string;
-  type: NotificationType;
-}
-
-export interface NotificationContextType {
-  notifications: Notification[];
-  addNotification: (message: string, type: NotificationType) => void;
-  removeNotification: (id: number) => void;
 }

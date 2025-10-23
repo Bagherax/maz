@@ -5,7 +5,6 @@ import { Ad, DisplayMode, SortOption, UserTier } from '../types';
 import { useLocalStorage } from '../hooks/usePersistentState';
 import { useMarketplace } from './MarketplaceContext';
 
-// FIX: This interface was moved from the obsolete MarketplaceControls.tsx file.
 export interface Filters {
     query: string;
     categories: string[];
@@ -13,7 +12,6 @@ export interface Filters {
     priceRange: [number, number];
     sellerTiers: UserTier['level'][];
 }
-
 interface MarketplaceUIContextType {
     filters: Filters;
     onFilterChange: (newFilters: Partial<Filters>) => void;

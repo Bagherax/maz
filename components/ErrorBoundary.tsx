@@ -1,4 +1,4 @@
-import React, { Component, ReactNode, ErrorInfo } from 'react';
+import React, { ReactNode, ErrorInfo, Component } from 'react';
 import { useLocalization } from '../hooks/useLocalization';
 
 interface Props {
@@ -28,11 +28,8 @@ const FallbackUI: React.FC = () => {
 
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Replaced class property state initialization with a constructor. Using a constructor is the standard way to initialize state in class components and ensures `this.props` is available, resolving the type error.
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
-  }
+  // FIX: Initialize state to ensure `this.state` and `this.props` are available throughout the component lifecycle, resolving property access errors.
+  public state: State = { hasError: false };
 
   static getDerivedStateFromError(_: Error): State {
     // Update state so the next render will show the fallback UI.

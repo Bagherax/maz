@@ -24,6 +24,7 @@ async function secureTranslateViaProxy(texts: string[], targetLang: SupportedLan
 
   try {
     const response = await ai.models.generateContent({
+      // FIX: Use the recommended 'gemini-2.5-flash' model instead of the prohibited 'gemini-1.5-flash'.
       model: "gemini-2.5-flash",
       contents: `Translate the following JSON array of strings into ${languageName}. Return ONLY a valid JSON array of the translated strings, with the same number of elements and order as the input.
       Input: ${JSON.stringify(texts)}`,

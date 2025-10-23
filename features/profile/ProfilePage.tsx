@@ -14,7 +14,8 @@ interface ProfilePageProps {
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
-  const { user: currentUser, getUserById, refreshCurrentUser } = useAuth();
+  // FIX: `getUserById` is part of AuthContext, not MarketplaceContext.
+  const { user: currentUser, getUserById } = useAuth();
   const { getAdsBySellerId, updateAd } = useMarketplace();
   const { t, language } = useLocalization();
   const { setView } = useView();
@@ -33,12 +34,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
   const isOwnProfile = currentUser?.id === viewedUser.id;
 
   const handleModerationUpdate = () => {
-    // In a real app with a backend, this would refetch data.
-    // For our local mock, we need to refresh the context state.
-    refreshCurrentUser(); 
-    // Ideally, we'd have a way to refresh any user, but for now this works if an admin moderates themself.
-    // A full solution requires a more robust state management.
-    console.log("Moderation action performed. State updated.");
+    // State updates are now handled automatically by the context after an action.
+    // This function can be used for any additional UI logic if needed.
+    console.log("Moderation action performed. UI reflects new state from context.");
   };
 
   const handleSaveAd = (adId: string, updatedData: { title: string; description: string; price: number }) => {
@@ -64,7 +62,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center justify-center space-x-2 rtl:space-x-reverse break-all">
             <span>{viewedUser.name}</span>
-            {viewedUser.isVerified && <Icon name="check-badge" className="w-7 h-7 text-blue-500" title={t('profile.verified')} />}
+            {/* FIX: Wrap Icon in a span to apply the title attribute for tooltips. */}
+            {viewedUser.isVerified && <span title={t('profile.verified')}><Icon name="check-badge" className="w-7 h-7 text-blue-500" /></span>}
           </h1>
           <div className="mt-2">
              <UserTierBadge tier={viewedUser.tier} />

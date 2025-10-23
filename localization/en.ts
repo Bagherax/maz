@@ -104,6 +104,8 @@ export const en = {
   'status.in_progress': 'In Progress',
   'status.active': 'Active',
   'status.banned': 'Banned',
+  'status.sold_auction': 'Sold (Auction)',
+
 
   // ARIA Labels
   'aria.toggle_theme': 'Toggle theme',
@@ -115,6 +117,8 @@ export const en = {
   'aria.open_marketplace_admin_panel': 'Open Marketplace Admin Panel',
   'aria.like_ad': 'Like ad',
   'aria.edit_ad': 'Edit ad',
+  'aria.show_password': 'Show password',
+  'aria.hide_password': 'Hide password',
 
   // --- Start of New Auth System Translations ---
   // Auth Page
@@ -140,6 +144,7 @@ export const en = {
   'auth.terms_agree': 'I agree to the',
   'auth.terms_and_conditions': 'Terms & Conditions',
   'auth.logout': 'Logout',
+  'auth.learn_agreement': 'Learn user licence agreement',
 
   'auth.forgot_password_title': 'Reset Password',
   'auth.forgot_password_prompt': "Enter your email address and we'll send you a link to reset your password.",
@@ -315,12 +320,18 @@ export const en = {
   'ad.delivery_cost': 'Delivery Cost',
   'ad.video_preview': 'Video Preview',
   'ad.document_preview': 'Document Preview',
+  'ad.details.brand': 'Brand',
+  'ad.details.model': 'Model',
+  'ad.details.color': 'Color',
+  'ad.details.size': 'Size',
+  'ad.details.no_image': 'No Image',
+  'ad.sold_to': 'Sold to {winner}',
   
   // Ad Creation
   'ad.create.title': 'Create a New Ad',
   'ad.create.step1': 'Details',
   'ad.create.step2': 'Media',
-  'ad.create.step3': 'Delivery',
+  'ad.create.step3': 'Delivery & Auction',
   'ad.create.step4': 'Review',
   'ad.create.next_step': 'Next Step',
   'ad.create.prev_step': 'Previous Step',
@@ -357,6 +368,8 @@ export const en = {
   'ad.create.limit_reached_message': 'You have posted {adCount} of {limit} ads allowed for your {tier} tier.',
   'ad.create.limit_reached_suggestion': 'To post more ads, please upgrade your account tier.',
   'ad.create.back_to_marketplace': 'Back to Marketplace',
+  'ad.create.list_as_auction': 'List as Auction',
+
 
   // Social
   'social.like': 'Like',
@@ -463,10 +476,15 @@ export const en = {
   'controls.sort.nearby-first': 'Location: Nearby First',
   'controls.sort.nearby-first-disabled': 'Nearby First (Enable Location)',
   'controls.price_range': 'Price Range',
+  'controls.price_min': 'Min',
+  'controls.price_max': 'Max',
   'controls.categories': 'Categories',
   'controls.all_categories': 'All Categories',
   'controls.condition': 'Condition',
   'controls.condition.all': 'All',
+  'controls.condition.new': 'New',
+  'controls.condition.used': 'Used',
+  'controls.condition.refurbished': 'Refurbished',
   'controls.seller_tier': 'Seller Tier',
   'controls.reset_filters': 'Reset',
   'controls.view.mode': 'View Mode',
@@ -494,6 +512,35 @@ export const en = {
   'controls.remove_category_confirm': 'Are you sure you want to remove this category?',
   'controls.category_exists_alert': 'Category with this name already exists.',
 
+  // Paid Ads & Boosters
+  'paid_ads.featuredListings': 'Top of Page',
+  'paid_ads.categoryHighlight': 'Category Highlight',
+  'paid_ads.homePageSpotlight': 'Home Page Spotlight',
+  'paid_ads.pushNotifications': 'Push Notifications to Users',
+  'paid_ads.searchBoost': 'Top of Search Results',
+  'paid_ads.socialProofBadges': 'Featured & Trusted Badges',
+
+  'social_boosters.autoSocialPosting': 'Automated Social Posting',
+  'social_boosters.targetedPromotion': 'Targeted Demographic Promotion',
+  'social_boosters.influencerCollaboration': 'Influencer Collaboration',
+  'social_boosters.viralSharing': 'Viral Sharing Campaigns',
+  'social_boosters.analyticsTracking': 'Campaign Performance Tracking',
+  'social_boosters.automatedHashtags': 'Smart Hashtags',
+
+  // Trust & Safety
+  'trust.identityVerification': 'Identity Verification (KYC)',
+  'trust.dualRatingSystem': 'Dual Rating System (for Selling & Buying)',
+  'trust.communityWarranty': 'Community Warranty',
+  'trust.disputeArbitration': 'Dispute Arbitration',
+  'trust.purchaseInsurance': 'Purchase Insurance',
+
+  // Social Commerce
+  'social_commerce.userShops': 'User Shops',
+  'social_commerce.liveSelling': 'Live Selling',
+  'social_commerce.interestGroups': 'Interest Groups',
+  'social_commerce.affiliateProgram': 'Affiliate Program',
+  'social_commerce.socialSharing': 'Social Sharing',
+
   // General UI
   'pagination.previous': 'Previous',
   'pagination.next': 'Next',
@@ -504,6 +551,7 @@ export const en = {
   'general.see_more': 'See more',
   'general.cancel': 'Cancel',
   'general.cancel_edit': 'Cancel edit',
+  'general.saving': 'Saving...',
   
   // Translation Controls
   'translation.title': 'Real-time Translation',
@@ -528,4 +576,67 @@ export const en = {
 
   // Language Settings
   'language_settings.search_placeholder': 'Search for a language...',
+
+  // Analytics
+  'analytics.this_month': 'This Month',
+  'analytics.last_month': 'Last Month',
+  'analytics.three_months_ago': '3 Months Ago',
+
+  // Auction System
+  'auction.title': 'Auction',
+  'auction.time_left': 'Time Left',
+  'auction.ended': 'Auction Ended',
+  'auction.current_bid': 'Current Bid',
+  'auction.starting_bid': 'Starting Bid',
+  'auction.place_bid': 'Place Bid',
+  'auction.your_bid': 'Your Bid',
+  'auction.buy_now': 'Buy It Now for {price}',
+  'auction.bid_history': 'Bid History',
+  'auction.reserve_not_met': 'Reserve not met',
+  'auction.reserve_met': 'Reserve met',
+  'auction.highest_bidder': 'Highest Bidder',
+  'auction.you_are_highest': 'You are the highest bidder!',
+  'auction.outbid': 'You have been outbid!',
+  'auction.bid_too_low': 'Your bid must be higher than the current bid.',
+  'auction.bid_increment_too_low': 'Your bid must be at least {increment} higher than the current bid.',
+  'auction.days': 'd',
+  'auction.hours': 'h',
+  'auction.minutes': 'm',
+  'auction.seconds': 's',
+  'auction.winner_notification_title': 'You won!',
+  'auction.winner_notification_body': 'Congratulations! You won the auction for "{title}".',
+  'auction.loser_notification_title': 'Auction Ended',
+  'auction.loser_notification_body': 'The auction for "{title}" has ended. Unfortunately, you were not the highest bidder.',
+  'auction.create.settings_title': 'Auction Settings',
+  'auction.create.start_time': 'Start Time',
+  'auction.create.end_time': 'End Time',
+  'auction.create.starting_bid': 'Starting Bid',
+  'auction.create.reserve_price': 'Reserve Price (Optional)',
+  'auction.create.buy_now_price': 'Buy Now Price (Optional)',
+  'auction.create.bid_increment': 'Bid Increment (Optional)',
+  'auction.status.outbid': 'You have been outbid!',
+  'auction.status.winning': 'You are the highest bidder!',
+  'auction.status.ended_won': 'You won this auction!',
+  'auction.status.ended_lost': 'Auction ended. You did not win.',
+  'auction.status.ended_no_winner': 'Auction ended without a winner (reserve not met).',
+  'auction.status.ended_winner_is': 'Winner: {winner}',
+  'auction.suggested_bid': 'Bid {amount}',
+  'chat.join_auction_chat': 'Join Auction Chat',
+
+
+
+  // Revenue Model
+  'revenue_model.title': 'Revenue Model',
+  'revenue_model.paidAds.title': 'Paid Ads',
+  'revenue_model.socialBoosters.title': 'Social Boosters',
+  'revenue_model.premiumFeatures.title': 'Premium Features',
+  'revenue_model.paidAds.featuredListings': 'Featured Listings: $10-50 depending on duration',
+  'revenue_model.paidAds.searchBoost': 'Search Boost: $5-20 weekly',
+  'revenue_model.paidAds.homepageSpotlight': 'Homepage Spotlight: $100-500 monthly',
+  'revenue_model.socialBoosters.autoPosting': 'Auto Posting: $5-30 depending on platform',
+  'revenue_model.socialBoosters.targetedPromotion': 'Targeted Promotion: $20-100 depending on audience',
+  'revenue_model.socialBoosters.influencerMarketing': 'Influencer Marketing: 10-30% commission',
+  'revenue_model.premiumFeatures.advancedAnalytics': 'Advanced Analytics: $9.99 monthly',
+  'revenue_model.premiumFeatures.automatedPosting': 'Automated Posting: $14.99 monthly',
+  'revenue_model.premiumFeatures.prioritySupport': 'Priority Support: $19.99 monthly',
 };

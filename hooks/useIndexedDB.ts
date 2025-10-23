@@ -11,6 +11,7 @@ export const useIndexedDB = (dbName: string) => {
   if (!dbs.has(dbName)) {
     dbs.set(dbName, new Map<string, any>());
   }
+  // FIX: Provide the dbName argument to the get method.
   db.current = dbs.get(dbName);
 
 

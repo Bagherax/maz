@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Icon from '../../../components/Icon';
+import { useLocalization } from '../../../hooks/useLocalization';
 
 interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
@@ -7,6 +8,7 @@ interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement>
 
 const PasswordInput: React.FC<PasswordInputProps> = ({ id, ...props }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const { t } = useLocalization();
 
   return (
     <div className="relative">
@@ -27,7 +29,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({ id, ...props }) => {
         type="button"
         className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
         onClick={() => setShowPassword(!showPassword)}
-        aria-label={showPassword ? "Hide password" : "Show password"}
+        aria-label={t(showPassword ? 'aria.hide_password' : 'aria.show_password')}
       >
         <Icon 
             name={showPassword ? 'eye-slash' : 'eye'} 

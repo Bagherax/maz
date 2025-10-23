@@ -18,13 +18,23 @@ const BottomNav: React.FC = () => {
     setView({ type: 'create' });
   };
 
+  const handleMessagesClick = () => {
+    if (promptLoginIfGuest({ type: 'chat' })) {
+        return;
+    }
+    setView({ type: 'chat' });
+  };
+
   const NavButton: React.FC<{
     label: string;
     icon: React.ComponentProps<typeof Icon>['name'];
-    targetView: View;
+    targetView?: View;
+    onClick?: () => void;
     currentView: View;
-  }> = ({ label, icon, targetView, currentView }) => {
-    const isActive = (() => {
+    isActiveOverride?: boolean;
+  }> = ({ label, icon, targetView, onClick, currentView, isActiveOverride }) => {
+    const isActive = isActiveOverride !== undefined ? isActiveOverride : (() => {
+      if (!targetView) return false;
       // Special case for Explore tab to be active during 'ad' view
       if (targetView.type === 'marketplace' && (currentView.type === 'marketplace' || currentView.type === 'ad')) {
         return true;
@@ -45,7 +55,7 @@ const BottomNav: React.FC = () => {
 
     return (
       <button
-        onClick={() => setView(targetView)}
+        onClick={onClick || (() => setView(targetView!))}
         className={`flex flex-col items-center justify-center w-full transition-colors ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400 hover:text-indigo-500'}`}
       >
         <Icon name={icon} className="w-6 h-6 mb-1" />
@@ -65,7 +75,13 @@ const BottomNav: React.FC = () => {
         </div>
       </button>
 
-      <NavButton label={t('bottom_nav.messages')} icon="chat-bubble-left-right" targetView={{ type: 'marketplace' }} currentView={{type: 'marketplace'}} /> {/* Placeholder */}
+      <NavButton 
+        label={t('bottom_nav.messages')} 
+        icon="chat-bubble-left-right" 
+        onClick={handleMessagesClick}
+        currentView={view}
+        isActiveOverride={view.type === 'chat'}
+      />
       {user && !isGuest && <NavButton label={t('bottom_nav.profile')} icon="user-circle" targetView={{ type: 'profile', id: user.id }} currentView={view} />}
     </div>
   );

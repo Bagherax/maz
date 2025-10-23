@@ -1,12 +1,91 @@
 import React from 'react';
 
 interface IconProps {
-  name: 'react' | 'palette' | 'globe' | 'wrench' | 'pwa' | 'sun' | 'moon' | 'user-plus' | 'logout' | 'share-network' | 'magnifying-glass-circle' | 'rocket-launch' | 'arrow-path' | 'shield-check' | 'database' | 'photo' | 'cloud-arrow-up' | 'server-stack' | 'arrows-pointing-in' | 'storefront' | 'magnifying-glass' | 'user-circle' | 'wallet' | 'squares-plus' | 'arrows-right-left' | 'queue-list' | 'arrow-down-on-square' | 'chat-bubble-left-right' | 'bolt' | 'arrow-down-tray' | 'arrow-path-rounded-square' | 'adjustments-horizontal' | 'bell' | 'chat-bubble-bottom-center-text' | 'beaker' | 'puzzle-piece' | 'cursor-arrow-rays' | 'chart-bar-square' | 'finger-print' | 'building-storefront' | 'globe-alt' | 'arrow-down-circle' | 'chart-pie' | 'google' | 'facebook' | 'twitter' | 'apple' | 'github' | 'phone' | 'eye' | 'eye-slash' | 'cog' | 'plus' | 'arrow-left' | 'arrow-right' | 'heart' | 'bookmark' | 'share' | 'check-badge' | 'truck' | 'map-pin' | 'clock' | 'trash' | 'shield-exclamation' | 'view-grid' | 'view-grid-compact' | 'view-grid-standard' | 'view-grid-detailed' | 'close' | 'document-text' | 'google-drive' | 'dropbox' | 'instagram' | 'video' | 'pencil';
+  name: 'react' | 'palette' | 'globe' | 'wrench' | 'pwa' | 'sun' | 'moon' | 'user-plus' | 'logout' | 'share-network' | 'magnifying-glass-circle' | 'rocket-launch' | 'arrow-path' | 'shield-check' | 'database' | 'photo' | 'cloud-arrow-up' | 'server-stack' | 'arrows-pointing-in' | 'storefront' | 'magnifying-glass' | 'user-circle' | 'wallet' | 'squares-plus' | 'arrows-right-left' | 'queue-list' | 'arrow-down-on-square' | 'chat-bubble-left-right' | 'bolt' | 'arrow-down-tray' | 'arrow-path-rounded-square' | 'adjustments-horizontal' | 'bell' | 'chat-bubble-bottom-center-text' | 'beaker' | 'puzzle-piece' | 'cursor-arrow-rays' | 'chart-bar-square' | 'finger-print' | 'building-storefront' | 'globe-alt' | 'arrow-down-circle' | 'chart-pie' | 'google' | 'facebook' | 'twitter' | 'apple' | 'github' | 'phone' | 'eye' | 'eye-slash' | 'cog' | 'plus' | 'arrow-left' | 'arrow-right' | 'heart' | 'bookmark' | 'share' | 'check-badge' | 'truck' | 'map-pin' | 'clock' | 'trash' | 'shield-exclamation' | 'view-grid' | 'view-grid-compact' | 'view-grid-standard' | 'view-grid-detailed' | 'close' | 'document-text' | 'google-drive' | 'dropbox' | 'instagram' | 'video' | 'pencil' | 'paper-airplane' | 'chat-assistant' | 'gavel' | 'microphone' | 'paperclip' | 'ellipsis-vertical' | 'stop-circle' | 'file-earmark-arrow-down' | 'users' | 'face-smile';
   className?: string;
 }
 
 const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
   const icons: { [key in IconProps['name']]: React.ReactElement } = {
+    // FIX: Add missing icon definitions
+    truck: (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H3.375A1.125 1.125 0 002.25 5.625v1.5c0 .621.504 1.125 1.125 1.125H10.5" />
+      </svg>
+    ),
+    'map-pin': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+      </svg>
+    ),
+    clock: (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    trash: (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.033-2.134H8.033c-1.12 0-2.033.954-2.033 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+      </svg>
+    ),
+    'shield-exclamation': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+      </svg>
+    ),
+    'users': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-2.272M15 19.128v-3.872M15 19.128A9.37 9.37 0 0112 19.5a9.37 9.37 0 01-3-5.372m-3 5.372a9.37 9.37 0 01-5.372-3 9.37 9.37 0 015.372-3m0 0a9.37 9.37 0 00-3-5.372m3 5.372a9.37 9.37 0 01-3-5.372" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0zM19.5 8.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+      </svg>
+    ),
+    'face-smile': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4.5 4.5 0 01-6.364 0M9 10.5h.01M15 10.5h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    'file-earmark-arrow-down': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className={className} viewBox="0 0 16 16">
+        <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
+        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 8 4.5v2.755a.5.5 0 0 0 .894.447l1.355-1.354a.5.5 0 0 0 0-.708z"/>
+      </svg>
+    ),
+    'stop-circle': (
+       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+      </svg>
+    ),
+    'ellipsis-vertical': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+      </svg>
+    ),
+    'paperclip': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.122 2.122l7.81-7.81" />
+      </svg>
+    ),
+    'microphone': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m12 5.25v-1.5a6 6 0 0 0-12 0v1.5m12 0a9 9 0 1 1-18 0a9 9 0 0 1 18 0ZM9.75 9.75a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1-.75-.75Z" />
+      </svg>
+    ),
+    'gavel': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 6.75L15.5 8.25M15.5 8.25L18.5 5.5M15.5 8.25L12.5 11.5M3 13.5l6-6m0 0l6 6m-6-6v10.5a2.25 2.25 0 002.25 2.25h1.5a2.25 2.25 0 002.25-2.25V7.5m-6 6h6" />
+      </svg>
+    ),
+    'chat-assistant': (
+        <svg fill="currentColor" xmlSpace="preserve" viewBox="0 0 1000 1000" y="0px" x="0px" version="1.1" className={className}>
+            <path d="M881.1,720.5H434.7L173.3,941V720.5h-54.4C58.8,720.5,10,671.1,10,610.2v-441C10,108.4,58.8,59,118.9,59h762.2C941.2,59,990,108.4,990,169.3v441C990,671.1,941.2,720.5,881.1,720.5L881.1,720.5z M935.6,169.3c0-30.4-24.4-55.2-54.5-55.2H118.9c-30.1,0-54.5,24.7-54.5,55.2v441c0,30.4,24.4,55.1,54.5,55.1h54.4h54.4v110.3l163.3-110.2H500h381.1c30.1,0,54.5-24.7,54.5-55.1V169.3L935.6,169.3z M717.8,444.8c-30.1,0-54.4-24.7-54.4-55.1c0-30.4,24.3-55.2,54.4-55.2c30.1,0,54.5,24.7,54.5,55.2C772.2,420.2,747.8,444.8,717.8,444.8L717.8,444.8z M500,444.8c-30.1,0-54.4-24.7-54.4-55.1c0-30.4,24.3-55.2,54.4-55.2c30.1,0,54.4,24.7,54.4,55.2C554.4,420.2,530.1,444.8,500,444.8L500,444.8z M282.2,444.8c-30.1,0-54.5-24.7-54.5-55.1c0-30.4,24.4-55.2,54.5-55.2c30.1,0,54.4,24.7,54.4,55.2C336.7,420.2,312.3,444.8,282.2,444.8L282.2,444.8z"></path>
+        </svg>
+    ),
+    'paper-airplane': (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+      </svg>
+    ),
     'pencil': (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -363,38 +442,12 @@ const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
     ),
     'check-badge': (
        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-      </svg>
-    ),
-    truck: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5v-1.875a3.375 3.375 0 013.375-3.375h9.75a3.375 3.375 0 013.375 3.375v1.875m-17.25 4.5h16.5M6 13.5h12m-12 0V6.375c0-.621.504-1.125 1.125-1.125h9.75c.621 0 1.125.504 1.125 1.125v7.125" />
-        </svg>
-    ),
-    'map-pin': (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-        </svg>
-    ),
-    clock: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-    ),
-    trash: (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-      </svg>
-    ),
-    'shield-exclamation': (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.--- FIX: Add closing path tag for check-badge icon
+745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
       </svg>
     ),
   };
-
-  return icons[name] || null;
+  return icons[name];
 };
-
+// FIX: Add default export
 export default Icon;

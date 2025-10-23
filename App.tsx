@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { LocalizationProvider } from './context/LocalizationContext';
@@ -12,6 +13,7 @@ import { TranslationProvider } from './context/TranslationContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { MarketplaceUIProvider } from './context/MarketplaceUIContext';
 import { useMarketplace } from './context/MarketplaceContext';
+import { ChatProvider } from './context/ChatContext';
 
 // Import new components
 import MarketplacePage from './features/marketplace/MarketplacePage';
@@ -23,6 +25,10 @@ import LanguageSettings from './features/profile/components/LanguageSettings';
 import AdDetailPanel from './features/marketplace/components/ads/AdDetailPanel';
 import BottomNav from './components/BottomNav';
 import LoginPrompt from './components/LoginPrompt';
+import AdminDashboard from './features/admin/AdminDashboard';
+import ChatPage from './features/chat/ChatPage';
+import { NotificationProvider } from './context/NotificationContext';
+import NotificationManager from './components/NotificationManager';
 
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -36,6 +42,7 @@ const AppContent: React.FC = () => {
   const { user, isAuthenticated, isGuest, postLoginAction, clearPostLoginAction } = useAuth();
   const [view, setView] = useState<View>({ type: 'marketplace' });
   const { getAdById } = useMarketplace();
+  const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
 
   useEffect(() => {
     // After a successful login, check if there was a pending action
@@ -57,6 +64,9 @@ const AppContent: React.FC = () => {
         return <CloudSyncSettings />;
       case 'language-settings':
         return <LanguageSettings />;
+      case 'chat':
+        // FIX: Check if `conversationId` exists on the view object before accessing it.
+        return <ChatPage conversationId={'conversationId' in view ? view.conversationId : undefined} />;
       case 'marketplace':
       case 'ad': // MarketplacePage is always visible now, panel slides over
       default:
@@ -67,13 +77,15 @@ const AppContent: React.FC = () => {
   return (
     <AppContext.Provider value={{ view, setView }}>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-        <SearchBar />
+        <SearchBar onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)} />
         <main className="pt-20 pb-16 md:pb-0 transition-all duration-500" style={{ filter: selectedAd ? 'blur(4px)' : 'none' }}>
+          {/* FIX: Wrap renderMainView in a fragment to ensure it's treated as a valid child element for ErrorBoundary. */}
           <ErrorBoundary>
-            {renderMainView()}
+            <>{renderMainView()}</>
           </ErrorBoundary>
         </main>
         <AdDetailPanel ad={selectedAd} isOpen={!!selectedAd} onClose={() => setView({ type: 'marketplace' })} />
+        <AdminDashboard isOpen={isAdminDashboardOpen} onClose={() => setIsAdminDashboardOpen(false)} />
         <BottomNav />
       </div>
     </AppContext.Provider>
@@ -84,13 +96,15 @@ const AppInitializer: React.FC = () => {
     const { isAuthenticated, isLoginPromptOpen } = useAuth();
     return (
         <MarketplaceProvider>
-          <TranslationProvider>
-            <MarketplaceUIProvider>
-              <AppContent />
-              {isLoginPromptOpen && <LoginPrompt />}
-              {!isAuthenticated && <AuthPage />}
-            </MarketplaceUIProvider>
-          </TranslationProvider>
+          <ChatProvider>
+            <TranslationProvider>
+              <MarketplaceUIProvider>
+                <AppContent />
+                {isLoginPromptOpen && <LoginPrompt />}
+                {!isAuthenticated && <AuthPage />}
+              </MarketplaceUIProvider>
+            </TranslationProvider>
+          </ChatProvider>
         </MarketplaceProvider>
     );
 };
@@ -99,11 +113,14 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <LocalizationProvider>
-        <AuthProvider>
-          <AuthConfigProvider>
-            <AppInitializer />
-          </AuthConfigProvider>
-        </AuthProvider>
+        <NotificationProvider>
+            <AuthProvider>
+            <AuthConfigProvider>
+                <AppInitializer />
+            </AuthConfigProvider>
+            </AuthProvider>
+            <NotificationManager />
+        </NotificationProvider>
       </LocalizationProvider>
     </ThemeProvider>
   );

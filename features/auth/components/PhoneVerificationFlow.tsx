@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useLocalization } from '../../../hooks/useLocalization';
-// FIX: The file `features/auth/components/CountrySwitcher.tsx` is not a module because it is an empty/obsolete file. The correct component is in the main components directory.
-import CountrySwitcher from '../../../components/CountrySwitcher';
 import Icon from '../../../components/Icon';
 
 interface PhoneVerificationFlowProps {

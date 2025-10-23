@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Ad } from '../../../../types';
 import { useLocalization } from '../../../../hooks/useLocalization';
 import Icon from '../../../../components/Icon';
-import { useAuth } from '../../../../hooks/useAuth';
 import AdModerationPanel from '../../../admin/AdModerationPanel';
 import AdActions from './AdActions';
 import { useView } from '../../../../App';
@@ -10,6 +9,12 @@ import CommentSystem from '../social/CommentSystem';
 import RatingReviewSystem from '../social/RatingReviewSystem';
 import T from '../../../../components/T';
 import SellerInfoCard from '../users/SellerInfoCard';
+import { useMarketplace } from '../../../../context/MarketplaceContext';
+// FIX: Import `useAuth` to get access to the current user and user-related functions.
+import { useAuth } from '../../../../hooks/useAuth';
+import { useChat } from '../../../../hooks/useChat';
+import MazAssistant from '../assistant/MazAssistant';
+import AuctionModal from '../auction/AuctionModal';
 
 interface AdDetailPanelProps {
   ad?: Ad;
@@ -26,12 +31,13 @@ const DetailItem: React.FC<{ label: string; value: string | number | React.React
 
 const ImageGallery: React.FC<{ images: string[], adTitle: string }> = ({ images, adTitle }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const { t } = useLocalization();
 
     const goToNext = () => setCurrentIndex(prev => (prev + 1) % images.length);
     const goToPrev = () => setCurrentIndex(prev => (prev - 1 + images.length) % images.length);
 
     if (!images || images.length === 0) {
-        return <div className="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">No Image</div>;
+        return <div className="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">{t('ad.details.no_image')}</div>;
     }
 
     return (
@@ -68,12 +74,27 @@ const ImageGallery: React.FC<{ images: string[], adTitle: string }> = ({ images,
 
 
 const AdDetailPanel: React.FC<AdDetailPanelProps> = ({ ad, isOpen, onClose }) => {
-  const { user: currentUser, getUserById } = useAuth();
+  const { user: currentUser, getUserById, promptLoginIfGuest } = useAuth();
+  const { } = useMarketplace();
+  const { startOrGetConversation } = useChat();
   const { t, language } = useLocalization();
   const { setView } = useView();
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [isAuctionModalOpen, setIsAuctionModalOpen] = useState(false);
 
   const seller = ad ? getUserById(ad.seller.id) : null;
+  const winner = ad?.auctionDetails?.winnerId ? getUserById(ad.auctionDetails.winnerId) : null;
   const isBanned = ad?.status === 'banned';
+  const isOwnAd = currentUser?.id === ad?.seller.id;
+
+  const handleStartChat = () => {
+      if (!ad) return;
+      if (promptLoginIfGuest({ type: 'ad', id: ad.id })) return;
+
+      const conversationId = startOrGetConversation(ad.id, ad.seller.id);
+      onClose(); // Close the ad panel
+      setView({ type: 'chat', conversationId }); // Navigate to the conversation
+  }
 
   return (
     <>
@@ -103,7 +124,7 @@ const AdDetailPanel: React.FC<AdDetailPanelProps> = ({ ad, isOpen, onClose }) =>
                 </button>
             </header>
             
-            <div className="flex-grow overflow-y-auto">
+            <div className="flex-grow overflow-y-auto relative">
                 <div className="p-4 sm:p-6 space-y-6">
                     {isBanned && (
                         <div className="bg-red-100 border-s-4 border-red-500 text-red-700 p-4 rounded-md mb-6" role="alert">
@@ -111,13 +132,48 @@ const AdDetailPanel: React.FC<AdDetailPanelProps> = ({ ad, isOpen, onClose }) =>
                         {ad.bannedReason && <p>{ad.bannedReason}</p>}
                         </div>
                     )}
+                     {ad.status === 'sold_auction' && winner && (
+                        <div className="bg-green-100 border-s-4 border-green-500 text-green-700 p-4 rounded-md mb-6" role="alert">
+                            <p className="font-bold">{t('auction.ended')}</p>
+                            <p>{t('ad.sold_to', { winner: winner.name })}</p>
+                        </div>
+                    )}
                     
                     <ImageGallery images={ad.images} adTitle={ad.title} />
 
                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
-                            {new Intl.NumberFormat(language, { style: 'currency', currency: ad.currency }).format(ad.price)}
-                        </p>
+                        {ad.isAuction && ad.auctionDetails ? (
+                             <div className="flex flex-col items-center gap-2">
+                                <div className="text-center">
+                                    <p className="text-sm text-gray-500">{t('auction.current_bid')}</p>
+                                    <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                                        {new Intl.NumberFormat(language, { style: 'currency', currency: ad.currency }).format(ad.auctionDetails.currentBid)}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setIsAuctionModalOpen(true)}
+                                    className="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2 ripple"
+                                >
+                                    <Icon name="gavel" className="w-5 h-5" />
+                                    <span>{t('auction.title')}</span>
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex justify-between items-center">
+                                <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                                    {new Intl.NumberFormat(language, { style: 'currency', currency: ad.currency }).format(ad.price)}
+                                </p>
+                                {!isOwnAd && !isBanned && (
+                                    <button
+                                        onClick={handleStartChat}
+                                        className="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 flex items-center gap-2 ripple"
+                                    >
+                                        <Icon name="chat-bubble-left-right" className="w-5 h-5" />
+                                        <span>Chat</span>
+                                    </button>
+                                )}
+                            </div>
+                        )}
                         {!isBanned && <AdActions ad={ad} />}
                     </div>
 
@@ -135,10 +191,10 @@ const AdDetailPanel: React.FC<AdDetailPanelProps> = ({ ad, isOpen, onClose }) =>
                       <div className="space-y-1 text-sm">
                           <DetailItem label={t('ad.category')} value={ad.category} />
                           <DetailItem label={t('ad.condition')} value={<span className="capitalize">{ad.condition}</span>} />
-                          <DetailItem label="Brand" value={ad.specifications.brand} />
-                          <DetailItem label="Model" value={ad.specifications.model} />
-                          {ad.specifications.color && <DetailItem label="Color" value={ad.specifications.color} />}
-                          {ad.specifications.size && <DetailItem label="Size" value={ad.specifications.size} />}
+                          <DetailItem label={t('ad.details.brand')} value={ad.specifications.brand} />
+                          <DetailItem label={t('ad.details.model')} value={ad.specifications.model} />
+                          {ad.specifications.color && <DetailItem label={t('ad.details.color')} value={ad.specifications.color} />}
+                          {ad.specifications.size && <DetailItem label={t('ad.details.size')} value={ad.specifications.size} />}
                       </div>
                     </div>
 
@@ -152,9 +208,20 @@ const AdDetailPanel: React.FC<AdDetailPanelProps> = ({ ad, isOpen, onClose }) =>
                     )}
                 </div>
             </div>
+             {/* MAZ Assistant Button */}
+             <div className="absolute bottom-6 right-6 z-10">
+                  <button className="chatBtn" onClick={() => setIsAssistantOpen(true)}>
+                    <Icon name="chat-assistant" className="w-6 h-6 text-white" />
+                    <span className="tooltip">MAZ Assistant</span>
+                  </button>
+              </div>
             </>
         )}
       </div>
+      {isAssistantOpen && ad && <MazAssistant ad={ad} onClose={() => setIsAssistantOpen(false)} />}
+      {isAuctionModalOpen && ad?.isAuction && (
+        <AuctionModal isOpen={isAuctionModalOpen} onClose={() => setIsAuctionModalOpen(false)} ad={ad} />
+      )}
     </>
   );
 };

@@ -42,7 +42,7 @@ const BarChart: React.FC<{ data: { label: string, value: number }[], color: stri
 
 
 const AnalyticsDashboard: React.FC = () => {
-    const { t } = useLocalization();
+    const { t, language } = useLocalization();
     const { users, ads, adminConfig } = useMarketplace();
 
     const totalRevenue = useMemo(() => {
@@ -54,9 +54,9 @@ const AnalyticsDashboard: React.FC = () => {
     
     // Mock User Growth Data
     const userGrowthData = [
-        { label: 'This Month', value: users.filter(u => new Date(u.createdAt) > new Date(new Date().setDate(new Date().getDate() - 30))).length },
-        { label: 'Last Month', value: 18 }, // Mock data
-        { label: '3 Months Ago', value: 12 }, // Mock data
+        { label: t('analytics.this_month'), value: users.filter(u => new Date(u.createdAt) > new Date(new Date().setDate(new Date().getDate() - 30))).length },
+        { label: t('analytics.last_month'), value: 18 }, // Mock data
+        { label: t('analytics.three_months_ago'), value: 12 }, // Mock data
     ];
 
     // Estimated Revenue by Tier
@@ -96,7 +96,7 @@ const AnalyticsDashboard: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <MetricCard title={t('admin.total_users')} value={users.length} />
                 <MetricCard title={t('admin.total_active_ads')} value={ads.filter(a => a.status === 'active').length} />
-                <MetricCard title={t('admin.est_total_revenue')} value={totalRevenue.toLocaleString('en-US', { style: 'currency', currency: 'USD' })} />
+                <MetricCard title={t('admin.est_total_revenue')} value={totalRevenue.toLocaleString(language, { style: 'currency', currency: 'USD' })} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -2,6 +2,7 @@ import React, { useState, FormEvent } from 'react';
 import { useAuth } from '../../../../hooks/useAuth';
 import { useLocalization } from '../../../../hooks/useLocalization';
 import { AuthView } from '../../../../types';
+import PasswordStrengthMeter from '../PasswordStrengthMeter';
 
 interface RegistrationWizardProps {
   onSwitchView: (view: AuthView) => void;
@@ -63,7 +64,7 @@ const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView })
           position: relative;
           display: flex;
           align-items: center;
-          padding-left: 30px;
+          padding-inline-start: 30px;
           color: #00bfff;
         }
 
@@ -85,7 +86,7 @@ const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView })
           height: 16px;
           width: 16px;
           border-radius: 50%;
-          left: 0px;
+          inset-inline-start: 0px;
           background-color: #00bfff;
         }
 
@@ -130,7 +131,7 @@ const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView })
         .custom-reg-form label .input + span {
           color: rgba(255, 255, 255, 0.5);
           position: absolute;
-          left: 10px;
+          inset-inline-start: 10px;
           top: 0px;
           font-size: 0.9em;
           cursor: text;
@@ -235,6 +236,9 @@ const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView })
           />
           <span>{t('auth.password')}</span>
         </label>
+        
+        <PasswordStrengthMeter password={password} />
+
         <label>
           <input 
             className="input" 
@@ -247,7 +251,7 @@ const RegistrationWizard: React.FC<RegistrationWizardProps> = ({ onSwitchView })
           <span>{t('auth.confirm_password')}</span>
         </label>
 
-        {(error || apiError) && <p className="text-xs text-red-500 text-center">{error || t(apiError!)}</p>}
+        {(error || apiError) && <p className="text-xs text-red-500 text-center mt-2">{error || t(apiError!)}</p>}
 
         <button className="submit ripple" type="submit" disabled={loading}>
           {loading ? t('auth.registration.submitting') : t('auth.registration.submit')}

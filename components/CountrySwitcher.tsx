@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import Dropdown from './Dropdown';
 import { COUNTRIES } from '../data/countries';
 import { useLocalization } from '../hooks/useLocalization';
@@ -22,12 +22,17 @@ const CountrySwitcher: React.FC = () => {
         localStorage.setItem(COUNTRY_STORAGE_KEY, selectedCountry.value);
     }, [selectedCountry]);
   
+    // FIX: Wrap the state setter in a handler to match the expected onSelect signature.
+    const handleSelect = (option: { value: string; label: string; icon?: ReactNode; disabled?: boolean; }) => {
+        setSelectedCountry(option as any);
+    };
+
     return (
       <Dropdown
         label={t('auth.select_country')}
         options={countryOptions}
         selected={selectedCountry}
-        onSelect={setSelectedCountry}
+        onSelect={handleSelect}
       />
     );
   };

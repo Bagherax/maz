@@ -125,7 +125,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSocialLogin, onSwitchView }) =>
           </button>
         </p>
       </div>
-      <span className="agreement"><a href="#">Learn user licence agreement</a></span>
+      <span className="agreement"><a href="#">{t('auth.learn_agreement')}</a></span>
     </>
   );
 };

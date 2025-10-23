@@ -472,7 +472,40 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [user, isGuest, refreshCurrentUser]);
 
-  const value = {
+  // FIX: Implement missing chat moderation functions
+  const blockUser = useCallback(async (userId: string): Promise<void> => {
+    if (!user || isGuest) return;
+    let usersDb = getUsersFromStorage();
+    const userIndex = usersDb.findIndex(u => u.id === user.id);
+    if (userIndex > -1) {
+      const currentUserInDb = usersDb[userIndex];
+      const blocked = new Set(currentUserInDb.blockedUsers || []);
+      blocked.add(userId);
+      currentUserInDb.blockedUsers = Array.from(blocked);
+      saveUsersToStorage(usersDb);
+      refreshCurrentUser();
+    }
+  }, [user, isGuest, refreshCurrentUser]);
+
+  const unblockUser = useCallback(async (userId: string): Promise<void> => {
+    if (!user || isGuest) return;
+    let usersDb = getUsersFromStorage();
+    const userIndex = usersDb.findIndex(u => u.id === user.id);
+    if (userIndex > -1) {
+      const currentUserInDb = usersDb[userIndex];
+      if (currentUserInDb.blockedUsers) {
+        currentUserInDb.blockedUsers = currentUserInDb.blockedUsers.filter(id => id !== userId);
+        saveUsersToStorage(usersDb);
+        refreshCurrentUser();
+      }
+    }
+  }, [user, isGuest, refreshCurrentUser]);
+
+  const isUserBlocked = useCallback((userId: string): boolean => {
+    return user?.blockedUsers?.includes(userId) ?? false;
+  }, [user]);
+
+  const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
     isGuest,
@@ -497,7 +530,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     refreshCurrentUser,
     isLoginPromptOpen,
     confirmLoginPrompt,
-    cancelLoginPrompt
+    cancelLoginPrompt,
+    blockUser,
+    unblockUser,
+    isUserBlocked,
   };
 
   return (

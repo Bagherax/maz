@@ -104,6 +104,7 @@ export const ar = {
   'status.in_progress': 'قيد التنفيذ',
   'status.active': 'نشط',
   'status.banned': 'محظور',
+  'status.sold_auction': 'مباع (مزاد)',
 
   // ARIA Labels
   'aria.toggle_theme': 'تبديل السمة',
@@ -115,6 +116,8 @@ export const ar = {
   'aria.open_marketplace_admin_panel': 'فتح لوحة تحكم مسؤول السوق',
   'aria.like_ad': 'إعجاب بالإعلان',
   'aria.edit_ad': 'تعديل الإعلان',
+  'aria.show_password': 'إظهار كلمة المرور',
+  'aria.hide_password': 'إخفاء كلمة المرور',
 
   // --- Start of New Auth System Translations ---
   // Auth Page
@@ -140,6 +143,7 @@ export const ar = {
   'auth.terms_agree': 'أوافق على',
   'auth.terms_and_conditions': 'الشروط والأحكام',
   'auth.logout': 'تسجيل الخروج',
+  'auth.learn_agreement': 'تعرف على اتفاقية ترخيص المستخدم',
 
   'auth.forgot_password_title': 'إعادة تعيين كلمة المرور',
   'auth.forgot_password_prompt': 'أدخل عنوان بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.',
@@ -315,12 +319,18 @@ export const ar = {
   'ad.delivery_cost': 'تكلفة التوصيل',
   'ad.video_preview': 'معاينة الفيديو',
   'ad.document_preview': 'معاينة المستند',
-  
+  'ad.details.brand': 'العلامة التجارية',
+  'ad.details.model': 'الموديل',
+  'ad.details.color': 'اللون',
+  'ad.details.size': 'الحجم',
+  'ad.details.no_image': 'لا توجد صورة',
+  'ad.sold_to': 'تم البيع لـ {winner}',
+
   // Ad Creation
   'ad.create.title': 'إنشاء إعلان جديد',
   'ad.create.step1': 'التفاصيل',
   'ad.create.step2': 'الوسائط',
-  'ad.create.step3': 'التوصيل',
+  'ad.create.step3': 'التوصيل والمزاد',
   'ad.create.step4': 'مراجعة',
   'ad.create.next_step': 'الخطوة التالية',
   'ad.create.prev_step': 'الخطوة السابقة',
@@ -357,6 +367,7 @@ export const ar = {
   'ad.create.limit_reached_message': 'لقد نشرت {adCount} من {limit} إعلانًا مسموحًا به لفئة {tier} الخاصة بك.',
   'ad.create.limit_reached_suggestion': 'لنشر المزيد من الإعلانات، يرجى ترقية فئة حسابك.',
   'ad.create.back_to_marketplace': 'العودة إلى السوق',
+  'ad.create.list_as_auction': 'عرض كمزاد',
 
   // Social
   'social.like': 'إعجاب',
@@ -463,10 +474,15 @@ export const ar = {
   'controls.sort.nearby-first': 'الموقع: الأقرب أولاً',
   'controls.sort.nearby-first-disabled': 'الأقرب أولاً (مكّن الموقع)',
   'controls.price_range': 'نطاق السعر',
+  'controls.price_min': 'الحد الأدنى',
+  'controls.price_max': 'الحد الأقصى',
   'controls.categories': 'الفئات',
   'controls.all_categories': 'جميع الفئات',
   'controls.condition': 'الحالة',
   'controls.condition.all': 'الكل',
+  'controls.condition.new': 'جديد',
+  'controls.condition.used': 'مستعمل',
+  'controls.condition.refurbished': 'مجدد',
   'controls.seller_tier': 'فئة البائع',
   'controls.reset_filters': 'إعادة تعيين',
   'controls.view.mode': 'وضع العرض',
@@ -498,6 +514,35 @@ export const ar = {
   'controls.remove_category_confirm': 'هل أنت متأكد أنك تريد إزالة هذه الفئة؟',
   'controls.category_exists_alert': 'الفئة بهذا الاسم موجودة بالفعل.',
   
+  // Paid Ads & Boosters
+  'paid_ads.featuredListings': 'أعلى الصفحة',
+  'paid_ads.categoryHighlight': 'تمييز حسب التصنيف',
+  'paid_ads.homePageSpotlight': 'مكان مميز في الصفحة الرئيسية',
+  'paid_ads.pushNotifications': 'إشعارات للمستخدمين',
+  'paid_ads.searchBoost': 'ظهور أول في نتائج البحث',
+  'paid_ads.socialProofBadges': 'شعارات المميز والموثوق',
+
+  'social_boosters.autoSocialPosting': 'نشر آلي على منصات التواصل',
+  'social_boosters.targetedPromotion': 'تسويق موجه ديموغرافياً',
+  'social_boosters.influencerCollaboration': 'شراكة مع المؤثرين',
+  'social_boosters.viralSharing': 'حملات المشاركة الجماعية',
+  'social_boosters.analyticsTracking': 'تتبع أداء الحملات',
+  'social_boosters.automatedHashtags': 'هاشتاقات ذكية',
+  
+  // Trust & Safety
+  'trust.identityVerification': 'التحقق من الهوية (KYC)',
+  'trust.dualRatingSystem': 'نظام التقييمات المزدوج (للبيع والشراء)',
+  'trust.communityWarranty': 'الضمان الجماعي (Community Warranty)',
+  'trust.disputeArbitration': 'التحكيم في النزاعات',
+  'trust.purchaseInsurance': 'التأمين على المشتريات',
+
+  // Social Commerce
+  'social_commerce.userShops': 'متاجر المستخدمين',
+  'social_commerce.liveSelling': 'البث المباشر للبيع',
+  'social_commerce.interestGroups': 'المجموعات المتخصصة',
+  'social_commerce.affiliateProgram': 'نظام العمولة',
+  'social_commerce.socialSharing': 'المشاركة الاجتماعية',
+
   // General UI
   'pagination.previous': 'السابق',
   'pagination.next': 'التالي',
@@ -508,6 +553,7 @@ export const ar = {
   'general.see_more': 'عرض المزيد',
   'general.cancel': 'إلغاء',
   'general.cancel_edit': 'إلغاء التعديل',
+  'general.saving': 'جارٍ الحفظ...',
 
   // Translation Controls
   'translation.title': 'الترجمة الفورية',
@@ -532,4 +578,65 @@ export const ar = {
 
   // Language Settings
   'language_settings.search_placeholder': 'ابحث عن لغة...',
+
+  // Analytics
+  'analytics.this_month': 'هذا الشهر',
+  'analytics.last_month': 'الشهر الماضي',
+  'analytics.three_months_ago': 'قبل 3 أشهر',
+
+  // Auction System
+  'auction.title': 'مزاد',
+  'auction.time_left': 'الوقت المتبقي',
+  'auction.ended': 'انتهى المزاد',
+  'auction.current_bid': 'المزايدة الحالية',
+  'auction.starting_bid': 'يبدأ المزاد من',
+  'auction.place_bid': 'زاود',
+  'auction.your_bid': 'مزايدتك',
+  'auction.buy_now': 'اشترِ الآن مقابل {price}',
+  'auction.bid_history': 'سجل المزايدات',
+  'auction.reserve_not_met': 'لم يتم الوصول للسعر الأدنى',
+  'auction.reserve_met': 'تم الوصول للسعر الأدنى',
+  'auction.highest_bidder': 'أعلى مزايد',
+  'auction.you_are_highest': 'أنت صاحب أعلى مزايدة!',
+  'auction.outbid': 'لقد تم التغلب على مزايدتك!',
+  'auction.bid_too_low': 'يجب أن تكون مزايدتك أعلى من المزايدة الحالية.',
+  'auction.bid_increment_too_low': 'يجب أن تكون مزايدتك أعلى بـ {increment} على الأقل من المزايدة الحالية.',
+  'auction.days': 'ي',
+  'auction.hours': 'س',
+  'auction.minutes': 'د',
+  'auction.seconds': 'ث',
+  'auction.winner_notification_title': 'لقد فزت!',
+  'auction.winner_notification_body': 'تهانينا! لقد فزت بمزاد "{title}".',
+  'auction.loser_notification_title': 'انتهى المزاد',
+  'auction.loser_notification_body': 'انتهى المزاد على "{title}". للأسف، لم تكن صاحب أعلى مزايدة.',
+  'auction.create.settings_title': 'إعدادات المزاد',
+  'auction.create.start_time': 'وقت البدء',
+  'auction.create.end_time': 'وقت الانتهاء',
+  'auction.create.starting_bid': 'سعر بدء المزايدة',
+  'auction.create.reserve_price': 'السعر الاحتياطي (اختياري)',
+  'auction.create.buy_now_price': 'سعر الشراء الفوري (اختياري)',
+  'auction.create.bid_increment': 'مقدار زيادة المزايدة (اختياري)',
+  'auction.status.outbid': 'تم التغلب على مزايدتك!',
+  'auction.status.winning': 'أنت صاحب أعلى مزايدة!',
+  'auction.status.ended_won': 'لقد فزت بهذا المزاد!',
+  'auction.status.ended_lost': 'انتهى المزاد. لم تفز.',
+  'auction.status.ended_no_winner': 'انتهى المزاد بدون فائز (لم يتم الوصول للسعر الاحتياطي).',
+  'auction.status.ended_winner_is': 'الفائز: {winner}',
+  'auction.suggested_bid': 'زاود بـ {amount}',
+  'chat.join_auction_chat': 'انضم إلى دردشة المزاد',
+
+  // Revenue Model
+  'revenue_model.title': 'نموذج الإيرادات',
+  'revenue_model.paidAds.title': 'الإعلانات المدفوعة',
+  'revenue_model.socialBoosters.title': 'معززات التواصل الاجتماعي',
+  'revenue_model.premiumFeatures.title': 'الميزات المميزة',
+  'revenue_model.paidAds.featuredListings': 'قوائم مميزة: 10-50$ حسب المدة',
+  'revenue_model.paidAds.searchBoost': 'تعزيز البحث: 5-20$ أسبوعياً',
+  'revenue_model.paidAds.homepageSpotlight': 'تسليط الضوء على الصفحة الرئيسية: 100-500$ شهرياً',
+  'revenue_model.socialBoosters.autoPosting': 'النشر التلقائي: 5-30$ حسب المنصة',
+  'revenue_model.socialBoosters.targetedPromotion': 'الترويج المستهدف: 20-100$ حسب الجمهور',
+  'revenue_model.socialBoosters.influencerMarketing': 'التسويق عبر المؤثرين: عمولة 10-30%',
+  'revenue_model.premiumFeatures.advancedAnalytics': 'تحليلات متقدمة: 9.99$ شهرياً',
+  'revenue_model.premiumFeatures.automatedPosting': 'النشر الآلي: 14.99$ شهرياً',
+  'revenue_model.premiumFeatures.prioritySupport': 'دعم ذو أولوية: 19.99$ شهرياً',
 };

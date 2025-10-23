@@ -18,6 +18,7 @@
               'scale-up': 'scale-up 0.2s ease-out forwards',
               'bounce-sm': 'bounce-sm 1.5s infinite',
               'shine': 'shine 1s forwards ease-in-out',
+              'smoke-flow': 'smoke-flow 4s ease-in-out infinite',
             },
             keyframes: {
               'slide-down-fast': {
@@ -48,6 +49,11 @@
               },
               'shine': {
                 '100%': { left: '125%' },
+              },
+              'smoke-flow': {
+                '0%': { background-position: '0% 50%' },
+                '50%': { background-position: '100% 50%' },
+                '100%': { background-position: '0% 50%' },
               }
             }
           }
@@ -81,6 +87,52 @@
         transform: scale(0, 0);
         opacity: .3;
         transition: 0s;
+      }
+
+      .chatBtn {
+        width: 55px;
+        height: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: none;
+        background-color: #FFE53B;
+        background-image: linear-gradient(147deg, #FFE53B, #FF2525,#FFE53B);
+        cursor: pointer;
+        padding-top: 3px;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.164);
+        position: relative;
+        background-size: 300%;
+        background-position: left;
+        transition-duration: 1s;
+      }
+
+      .tooltip {
+        position: absolute;
+        top: -40px;
+        opacity: 0;
+        background-color: rgb(255, 180, 82);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition-duration: .5s;
+        pointer-events: none;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+      }
+
+      .chatBtn:hover .tooltip {
+        opacity: 1;
+        transition-duration: .5s;
+      }
+
+      .chatBtn:hover {
+        background-position: right;
+        transition-duration: 1s;
       }
     </style>
 

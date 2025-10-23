@@ -8,14 +8,38 @@ export const LocalizationContext = createContext<LocalizationContextType | undef
 
 export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useLocalStorage<Language>('language', () => {
-    // Auto-detect the browser language as the default.
-    const browserLang = navigator.language.split('-')[0] as Language;
+    // Comprehensive language detection for first launch
+    const supportedLangCodes = new Set(LANGUAGES.map(l => l.code));
+    const fallbackMap: { [key: string]: string } = {
+        'in': 'id', // Old Indonesian code
+        'iw': 'he', // Old Hebrew code
+        'ji': 'yi', // Old Yiddish code
+    };
     
-    // Check if the detected language is one of the supported languages.
-    const isSupported = LANGUAGES.some(lang => lang.code === browserLang);
-    
-    // If the browser's language is supported, use it. Otherwise, fall back to English.
-    return isSupported ? browserLang : 'en';
+    // navigator.languages can contain multiple preferred languages
+    const browserLangs = navigator.languages || [navigator.language];
+
+    for (let lang of browserLangs) {
+        if (fallbackMap[lang]) {
+            lang = fallbackMap[lang];
+        }
+
+        // 1. Try to match the full language code first (e.g., "zh-TW")
+        if (supportedLangCodes.has(lang)) {
+            return lang;
+        }
+
+        // 2. If not found, try the base language (e.g., "zh")
+        const baseLang = lang.split('-')[0];
+        let finalBaseLang = fallbackMap[baseLang] || baseLang;
+
+        if (supportedLangCodes.has(finalBaseLang)) {
+            return finalBaseLang;
+        }
+    }
+
+    // 3. Fallback to English if no match is found
+    return 'en';
   });
 
   // This useEffect is still needed to update document attributes for language and direction.

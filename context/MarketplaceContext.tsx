@@ -1,10 +1,11 @@
 import React, { createContext, ReactNode, useContext, useCallback, useMemo, useState, useEffect } from 'react';
-import { MarketplaceContextType, Ad, User, Comment, MarketplaceState, Category, UserTier, Report, ModerationItem, Review, AdminConfig } from '../types';
+import { MarketplaceContextType, Ad, User, Comment, MarketplaceState, Category, UserTier, Report, ModerationItem, Review, AdminConfig, Bid } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { MOCK_ADS, MOCK_SELLERS } from '../data/mockAds';
 import { useLocalStorage } from '../hooks/usePersistentState';
 import { usePersistentSet } from '../hooks/usePersistentSetState';
 import { useLocalization } from '../hooks/useLocalization';
+import { useNotification } from '../hooks/useNotification';
 
 export const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
 
@@ -97,8 +98,9 @@ const updateUserTierIfNeeded = (user: User, tiers: UserTier[]): User => {
 
 
 export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const { user: currentUser } = useAuth();
+    const { user: currentUser, isGuest, promptLoginIfGuest, getUserById } = useAuth();
     const { t } = useLocalization();
+    const { addNotification } = useNotification();
     
     const [state, setAndPersistState] = useLocalStorage<Omit<MarketplaceState, 'adminConfig'>>(
         'marketplaceState_v2',
@@ -261,6 +263,130 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
     
     const shareAd = (adId: string) => { /* ... existing implementation ... */ };
     
+    const placeBid = useCallback((adId: string, amount: number) => {
+        if (promptLoginIfGuest({ type: 'ad', id: adId })) return;
+    
+        setAndPersistState(prevState => {
+            const adIndex = prevState.ads.findIndex(a => a.id === adId);
+            if (adIndex === -1) return prevState;
+    
+            const ad = prevState.ads[adIndex];
+            if (!ad.isAuction || !ad.auctionDetails) return prevState;
+            
+            const bidIncrement = ad.auctionDetails.bidIncrement || 1;
+            const minBid = ad.auctionDetails.currentBid + bidIncrement;
+
+            if (amount < minBid) {
+                addNotification(t('auction.bid_increment_too_low', { increment: bidIncrement }), 'error');
+                return prevState;
+            }
+    
+            const newBid: Bid = {
+                bidderId: currentUser!.id,
+                amount,
+                timestamp: new Date().toISOString(),
+            };
+    
+            const previousHighestBidderId = ad.auctionDetails.bids[0]?.bidderId;
+    
+            const updatedAd = {
+                ...ad,
+                auctionDetails: {
+                    ...ad.auctionDetails,
+                    currentBid: amount,
+                    bids: [newBid, ...ad.auctionDetails.bids],
+                },
+            };
+    
+            const updatedAds = [...prevState.ads];
+            updatedAds[adIndex] = updatedAd;
+
+            // --- Real-time Simulation & Notifications ---
+            const isCurrentUserBidding = currentUser!.id === newBid.bidderId;
+            if (isCurrentUserBidding) {
+                 // Outbid notification for previous bidder
+                if (previousHighestBidderId && previousHighestBidderId !== currentUser!.id) {
+                    // In a real app, you'd send a push notification to this user.
+                    // For this demo, if they are the current user (somehow), we can show a toast.
+                    console.log(`[Simulated Notification] User ${previousHighestBidderId} has been outbid.`);
+                }
+                
+                // Simulate a counter-bid after a delay
+                const counterBidDelay = Math.random() * 10000 + 5000; // 5-15 seconds
+                setTimeout(() => {
+                    const mockBidders = MOCK_SELLERS.filter(s => s.id !== currentUser!.id);
+                    const randomBidder = mockBidders[Math.floor(Math.random() * mockBidders.length)];
+                    const counterBidAmount = amount + (ad.auctionDetails?.bidIncrement || 1) * (Math.floor(Math.random() * 3) + 1);
+
+                    const counterBid: Bid = {
+                        bidderId: randomBidder.id,
+                        amount: counterBidAmount,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    setAndPersistState(current => {
+                        const adToUpdate = current.ads.find(a => a.id === adId);
+                        if(adToUpdate && new Date(adToUpdate.auctionDetails!.endTime) > new Date()) {
+                            adToUpdate.auctionDetails!.currentBid = counterBidAmount;
+                            adToUpdate.auctionDetails!.bids.unshift(counterBid);
+                            addNotification(t('auction.outbid'), 'warning');
+                            return { ...current, ads: current.ads.map(a => a.id === adId ? adToUpdate : a) };
+                        }
+                        return current;
+                    });
+
+                }, counterBidDelay);
+            }
+    
+            return { ...prevState, ads: updatedAds };
+        });
+    }, [currentUser, setAndPersistState, promptLoginIfGuest, addNotification, t]);
+
+    // --- Winner Determination Logic ---
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setAndPersistState(prevState => {
+                const now = new Date();
+                let hasChanges = false;
+                const updatedAds = prevState.ads.map(ad => {
+                    if (ad.isAuction && ad.auctionDetails && ad.status === 'active' && new Date(ad.auctionDetails.endTime) <= now) {
+                        hasChanges = true;
+                        const finalBids = ad.auctionDetails.bids;
+                        const winnerBid = finalBids[0];
+                        const reserveMet = ad.auctionDetails.reservePrice ? ad.auctionDetails.currentBid >= ad.auctionDetails.reservePrice : true;
+
+                        if (winnerBid && reserveMet) {
+                            // We have a winner
+                            const winner = getUserById(winnerBid.bidderId);
+                            if (winner) {
+                                if (winner.id === currentUser?.id) {
+                                    addNotification(t('auction.winner_notification_body', { title: ad.title }), 'success');
+                                }
+                                // FIX: Use `as const` to ensure TypeScript treats the status as a literal type.
+                                return { ...ad, status: 'sold_auction' as const, auctionDetails: { ...ad.auctionDetails, winnerId: winner.id } };
+                            }
+                        }
+                         // No winner (no bids or reserve not met)
+                        if (currentUser && finalBids.some(b => b.bidderId === currentUser.id)) {
+                             addNotification(t('auction.loser_notification_body', { title: ad.title }), 'info');
+                        }
+                        // FIX: Use `as const` to ensure TypeScript treats the status as a literal type.
+                        return { ...ad, status: 'expired' as const };
+                    }
+                    return ad;
+                });
+
+                if (hasChanges) {
+                    return { ...prevState, ads: updatedAds };
+                }
+                return prevState;
+            });
+        }, 10000); // Check every 10 seconds
+
+        return () => clearInterval(interval);
+    }, [setAndPersistState, addNotification, t, currentUser, getUserById]);
+
+
     const removeAd = (adId: string, reason: string) => { setAndPersistState(prevState => ({ ...prevState, ads: prevState.ads.map(ad => ad.id === adId ? { ...ad, status: 'banned', bannedReason: reason } : ad) })); };
     const approveAd = (adId: string) => { setAndPersistState(prevState => ({ ...prevState, ads: prevState.ads.map(ad => ad.id === adId ? { ...ad, reports: [] } : ad) })); };
     const deleteComment = (adId: string, commentId: string) => {
@@ -280,7 +406,7 @@ export const MarketplaceProvider: React.FC<{ children: ReactNode }> = ({ childre
     const value: MarketplaceContextType = {
         ...state, adminConfig, moderationQueue, getAdById, getAdsBySellerId, createAd, updateAd, addCategory, removeCategory,
         toggleLike, isLiked, toggleFavorite, isFavorite, addComment, addReview,
-        addReplyToComment, shareAd, removeAd, approveAd, deleteComment, updateUserTiers,
+        addReplyToComment, shareAd, placeBid, removeAd, approveAd, deleteComment, updateUserTiers,
         updateAdminConfig,
         refreshUsers,
     };

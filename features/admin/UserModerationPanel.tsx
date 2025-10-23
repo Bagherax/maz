@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { User, UserTier } from '../../types';
-import { useAuth } from '../../hooks/useAuth';
 import { useLocalization } from '../../hooks/useLocalization';
 import Icon from '../../components/Icon';
+import { useAuth } from '../../hooks/useAuth';
 
 interface UserModerationPanelProps {
   userToModerate: User;
@@ -12,7 +12,8 @@ interface UserModerationPanelProps {
 const UserModerationPanel: React.FC<UserModerationPanelProps> = ({ userToModerate, onUpdate }) => {
   const [banReason, setBanReason] = useState('');
   const [selectedTier, setSelectedTier] = useState<UserTier['level']>(userToModerate.tier);
-  const { banUser, updateUserTier } = useAuth();
+  // FIX: Use `useAuth` hook which provides user management functions.
+  const { banUser, unbanUser, updateUserTier } = useAuth();
   const { t } = useLocalization();
 
   const handleBanUser = async () => {

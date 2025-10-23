@@ -1,17 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
-import Icon from '../../../../components/Icon';
 import { useLocalization } from '../../../../hooks/useLocalization';
 import { useDebounce } from '../../../../hooks/useDebounce';
 import { useMarketplaceUI } from '../../../../context/MarketplaceUIContext';
-import SearchExpansionPanel from './SearchExpansionPanel';
+import SmartSearchDropdown from './SearchExpansionPanel';
+import { useAuth } from '../../../../hooks/useAuth';
 
-const SearchBar: React.FC = () => {
+interface SearchBarProps {
+  onOpenAdminDashboard: () => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onOpenAdminDashboard }) => {
   const {
     filters,
     onFilterChange,
   } = useMarketplaceUI();
 
   const { t } = useLocalization();
+  const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
   
   const [localQuery, setLocalQuery] = useState(filters.query);
@@ -27,65 +32,58 @@ const SearchBar: React.FC = () => {
     }
   }, [filters.query]);
   
-  const searchBarRef = useRef<HTMLDivElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
         setIsExpanded(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
+  
   return (
-    <>
       <div 
-        ref={searchBarRef} 
+        ref={searchContainerRef} 
         className="fixed top-0 left-0 right-0 z-40"
       >
         <div className={`
           backdrop-blur-lg transition-all duration-300
-          ${isExpanded ? 'bg-white/80 dark:bg-gray-900/80 shadow-lg' : 'bg-transparent'}
+          ${isExpanded ? 'bg-white/90 dark:bg-gray-900/90 shadow-lg' : 'bg-transparent'}
         `}>
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-3 py-3">
-              {/* Search Input */}
-              <div className="flex-1 relative">
-                <div className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 pl-4 rtl:pl-0 rtl:pr-4 flex items-center pointer-events-none">
-                  <Icon name="magnifying-glass" className={`w-5 h-5 transition-colors duration-300 ${isExpanded ? 'text-gray-400' : 'text-white/80'}`} />
+            <div className="flex flex-col items-center pt-4 pb-2">
+                <h1 className="text-4xl font-black bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-[length:200%_auto] bg-clip-text text-transparent animate-smoke-flow">
+                    MAZ
+                </h1>
+                
+                <div className="relative w-full max-w-lg mt-2">
+                   <input 
+                        id="main-search"
+                        type="text"
+                        name="text"
+                        className="w-full h-12 pl-10 pr-4 rounded-full text-sm placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-200/50 dark:bg-gray-800/50 hover:bg-white/70 dark:hover:bg-gray-700/70 focus:bg-white dark:focus:bg-gray-800"
+                        placeholder={t('marketplace.search_placeholder')}
+                        value={localQuery}
+                        onChange={(e) => setLocalQuery(e.target.value)}
+                        onFocus={() => setIsExpanded(true)}
+                    />
+                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
                 </div>
-                <input
-                  id="main-search"
-                  type="text"
-                  placeholder={t('marketplace.search_placeholder')}
-                  className={`
-                      w-full pl-12 pr-4 rtl:pl-4 rtl:pr-12 py-3 rounded-2xl border transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500
-                      ${isExpanded 
-                          ? 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100' 
-                          : 'bg-white/10 border-white/20 text-white placeholder-gray-300'
-                      }
-                  `}
-                  value={localQuery}
-                  onChange={(e) => setLocalQuery(e.target.value)}
-                  onFocus={() => setIsExpanded(true)}
-                />
-              </div>
-              
-              {/* Filter Button */}
-              <button className="p-3 rounded-xl bg-green-500 text-white hover:bg-green-600 transition-colors" onClick={() => setIsExpanded(prev => !prev)}>
-                <Icon name="adjustments-horizontal" className="w-6 h-6" />
-              </button>
             </div>
 
-            {/* Expanding Panel */}
-            <SearchExpansionPanel isExpanded={isExpanded} onCategorySelect={() => setIsExpanded(false)} />
-
+            <SmartSearchDropdown 
+              isExpanded={isExpanded} 
+              onClose={() => setIsExpanded(false)}
+              onOpenAdminDashboard={onOpenAdminDashboard}
+            />
           </div>
         </div>
       </div>
-    </>
   );
 };
 
